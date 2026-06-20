@@ -5107,6 +5107,53 @@ if('serviceWorker' in navigator){
     navigator.serviceWorker.register('sw.js').catch(err=>console.warn('SW 등록 실패:', err));
   });
 }
+
+/* ═══ 임시 PWA 진단 패널 (문제 해결되면 삭제해도 됨) ═══ */
+(function(){
+  const panel = document.createElement('div');
+  panel.id = 'pwaDebugPanel';
+  panel.style.cssText = 'position:fixed;bottom:0;left:0;right:0;background:#0F172A;color:#4ADE80;'
+    + 'font-size:11px;line-height:1.6;padding:10px 12px 28px;z-index:99999;font-family:monospace;'
+    + 'white-space:pre-wrap;max-height:45vh;overflow-y:auto;border-top:2px solid #4ADE80;';
+  panel.textContent = '🔍 PWA 진단 시작...\n';
+  document.body.appendChild(panel);
+
+  const closeBtn = document.createElement('button');
+  closeBtn.textContent = '✕ 진단창 닫기';
+  closeBtn.style.cssText = 'position:fixed;bottom:8px;right:10px;z-index:100000;background:#4ADE80;'
+    + 'color:#0F172A;border:none;border-radius:6px;padding:4px 10px;font-size:11px;font-weight:700;';
+  closeBtn.onclick = ()=>{ panel.remove(); closeBtn.remove(); };
+  document.body.appendChild(closeBtn);
+
+  const log = (msg)=>{ panel.textContent += msg + '\n'; };
+
+  log('현재 주소: ' + location.href);
+  log('매니페스트 href(해석된 절대경로): ' + (document.querySelector('link[rel="manifest"]')?.href || '없음'));
+
+  fetch('manifest.json').then(r=>log('manifest.json 응답: ' + r.status + (r.ok?' (정상)':' (실패)')))
+    .catch(e=>log('manifest.json 가져오기 에러: ' + e));
+
+  fetch('sw.js').then(r=>log('sw.js 응답: ' + r.status + (r.ok?' (정상)':' (실패)')))
+    .catch(e=>log('sw.js 가져오기 에러: ' + e));
+
+  log('서비스워커 지원 여부: ' + ('serviceWorker' in navigator));
+
+  if('serviceWorker' in navigator){
+    navigator.serviceWorker.getRegistrations().then(regs=>{
+      log('등록된 서비스워커 수: ' + regs.length);
+      regs.forEach(r=>log(' - scope: ' + r.scope + ' / active: ' + !!r.active));
+    });
+  }
+
+  window.addEventListener('beforeinstallprompt', (e)=>{
+    log('🎉🎉🎉 beforeinstallprompt 이벤트 발생! → 크롬이 설치 가능으로 판단함!');
+  });
+
+  setTimeout(()=>{
+    log('--- 5초 경과 ---');
+    log('위에 🎉 줄이 없다면, 크롬이 아직 설치 가능 상태로 인식하지 않은 것입니다.');
+  }, 5000);
+})();
 </script>
 </body>
 </html>
