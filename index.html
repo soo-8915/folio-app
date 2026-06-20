@@ -184,7 +184,7 @@ table{border-collapse:collapse;width:100%;}
 .gap-pos{color:var(--amber);font-weight:700;}
 .gap-neg{color:var(--neg);font-weight:700;}
 .gap-ok{color:var(--text-3);}
-.st{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;}
+.st{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;white-space:nowrap;}
 .st-buy{background:var(--pos-soft);color:var(--pos);}
 .st-sell{background:var(--amber-soft);color:var(--amber);}
 .st-hold{background:var(--green-soft);color:var(--green);}
@@ -610,13 +610,13 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;
   <div class="g2">
     <div class="card">
       <div class="card-ttl">목표비중 vs 현재비중 <span class="chip" id="wtChip">전체</span></div>
-      <table class="wt-tbl">
+      <div style="overflow-x:auto"><table class="wt-tbl">
         <thead><tr>
           <th style="text-align:left">종목명</th>
           <th>목표</th><th>현재</th><th>차이</th><th>상태</th>
         </tr></thead>
         <tbody id="wtBody"></tbody>
-      </table>
+      </table></div>
     </div>
     <div class="card">
       <div class="card-ttl">리밸런싱 액션 <span class="chip" id="rbChip">전체</span></div>
@@ -2248,6 +2248,7 @@ function renderRebal(){
 
   if(!hasSummary){
     rbCatCount = 0;
+    document.getElementById('rbSummary').innerHTML = '';
     document.getElementById('rbContent').innerHTML =
       `<div class="rb-empty">🎉 리밸런싱이 필요한 구분이 없습니다.</div>`;
     return;
