@@ -368,6 +368,27 @@ table{border-collapse:collapse;width:100%;}
 .val.under{color:var(--amber);}.hint.under{color:var(--amber);}
 .we-bar{flex:1;height:8px;background:var(--bg2);border-radius:99px;overflow:hidden;max-width:280px;}
 .we-bar-fill{height:100%;border-radius:99px;transition:width .3s,background .3s;}
+
+/* FIRE 계산기 탭 */
+.fire-wrap{display:grid;grid-template-columns:1fr 1.15fr;gap:16px;align-items:start;}
+@media(max-width:900px){.fire-wrap{grid-template-columns:1fr;}}
+.fire-progress-wrap{margin-bottom:18px;}
+.fire-bar-track{height:8px;background:var(--bg2);border-radius:99px;overflow:hidden;margin-bottom:8px;}
+.fire-bar-fill{height:100%;border-radius:99px;background:var(--grad-gold);transition:width .5s ease;}
+.fire-progress-lbl{display:flex;align-items:baseline;gap:8px;}
+.fire-progress-lbl span:first-child{font-size:15px;font-weight:900;color:var(--text-1);letter-spacing:-.3px;}
+.fire-hero{background:var(--grad-navy);border-radius:18px;padding:22px 22px 20px;margin-bottom:18px;
+  color:#fff;position:relative;overflow:hidden;box-shadow:0 16px 40px rgba(27,24,64,.28);text-align:center;}
+.fire-hero::before{content:'';position:absolute;top:-30px;right:-30px;width:160px;height:160px;
+  border-radius:50%;background:radial-gradient(circle,rgba(192,154,62,.18),transparent 70%);}
+.fire-hero-lbl{font-size:11px;font-weight:700;opacity:.65;letter-spacing:.8px;text-transform:uppercase;position:relative;z-index:1;}
+.fire-hero-val{font-size:32px;font-weight:900;letter-spacing:-.8px;margin-top:6px;position:relative;z-index:1;}
+.fire-hero-sub{font-size:12px;font-weight:600;opacity:.75;margin-top:6px;position:relative;z-index:1;}
+.fire-stat-g{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-bottom:18px;}
+.fire-stat{background:var(--bg);border-radius:13px;padding:13px 15px;border:1px solid var(--border);}
+.fire-stat-lbl{font-size:10px;color:var(--text-3);margin-bottom:5px;font-weight:600;}
+.fire-stat-val{font-size:15px;font-weight:900;letter-spacing:-.3px;color:var(--text-1);}
+.fire-chart-wrap{height:200px;position:relative;}
 .sl-row{background:var(--surface);border-radius:var(--r-lg);padding:16px 22px;
   box-shadow:var(--sh);border:1px solid var(--border);margin-bottom:10px;}
 .sl-row-acc{border-left:3px solid var(--blue);}
@@ -559,6 +580,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;
       <button class="nav-btn on" onclick="switchTab('dashboard')">대시보드</button>
       <button class="nav-btn" onclick="switchTab('weight')">목표비중</button>
       <button class="nav-btn" onclick="switchTab('data')">데이터 입력</button>
+      <button class="nav-btn" onclick="switchTab('fire')">🔥 FIRE 계산기</button>
     </nav>
     <div class="nav-sub-hint">
       빠른 이동:
@@ -590,6 +612,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;
   <div class="g3">
     <div class="card">
       <div class="card-ttl">계좌별 자산비중 <span class="chip" id="donutChip">전체</span></div>
+      <div style="font-size:11px;color:var(--text-3);margin:-6px 0 10px" id="donutAccTotalSub"></div>
       <div class="donut-wrap">
         <canvas id="donutChart"></canvas>
         <div class="donut-center">
@@ -1037,7 +1060,7 @@ function handleLoadDB(){
       <div style="padding-bottom:1px"><button class="btn-p" style="white-space:nowrap" onclick="addAccount()">+ 추가</button></div>
     </div>
     <div id="accMgrBody_wrap" style="overflow-x:auto"><table class="dm-tbl" style="width:100%;min-width:560px">
-      <thead><tr><th style="white-space:nowrap">계좌명</th><th style="white-space:nowrap">ID</th><th style="white-space:nowrap">아이콘</th><th style="white-space:nowrap">색상</th><th style="white-space:nowrap">총금액</th><th style="white-space:nowrap">비중</th><th style="white-space:nowrap">수정 / 삭제</th></tr></thead>
+      <thead><tr><th style="white-space:nowrap">계좌명</th><th style="white-space:nowrap">ID</th><th style="white-space:nowrap">아이콘</th><th style="white-space:nowrap">색상</th><th style="white-space:nowrap">총금액</th><th style="white-space:nowrap">비중</th><th style="white-space:nowrap">대시보드 표시</th><th style="white-space:nowrap">수정 / 삭제</th></tr></thead>
       <tbody id="accMgrBody"></tbody>
     </table>
     </div><div class="acc-edit-form" id="accEditForm">
@@ -1229,6 +1252,89 @@ function handleLoadDB(){
   </div></div>
 </div>
 
+<!-- FIRE 계산기 탭 -->
+<div class="tab-p" id="tab-fire">
+  <div class="fire-wrap">
+    <div class="card">
+      <div class="card-ttl">🔥 FIRE 목표 시뮬레이션 <span class="chip">목표금액 도달 예상 시기</span></div>
+
+      <div style="display:flex;gap:4px;background:var(--bg2);border-radius:9px;padding:3px;
+        border:1px solid var(--border);width:fit-content;margin-bottom:18px">
+        <button id="fireModeIncome" onclick="setFireMode('income')"
+          style="padding:6px 16px;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;
+            border:none;background:var(--blue);color:#fff;transition:all .15s">총소득 기준</button>
+        <button id="fireModeAsset" onclick="setFireMode('asset')"
+          style="padding:6px 16px;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;
+            border:none;background:transparent;color:var(--text-2);transition:all .15s">평가금액 기준</button>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:6px">
+        <div class="fg" style="margin:0">
+          <label>목표 자산 (원)</label>
+          <input class="fc" id="fireTarget" type="number" min="0" step="1000000" oninput="calcFire()">
+        </div>
+        <div class="fg" style="margin:0">
+          <label>현재 평가금액 (원) <em style="font-weight:400;color:var(--text-3);font-size:10px">← 전체 계좌 합산</em></label>
+          <input class="fc" id="fireCurrent" type="number" min="0" step="1000000" oninput="calcFire()">
+        </div>
+        <div class="fg" style="margin:0">
+          <label>예상 연 수익률 (%)</label>
+          <input class="fc" id="fireReturn" type="number" min="0" step="0.1" oninput="calcFire()">
+        </div>
+        <div class="fg" id="fireIncomeFields1" style="margin:0">
+          <label>월 총소득 (원)</label>
+          <input class="fc" id="fireMonthlyIncome" type="number" min="0" step="100000" oninput="calcFire()">
+        </div>
+        <div class="fg" id="fireIncomeFields2" style="margin:0">
+          <label>저축(투자)율 (%) <em style="font-weight:400;color:var(--text-3);font-size:10px">← 소득 중 투자 비중</em></label>
+          <input class="fc" id="fireSavingsRate" type="number" min="0" max="100" step="1" oninput="calcFire()">
+        </div>
+      </div>
+      <div id="fireMonthlyInvestHint" style="font-size:11px;color:var(--text-3);margin-top:2px"></div>
+    </div>
+
+    <div class="card" id="fireResultCard">
+      <div class="card-ttl">예상 결과 <span class="chip" id="fireModeChip">총소득 기준</span></div>
+
+      <div class="fire-progress-wrap">
+        <div class="fire-bar-track"><div class="fire-bar-fill" id="fireBarFill"></div></div>
+        <div class="fire-progress-lbl">
+          <span id="fireProgressPct">0%</span>
+          <span style="color:var(--text-3);font-size:11px" id="fireProgressSub"></span>
+        </div>
+      </div>
+
+      <div class="fire-hero">
+        <div class="fire-hero-lbl">예상 목표 도달 시기</div>
+        <div class="fire-hero-val" id="fireEtaDate">-</div>
+        <div class="fire-hero-sub" id="fireEtaRemain"></div>
+      </div>
+
+      <div class="fire-stat-g">
+        <div class="fire-stat">
+          <div class="fire-stat-lbl">목표 자산</div>
+          <div class="fire-stat-val" id="fireStatTarget">-</div>
+        </div>
+        <div class="fire-stat">
+          <div class="fire-stat-lbl">현재 평가금액</div>
+          <div class="fire-stat-val" id="fireStatCurrent">-</div>
+        </div>
+        <div class="fire-stat">
+          <div class="fire-stat-lbl">부족 금액</div>
+          <div class="fire-stat-val" id="fireStatGap">-</div>
+        </div>
+        <div class="fire-stat">
+          <div class="fire-stat-lbl" id="fireStatExtraLbl">월 투자금액</div>
+          <div class="fire-stat-val" id="fireStatExtra">-</div>
+        </div>
+      </div>
+
+      <div class="fire-chart-wrap"><canvas id="fireChart"></canvas></div>
+      <p style="font-size:10px;color:var(--text-3);margin-top:10px;">* 매달 일정 수익률·투자금이 유지된다는 가정의 단순 추정이며, 실제 시장 상황에 따라 달라질 수 있습니다.</p>
+    </div>
+  </div>
+</div>
+
 <div class="modal-ov" id="modalOv" onclick="closeModalOv(event)">
   <div class="modal">
     <div class="modal-hdr">
@@ -1388,6 +1494,8 @@ let DB = {
   accCatTargets:{},
   // 계좌별 종목별 목표비중
   accEtfTargets:{},
+
+  fireSettings:{ mode:'income', target:500000000, monthlyIncome:5000000, savingsRate:40, annualReturn:6 },
 
   /* 컬럼: baseDate / accountId / etfId / qty / avgCost / evalAmount / memo */
   holdings:[
@@ -1626,18 +1734,23 @@ function renderKpi(){
   const g=DB.totalGain, r=DB.totalGainRate;
 
   // 계좌 카드 정렬: 영문(A-Z) 라벨 먼저 알파벳순 → 그 다음 한글 라벨 가나다순
-  const sortedAccSummary = sortAccountsByLabel(DB.accSummary);
+  // + 계좌관리에서 '대시보드 표시'를 끈 계좌는 카드에서 제외
+  const sortedAccSummary = sortAccountsByLabel(DB.accSummary).filter(a=>a.showOnDash!==false);
 
   const accCards = sortedAccSummary.map(a=>{
+    // 수동입력 총금액이 있으면 그 값을 평가금액으로 사용 (계좌관리 합계와 일치시킴)
+    const dispAmt = parseFloat(a.totalAmount)>0 ? parseFloat(a.totalAmount) : a.totalEval;
     const aGain = a.totalEval - a.totalInvest;
     const aRate = a.totalInvest>0 ? (aGain/a.totalInvest)*100 : 0;
-    const pct   = DB.totalEval>0 ? (a.totalEval/DB.totalEval*100).toFixed(1) : '0';
+    // 실제 보유 종목(투자원금)이 없는 계좌는 수익률을 계산할 근거가 없음 → 0%로 오인하지 않도록 '-' 표시
+    const hasHoldings = a.totalInvest>0;
     return {
       ico: a.icon||'💰', cls:'ico-acc',
       lbl: a.label+' 평가금액',
-      val: W(a.totalEval), valCls:'',
-      sub: '비중 '+pct+'%',
-      sub2: W2(aGain)+' ('+PCT(aRate)+')',
+      val: W(dispAmt), valCls:'',
+      sub: hasHoldings ? W2(aGain)+' ('+PCT(aRate)+')' : '보유 종목 없음',
+      subCls: hasHoldings ? (aGain>=0?'pos':'neg') : '',
+      sub2: '',
       sub2Cls: aGain>=0?'pos':'neg',
       accent: a.color
     };
@@ -1668,6 +1781,16 @@ function renderKpi(){
 }
 
 /* ═══ 도넛 ═══ */
+// 계좌관리 표의 "총금액" 합계 (수동입력 totalAmount 우선, 없으면 평가금액)
+function getAccTotalSum(){
+  return DB.accounts.reduce((s,a)=>{
+    const summary = DB.accSummary?.find(x=>x.id===a.id);
+    const accEval = summary?.totalEval||0;
+    const dispAmt = parseFloat(a.totalAmount)>0 ? parseFloat(a.totalAmount) : accEval;
+    return s + dispAmt;
+  }, 0);
+}
+
 function renderDonut(){
   const wrap = document.querySelector('.donut-wrap');
   const oldCanvas = document.getElementById('donutChart');
@@ -1676,6 +1799,9 @@ function renderDonut(){
   newCanvas.id = 'donutChart';
   wrap.insertBefore(newCanvas, wrap.firstChild);
   const ctx = newCanvas.getContext('2d');
+
+  const subEl = document.getElementById('donutAccTotalSub');
+  if(subEl) subEl.textContent = '계좌관리 총금액 합계 ' + W(getAccTotalSum());
 
   // 중앙값·레이블
   const centerVal = activeFilter==='ALL'
@@ -4234,6 +4360,9 @@ function renderAccMgr(){
           </div>`
         : '<span style="color:var(--text-3);font-size:11px">-</span>'}
     </td>
+    <td style="white-space:nowrap;text-align:center">
+      <input type="checkbox" ${a.showOnDash!==false?'checked':''} onchange="toggleAccDash(${i})" style="width:15px;height:15px;accent-color:var(--blue);cursor:pointer">
+    </td>
     <td style="white-space:nowrap">
       <button class="btn-o" style="padding:4px 10px;font-size:11px;margin-right:5px" onclick="startAccEdit(${i})">수정</button>
       ${DB.accounts.length>1
@@ -4242,6 +4371,13 @@ function renderAccMgr(){
     </td>
   </tr>`;}).join('');
   renderAccSelect();
+}
+
+function toggleAccDash(i){
+  const a = DB.accounts[i];
+  a.showOnDash = a.showOnDash===false ? true : false;
+  renderAll(); save();
+  showToast(`${a.label} 계좌가 대시보드에서 ${a.showOnDash?'표시':'숨김'} 처리되었습니다.`);
 }
 
 function startAccEdit(i){
@@ -4342,6 +4478,151 @@ function renderDataTab(){
   if(sdd) sdd.textContent = today();
   renderEtfMgr(); renderHoldMgr(); renderAccMgr(); renderDictTable();
 }
+
+/* ═══ FIRE 계산기 ═══ */
+function renderFireTab(){
+  const fs = DB.fireSettings || {};
+  document.getElementById('fireTarget').value        = fs.target ?? 500000000;
+  document.getElementById('fireCurrent').value        = fs.current ?? Math.round(DB.totalEval||0);
+  document.getElementById('fireReturn').value         = fs.annualReturn ?? 6;
+  document.getElementById('fireMonthlyIncome').value  = fs.monthlyIncome ?? 5000000;
+  document.getElementById('fireSavingsRate').value    = fs.savingsRate ?? 40;
+  setFireMode(fs.mode || 'income');
+}
+
+function setFireMode(mode){
+  DB.fireSettings = DB.fireSettings || {};
+  DB.fireSettings.mode = mode;
+  const onCol  = 'var(--blue)', offCol = 'transparent';
+  const incBtn = document.getElementById('fireModeIncome');
+  const astBtn = document.getElementById('fireModeAsset');
+  incBtn.style.background = mode==='income' ? onCol : offCol;
+  incBtn.style.color      = mode==='income' ? '#fff' : 'var(--text-2)';
+  astBtn.style.background = mode==='asset'  ? onCol : offCol;
+  astBtn.style.color      = mode==='asset'  ? '#fff' : 'var(--text-2)';
+
+  const showIncome = mode==='income';
+  document.getElementById('fireIncomeFields1').style.display = showIncome ? '' : 'none';
+  document.getElementById('fireIncomeFields2').style.display = showIncome ? '' : 'none';
+  document.getElementById('fireModeChip').textContent   = showIncome ? '총소득 기준' : '평가금액 기준';
+  document.getElementById('fireStatExtraLbl').textContent = showIncome ? '월 투자금액' : '적용 수익률';
+  calcFire();
+}
+
+function calcFire(){
+  const target  = parseFloat(document.getElementById('fireTarget').value)||0;
+  const current = parseFloat(document.getElementById('fireCurrent').value)||0;
+  const annualReturn = parseFloat(document.getElementById('fireReturn').value)||0;
+  const mode = (DB.fireSettings && DB.fireSettings.mode) || 'income';
+
+  let monthlyIncome=0, savingsRate=0, monthlyInvest=0;
+  const hintEl = document.getElementById('fireMonthlyInvestHint');
+  if(mode==='income'){
+    monthlyIncome = parseFloat(document.getElementById('fireMonthlyIncome').value)||0;
+    savingsRate   = parseFloat(document.getElementById('fireSavingsRate').value)||0;
+    monthlyInvest = monthlyIncome * savingsRate/100;
+    hintEl.textContent = `월 투자(저축)금액 약 ${W(Math.round(monthlyInvest))} (소득의 ${savingsRate}%)`;
+  } else {
+    hintEl.textContent = '';
+  }
+
+  // 입력값 저장
+  DB.fireSettings = { mode, target, current, annualReturn, monthlyIncome, savingsRate };
+  save();
+
+  // 월 단위 시뮬레이션 (최대 50년 = 600개월)
+  const monthlyRate = Math.pow(1+annualReturn/100, 1/12) - 1;
+  const MAXM = 600;
+  let bal = current;
+  const series = [bal];
+  let reachMonth = (target>0 && current>=target) ? 0 : -1;
+  for(let m=1; m<=MAXM; m++){
+    bal = bal*(1+monthlyRate) + (mode==='income' ? monthlyInvest : 0);
+    series.push(bal);
+    if(reachMonth===-1 && target>0 && bal>=target) reachMonth = m;
+  }
+
+  // 진행률 바
+  const pct = target>0 ? Math.min(100, current/target*100) : 0;
+  document.getElementById('fireBarFill').style.width = pct.toFixed(1)+'%';
+  document.getElementById('fireProgressPct').textContent = pct.toFixed(1)+'%';
+  document.getElementById('fireProgressSub').textContent = `현재 ${W(current)} / 목표 ${W(target)}`;
+
+  // 도달 시기 히어로
+  const etaEl = document.getElementById('fireEtaDate');
+  const remEl = document.getElementById('fireEtaRemain');
+  if(target<=0){
+    etaEl.textContent = '-';
+    remEl.textContent = '목표 자산을 입력해주세요.';
+  } else if(reachMonth===0){
+    etaEl.textContent = '이미 달성! 🎉';
+    remEl.textContent = '현재 평가금액이 목표 자산을 넘어섰습니다.';
+  } else if(reachMonth===-1){
+    etaEl.textContent = '50년 이상';
+    remEl.textContent = '현재 조건으로는 도달까지 매우 오래 걸려요. 수익률·투자금을 조정해보세요.';
+  } else {
+    const now = new Date();
+    const d = new Date(now.getFullYear(), now.getMonth()+reachMonth, 1);
+    etaEl.textContent = `${d.getFullYear()}년 ${d.getMonth()+1}월`;
+    const y = Math.floor(reachMonth/12), mo = reachMonth%12;
+    let remainTxt = '';
+    if(y>0)  remainTxt += y+'년 ';
+    if(mo>0) remainTxt += mo+'개월 ';
+    remEl.textContent = '지금부터 약 '+remainTxt.trim()+' 후 도달 예상';
+  }
+
+  // 통계 카드
+  document.getElementById('fireStatTarget').textContent  = W(target);
+  document.getElementById('fireStatCurrent').textContent = W(current);
+  document.getElementById('fireStatGap').textContent     = target>current ? W(target-current) : '달성 완료';
+  document.getElementById('fireStatExtra').textContent   = mode==='income'
+    ? (monthlyInvest>0 ? W(Math.round(monthlyInvest)) : '-')
+    : PCT1(annualReturn);
+
+  renderFireChart(series, target, reachMonth);
+}
+
+function renderFireChart(series, target, reachMonth){
+  const wrap = document.querySelector('.fire-chart-wrap');
+  if(!wrap) return;
+  wrap.innerHTML = '<canvas id="fireChart"></canvas>';
+  const ctx = document.getElementById('fireChart').getContext('2d');
+
+  const showM = reachMonth>=0 ? Math.min(series.length-1, reachMonth+6) : Math.min(series.length-1, 120);
+  const now = new Date();
+  const labels = [];
+  for(let m=0; m<=showM; m++){
+    const d = new Date(now.getFullYear(), now.getMonth()+m, 1);
+    labels.push(d.getMonth()===0 ? String(d.getFullYear()) : '');
+  }
+  const data = series.slice(0, showM+1);
+
+  if(window.fireChartInstance){ window.fireChartInstance.destroy(); }
+  window.fireChartInstance = new Chart(ctx, {
+    type:'line',
+    data:{
+      labels,
+      datasets:[
+        { label:'예상 자산', data, borderColor:'#37339C', backgroundColor:'rgba(55,51,156,.08)',
+          fill:true, tension:.3, pointRadius:0, borderWidth:2.5 },
+        { label:'목표', data:data.map(()=>target), borderColor:'#C09A3E',
+          borderDash:[6,5], borderWidth:1.5, pointRadius:0, fill:false }
+      ]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{
+        legend:{display:false},
+        tooltip:{callbacks:{label:c=> c.dataset.label+': '+W(c.raw)}}
+      },
+      scales:{
+        x:{grid:{display:false}, ticks:{font:{size:10}, color:'#9396B2', autoSkip:true, maxRotation:0}},
+        y:{ticks:{callback:v=>WK(v), font:{size:10}, color:'#9396B2'}, grid:{color:'#EBEDF6'}}
+      }
+    }
+  });
+}
+
 
 /* export / import */
 /* ═══ CSV 내보내기 ═══ */
@@ -4462,13 +4743,13 @@ function importData(ev){
 
 /* ═══ 탭/필터 ═══ */
 function switchTab(t){
-  ['dashboard','weight','data'].forEach(id=>{
+  ['dashboard','weight','data','fire'].forEach(id=>{
     document.getElementById('tab-'+id).classList.toggle('on',id===t);
   });
   document.querySelectorAll('.nav-btn').forEach((b,i)=>{
-    b.classList.toggle('on',['dashboard','weight','data'][i]===t);
+    b.classList.toggle('on',['dashboard','weight','data','fire'][i]===t);
   });
-  // KPI 카드는 대시보드에서만 노출 (목표비중/데이터입력에서는 숨겨서 스크롤 줄임)
+  // KPI 카드는 대시보드에서만 노출 (목표비중/데이터입력/FIRE계산기에서는 숨겨서 스크롤 줄임)
   const kpiWrap = document.getElementById('kpiStripWrap');
   if(kpiWrap) kpiWrap.style.display = (t==='dashboard') ? '' : 'none';
   if(t==='weight'){
@@ -4479,6 +4760,7 @@ function switchTab(t){
     if(cur) setWeightAcc(cur);
   }
   if(t==='data')   renderDataTab();
+  if(t==='fire')   renderFireTab();
 }
 
 let kpiCollapsed = false;
@@ -4629,6 +4911,7 @@ async function syncDownload(){
     if(p.etfTargets)    DB.etfTargets    = p.etfTargets;
     if(p.accCatTargets) DB.accCatTargets = p.accCatTargets;
     if(p.accEtfTargets) DB.accEtfTargets = p.accEtfTargets;
+    if(p.fireSettings)  DB.fireSettings  = p.fireSettings;
     if(p.accounts && p.accounts.length) DB.accounts = p.accounts;
 
     save();
@@ -4762,6 +5045,7 @@ function load(){
     if(p.etfTargets)    DB.etfTargets    = p.etfTargets;
     if(p.accCatTargets) DB.accCatTargets = p.accCatTargets;
     if(p.accEtfTargets) DB.accEtfTargets = p.accEtfTargets;
+    if(p.fireSettings)  DB.fireSettings  = p.fireSettings;
 
     // 구버전 호환: category 없는 etf는 빈 문자열로 초기화 (name fallback 방지)
     DB.etfs.forEach(e=>{ if(e.category===undefined) e.category=''; });
