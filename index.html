@@ -1268,17 +1268,19 @@ function handleLoadDB(){
             border:none;background:transparent;color:var(--text-2);transition:all .15s">평가금액 기준</button>
       </div>
 
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:6px">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:6px">
         <div class="fg" style="margin:0">
           <label>목표 자산 (원)</label>
           <input class="fc" id="fireTarget" type="number" min="0" step="1000000" oninput="calcFire()">
         </div>
         <div class="fg" style="margin:0">
-          <label>현재 평가금액 (원) <em style="font-weight:400;color:var(--text-3);font-size:10px">← 전체 계좌 합산</em></label>
-          <input class="fc" id="fireCurrent" type="number" min="0" step="1000000" oninput="calcFire()">
+          <label>현재 평가금액 (원)</label>
+          <input class="fc" id="fireCurrent" type="number" readonly
+            style="background:var(--bg2);color:var(--text-2);cursor:default;">
+          <div id="fireCurrentHint" style="font-size:10px;color:var(--text-3);margin-top:4px"></div>
         </div>
         <div class="fg" style="margin:0">
-          <label>예상 연 수익률 (%)</label>
+          <label>예상 연 수익률 (%)<em style="display:block;font-weight:400;color:var(--text-3);font-size:10px;margin-top:2px">← 직접 수정 가능</em></label>
           <input class="fc" id="fireReturn" type="number" min="0" step="0.1" oninput="calcFire()">
         </div>
         <div class="fg" id="fireIncomeFields1" style="margin:0">
@@ -1286,10 +1288,11 @@ function handleLoadDB(){
           <input class="fc" id="fireMonthlyIncome" type="number" min="0" step="100000" oninput="calcFire()">
         </div>
         <div class="fg" id="fireIncomeFields2" style="margin:0">
-          <label>저축(투자)율 (%) <em style="font-weight:400;color:var(--text-3);font-size:10px">← 소득 중 투자 비중</em></label>
+          <label>저축(투자)율 (%)<em style="display:block;font-weight:400;color:var(--text-3);font-size:10px;margin-top:2px">← 소득 중 투자 비중</em></label>
           <input class="fc" id="fireSavingsRate" type="number" min="0" max="100" step="1" oninput="calcFire()">
         </div>
       </div>
+      <div id="fireReturnHint" style="font-size:11px;color:var(--text-3);margin-top:2px"></div>
       <div id="fireMonthlyInvestHint" style="font-size:11px;color:var(--text-3);margin-top:2px"></div>
     </div>
 
@@ -4480,11 +4483,32 @@ function renderDataTab(){
 }
 
 /* ═══ FIRE 계산기 ═══ */
+// 최근 자산 추이(월별 스냅샷) 기준 연 환산 수익률(CAGR) 자동계산
+function computeHistoricalCAGR(){
+  const snaps = (DB.monthlySnapshots||[]).filter(s=>s.totalAsset>0);
+  if(snaps.length<2) return null;
+  const first = snaps[0], last = snaps[snaps.length-1];
+  const [fy,fm] = first.month.split('-').map(Number);
+  const [ly,lm] = last.month.split('-').map(Number);
+  const months = (ly-fy)*12 + (lm-fm);
+  if(months<=0 || first.totalAsset<=0) return null;
+  const cagr = (Math.pow(last.totalAsset/first.totalAsset, 12/months) - 1) * 100;
+  return isFinite(cagr) ? { rate:cagr, months } : null;
+}
+
 function renderFireTab(){
   const fs = DB.fireSettings || {};
   document.getElementById('fireTarget').value        = fs.target ?? 500000000;
-  document.getElementById('fireCurrent').value        = fs.current ?? Math.round(DB.totalEval||0);
-  document.getElementById('fireReturn').value         = fs.annualReturn ?? 6;
+
+  // 예상 연 수익률: 이전에 직접 입력한 값이 있으면 유지, 없으면 최근 자산추이 기준 CAGR을 기본값으로 제안
+  const cagr = computeHistoricalCAGR();
+  const suggested = cagr!=null ? Math.max(0, cagr.rate) : 6;
+  const returnVal = fs.annualReturn ?? suggested;
+  document.getElementById('fireReturn').value = returnVal.toFixed(1);
+  document.getElementById('fireReturnHint').textContent = cagr!=null
+    ? `참고: 최근 ${cagr.months}개월 자산 추이 기준 환산 수익률은 약 ${suggested.toFixed(1)}%예요. 직접 값을 바꿔도 돼요.`
+    : '자산 추이 데이터가 충분하지 않아 기본값 6%를 제안했어요. 직접 값을 바꿔도 돼요.';
+
   document.getElementById('fireMonthlyIncome').value  = fs.monthlyIncome ?? 5000000;
   document.getElementById('fireSavingsRate').value    = fs.savingsRate ?? 40;
   setFireMode(fs.mode || 'income');
@@ -4506,6 +4530,15 @@ function setFireMode(mode){
   document.getElementById('fireIncomeFields2').style.display = showIncome ? '' : 'none';
   document.getElementById('fireModeChip').textContent   = showIncome ? '총소득 기준' : '평가금액 기준';
   document.getElementById('fireStatExtraLbl').textContent = showIncome ? '월 투자금액' : '적용 수익률';
+
+  // 현재 평가금액: 모드별로 기준이 다름
+  // 총소득 기준 → 계좌관리 총금액 합계 (수동입력 포함, 대시보드 표시 끈 계좌도 포함)
+  // 평가금액 기준 → 보유종목(주수×현재가) 합계만 (수동입력 제외)
+  document.getElementById('fireCurrent').value = Math.round(showIncome ? getAccTotalSum() : DB.totalEval) || 0;
+  document.getElementById('fireCurrentHint').textContent = showIncome
+    ? '← 자동산출 · 계좌관리 총금액 합계 (수동입력 포함)'
+    : '← 자동산출 · 보유종목 평가금액 합계 (수동입력 제외)';
+
   calcFire();
 }
 
