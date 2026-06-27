@@ -581,6 +581,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;
       <button class="nav-btn on" onclick="switchTab('dashboard')">대시보드</button>
       <button class="nav-btn" onclick="switchTab('weight')">목표비중</button>
       <button class="nav-btn" onclick="switchTab('data')">보유 포지션</button>
+      <button class="nav-btn" onclick="switchTab('trades')">📝 거래기록</button>
       <button class="nav-btn" onclick="switchTab('dividend')">💰 배당금</button>
       <button class="nav-btn" onclick="switchTab('fire')">🔥 FIRE 계산기</button>
       <button class="nav-btn" onclick="switchTab('settings')">⚙️ 설정</button>
@@ -1012,6 +1013,110 @@ function handleLoadDB(){
           현재가 <b id="hepCurPrice">-</b> &nbsp;·&nbsp; 실투자금액 <b id="hepInvest">-</b> &nbsp;·&nbsp; 평가손익 <b id="hepGain">-</b> &nbsp;·&nbsp; 수익률 <b id="hepRate">-</b>
         </div>
         <div style="display:flex;gap:8px;"><button class="btn-p" onclick="saveHoldEdit()">저장</button><button class="btn-o" onclick="cancelHoldEdit()">취소</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="tab-p" id="tab-trades">
+  <div class="data-g">
+    <div class="card">
+      <div class="card-ttl">매수·매도 기록 <span class="chip">평단가 자동계산 · 실현손익 기록</span></div>
+      <div style="display:flex;gap:4px;background:var(--bg2);border-radius:9px;padding:3px;border:1px solid var(--border);width:fit-content;margin-bottom:14px">
+        <button id="trTypeBuy" onclick="setTrType('buy')"
+          style="padding:6px 16px;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;
+            border:none;background:var(--blue);color:#fff;transition:all .15s">매수</button>
+        <button id="trTypeSell" onclick="setTrType('sell')"
+          style="padding:6px 16px;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;
+            border:none;background:transparent;color:var(--text-2);transition:all .15s">매도</button>
+      </div>
+      <div class="fr">
+        <div class="fg"><label>거래일</label><input class="fc" id="trDate" type="date" onchange="updateTrPreview()"></div>
+        <div class="fg"><label>계좌</label><select class="fc" id="trAcc" onchange="updateTrPreview()"></select></div>
+      </div>
+      <div class="fr">
+        <div class="fg"><label>종목</label><select class="fc" id="trEtf" onchange="updateTrPreview()"></select></div>
+        <div class="fg"><label>수량 (주)</label><input class="fc" id="trQty" type="number" placeholder="100" oninput="updateTrPreview()"></div>
+      </div>
+      <div class="fr">
+        <div class="fg"><label id="trPriceLabel">매수 단가 (원)</label><input class="fc" id="trPrice" type="number" placeholder="15000" oninput="updateTrPreview()"></div>
+        <div class="fg"><label>수수료+세금 합계 (원) <em style="font-weight:400;color:var(--text-3);font-size:10px">선택</em></label><input class="fc" id="trFee" type="number" placeholder="0" oninput="updateTrPreview()"></div>
+      </div>
+      <div class="fg"><label>메모</label><input class="fc" id="trMemo" placeholder="선택 입력"></div>
+      <div class="calc-preview" id="trPreview" style="display:none"></div>
+      <button class="btn-p" id="trSubmitBtn" onclick="addTrade()" style="width:100%;margin-top:10px;padding:11px;">+ 매수 기록 추가</button>
+    </div>
+
+    <div class="card">
+      <div class="card-ttl">실현손익 요약 <span class="chip">매도 기준</span></div>
+      <div class="fire-stat-g">
+        <div class="fire-stat">
+          <div class="fire-stat-lbl">올해 실현손익</div>
+          <div class="fire-stat-val" id="trStatYtd">-</div>
+        </div>
+        <div class="fire-stat">
+          <div class="fire-stat-lbl">전체 실현손익</div>
+          <div class="fire-stat-val" id="trStatAll">-</div>
+        </div>
+        <div class="fire-stat">
+          <div class="fire-stat-lbl">매도 건수</div>
+          <div class="fire-stat-val" id="trStatCount">-</div>
+        </div>
+        <div class="fire-stat">
+          <div class="fire-stat-lbl">평균 실현수익률</div>
+          <div class="fire-stat-val" id="trStatRate">-</div>
+        </div>
+      </div>
+      <div style="height:180px;margin-top:10px;position:relative"><canvas id="trChart"></canvas></div>
+      <p style="font-size:10px;color:var(--text-3);margin-top:10px;">* 평단가·보유수량은 거래기록을 바탕으로 자동 계산되어 "보유 포지션"에 반영됩니다.</p>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:20px">
+    <div class="card-ttl">계좌별 실현손익 <span class="chip">전체 기간 누적 기준</span></div>
+    <div id="trByAccList"></div>
+  </div>
+
+  <div class="card" style="margin-top:20px">
+    <div class="card-ttl">거래 내역 <span class="chip">수정 버튼 클릭 → 인라인 편집</span>
+      <button onclick="exportTradeCsv()" style="margin-left:auto;padding:4px 12px;border-radius:7px;border:1.5px solid var(--border);background:var(--surface);color:var(--text-2);font-size:11px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:4px;transition:all .15s;" onmouseover="this.style.borderColor='var(--blue)';this.style.color='var(--blue)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-2)'">⬇ CSV</button>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap;">
+      <div id="trFilterRow" style="display:flex;gap:6px;flex-wrap:nowrap;overflow-x:auto;flex:1;min-width:0;padding-bottom:2px;"></div>
+    </div>
+    <div style="overflow-x:auto;">
+      <table class="dm-tbl" style="width:100%">
+        <thead><tr>
+          <th style="min-width:92px;white-space:nowrap">날짜</th>
+          <th style="min-width:70px;white-space:nowrap">계좌</th>
+          <th style="min-width:120px">종목</th>
+          <th style="min-width:55px;white-space:nowrap">구분</th>
+          <th style="min-width:72px;white-space:nowrap">수량</th>
+          <th style="min-width:90px;white-space:nowrap">단가</th>
+          <th style="min-width:100px;white-space:nowrap">거래금액</th>
+          <th style="min-width:110px;white-space:nowrap">실현손익</th>
+          <th style="min-width:100px">메모</th>
+          <th style="min-width:150px;white-space:nowrap;position:sticky;right:0;background:var(--surface);box-shadow:-6px 0 6px -6px rgba(0,0,0,.12);z-index:3;">수정/삭제</th>
+        </tr></thead>
+        <tbody id="trBody"></tbody>
+      </table>
+    </div>
+    <div id="trEditForm" style="display:none;background:var(--bg2);border-radius:12px;padding:16px 18px;margin-top:14px;border:1px solid var(--border);">
+      <div style="font-size:12px;font-weight:700;color:var(--blue);margin-bottom:12px">✏️ 거래 수정</div>
+      <input type="hidden" id="editTrIdx">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:12px;">
+        <div class="fg" style="margin:0"><label>구분</label><select class="fc" id="editTrType"><option value="buy">매수</option><option value="sell">매도</option></select></div>
+        <div class="fg" style="margin:0"><label>거래일</label><input class="fc" id="editTrDate" type="date"></div>
+        <div class="fg" style="margin:0"><label>계좌</label><select class="fc" id="editTrAcc"></select></div>
+        <div class="fg" style="margin:0"><label>종목</label><select class="fc" id="editTrEtf"></select></div>
+        <div class="fg" style="margin:0"><label>수량 (주)</label><input class="fc" id="editTrQty" type="number"></div>
+        <div class="fg" style="margin:0"><label>단가 (원)</label><input class="fc" id="editTrPrice" type="number"></div>
+        <div class="fg" style="margin:0"><label>수수료+세금 (원)</label><input class="fc" id="editTrFee" type="number"></div>
+        <div class="fg" style="margin:0"><label>메모</label><input class="fc" id="editTrMemo"></div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn-p" style="flex:1" onclick="saveTradeEdit()">저장</button>
+        <button class="btn-o" style="flex:1" onclick="cancelTradeEdit()">취소</button>
       </div>
     </div>
   </div>
@@ -1702,6 +1807,9 @@ let DB = {
 
   /* 컬럼: date(입금일) / accountId / etfId / amount(실수령액,원) / memo */
   dividends:[],
+
+  /* 컬럼: date / accountId / etfId / type(buy|sell) / qty / price / fee / memo / realizedGain(sell만, 자동계산) */
+  trades:[],
 
   /* 컬럼: baseDate / accountId / etfId / qty / avgCost / evalAmount / memo */
   holdings:[
@@ -5346,6 +5454,437 @@ function applyDivPaste(){
 }
 
 
+/* ═══ 매수/매도 거래기록 관리 ═══ */
+let _trType = 'buy';
+
+function setTrType(type){
+  _trType = type;
+  const onCol='var(--blue)', offCol='transparent';
+  const buyBtn=document.getElementById('trTypeBuy'), sellBtn=document.getElementById('trTypeSell');
+  if(buyBtn){ buyBtn.style.background = type==='buy' ? onCol : offCol; buyBtn.style.color = type==='buy' ? '#fff' : 'var(--text-2)'; }
+  if(sellBtn){ sellBtn.style.background = type==='sell' ? 'var(--amber)' : offCol; sellBtn.style.color = type==='sell' ? '#fff' : 'var(--text-2)'; }
+  document.getElementById('trPriceLabel').textContent = type==='buy' ? '매수 단가 (원)' : '매도 단가 (원)';
+  document.getElementById('trSubmitBtn').textContent  = type==='buy' ? '+ 매수 기록 추가' : '+ 매도 기록 추가';
+  document.getElementById('trSubmitBtn').style.background = type==='sell' ? 'var(--amber)' : '';
+  updateTrPreview();
+}
+
+// 특정 계좌+종목의 현재(보유 포지션 기준) 보유수량·평단가 — 거래기록 입력 미리보기용
+function getCurrentHoldingState(accountId, etfId){
+  const rows = DB.holdings.filter(h=>h.accountId===accountId && h.etfId===etfId);
+  if(!rows.length) return { qty:0, avgCost:0, curPrice:0 };
+  const latest = [...rows].sort((a,b)=> b.baseDate.localeCompare(a.baseDate))[0];
+  return { qty:latest.qty||0, avgCost:latest.avgCost||0, curPrice:latest.curPrice||0 };
+}
+
+function updateTrPreview(){
+  const accountId = document.getElementById('trAcc')?.value;
+  const etfId     = document.getElementById('trEtf')?.value;
+  const qty       = parseFloat(document.getElementById('trQty').value)||0;
+  const price     = parseFloat(document.getElementById('trPrice').value)||0;
+  const fee       = parseFloat(document.getElementById('trFee').value)||0;
+  const prev = document.getElementById('trPreview');
+  if(!accountId || !etfId || !qty || !price){ prev.style.display='none'; return; }
+
+  const cur = getCurrentHoldingState(accountId, etfId);
+  if(_trType==='buy'){
+    const newQty = cur.qty + qty;
+    const newCost = cur.qty*cur.avgCost + qty*price + fee;
+    const newAvg = newQty>0 ? newCost/newQty : 0;
+    prev.innerHTML = `현재 보유 <b>${cur.qty.toLocaleString()}주</b> (평단가 ${W(Math.round(cur.avgCost))})
+      &nbsp;→&nbsp; 매수 후 <b>${newQty.toLocaleString()}주</b> (평단가 ${W(Math.round(newAvg))})`;
+  } else {
+    const sellQty = Math.min(qty, cur.qty);
+    const realizedGain = (price - cur.avgCost) * sellQty - fee;
+    const rate = cur.avgCost>0 ? (price-cur.avgCost)/cur.avgCost*100 : 0;
+    prev.innerHTML = `현재 보유 <b>${cur.qty.toLocaleString()}주</b> (평단가 ${W(Math.round(cur.avgCost))})
+      &nbsp;→&nbsp; 매도 후 <b>${Math.max(0,cur.qty-qty).toLocaleString()}주</b>
+      &nbsp;·&nbsp; 예상 실현손익 <b style="color:${realizedGain>=0?'var(--pos)':'var(--neg)'}">${W2(realizedGain)}</b> (${PCT1(rate)})
+      ${qty>cur.qty ? `<br><span style="color:var(--pos)">⚠ 보유수량(${cur.qty}주)보다 많은 수량이라 ${cur.qty}주까지만 매도로 처리돼요.</span>` : ''}`;
+  }
+  prev.style.display = 'block';
+}
+
+// 특정 계좌+종목의 전체 거래내역을 날짜순으로 재생(replay)하여 보유수량·평단가·실현손익을 다시 계산하고
+// 그 결과를 "보유 포지션"의 오늘자 스냅샷 행에 반영한다. (거래 추가/수정/삭제 후 항상 이 함수로 동기화)
+function recomputeHoldingFromTrades(accountId, etfId){
+  const trades = (DB.trades||[])
+    .filter(t=>t.accountId===accountId && t.etfId===etfId)
+    .sort((a,b)=> a.date===b.date ? 0 : a.date.localeCompare(b.date));
+
+  let qty=0, avgCost=0;
+  trades.forEach(t=>{
+    if(t.type==='buy'){
+      const newQty = qty + t.qty;
+      const newCost = qty*avgCost + t.qty*t.price + (t.fee||0);
+      avgCost = newQty>0 ? newCost/newQty : 0;
+      qty = newQty;
+      t.realizedGain = undefined; // 매수는 실현손익 없음
+    } else {
+      const sellQty = Math.min(t.qty, qty);
+      t.realizedGain = (t.price - avgCost) * sellQty - (t.fee||0);
+      qty = Math.max(0, qty - t.qty);
+      // 매도는 평단가를 바꾸지 않음 (이동평균법)
+    }
+  });
+
+  const baseDate = today();
+  const priorRows = DB.holdings.filter(h=>h.accountId===accountId && h.etfId===etfId)
+    .sort((a,b)=> b.baseDate.localeCompare(a.baseDate));
+  const curPrice = priorRows.find(h=>h.curPrice>0)?.curPrice || trades[trades.length-1]?.price || 0;
+  const evalAmount = Math.round(qty*curPrice);
+
+  const existing = DB.holdings.find(h=>h.baseDate===baseDate && h.accountId===accountId && h.etfId===etfId);
+  if(existing){
+    existing.qty = qty; existing.avgCost = avgCost; existing.curPrice = curPrice; existing.evalAmount = evalAmount;
+    if(qty===0 && !existing.memo) existing.memo = '매도처리';
+  } else {
+    DB.holdings.push({ baseDate, accountId, etfId, qty, avgCost, curPrice, evalAmount, memo: qty===0?'매도처리':'' });
+  }
+
+  DB.meta.baseDate = baseDate;
+  const hd = document.getElementById('hdrDate'), hdi = document.getElementById('hdrDateInput');
+  if(hd) hd.textContent = baseDate;
+  if(hdi) hdi.value = baseDate;
+}
+
+function renderTradeSelects(){
+  ['trAcc','editTrAcc'].forEach(id=>{
+    const sel = document.getElementById(id);
+    if(!sel) return;
+    const cur = sel.value;
+    sel.innerHTML = sortAccountsByLabel(DB.accounts).map(a=>`<option value="${a.id}">${a.label}</option>`).join('');
+    if(cur && DB.accounts.find(a=>a.id===cur)) sel.value = cur;
+  });
+  ['trEtf','editTrEtf'].forEach(id=>{
+    const sel = document.getElementById(id);
+    if(!sel) return;
+    const cur = sel.value;
+    sel.innerHTML = DB.etfs.map(e=>`<option value="${e.id}">${e.name}</option>`).join('');
+    if(cur && DB.etfs.find(e=>e.id===cur)) sel.value = cur;
+  });
+}
+
+function addTrade(){
+  const accountId = document.getElementById('trAcc').value;
+  const etfId     = document.getElementById('trEtf').value;
+  const date      = document.getElementById('trDate').value || today();
+  const qty       = parseFloat(document.getElementById('trQty').value)||0;
+  const price     = parseFloat(document.getElementById('trPrice').value)||0;
+  const fee       = parseFloat(document.getElementById('trFee').value)||0;
+  const memo      = document.getElementById('trMemo').value.trim();
+  if(!qty || !price){ showToast('수량과 단가를 입력해주세요.'); return; }
+
+  if(_trType==='sell'){
+    const cur = getCurrentHoldingState(accountId, etfId);
+    if(cur.qty<=0){ showToast('해당 계좌·종목의 보유수량이 없어 매도로 기록할 수 없습니다.'); return; }
+  }
+
+  DB.trades.push({ date, accountId, etfId, type:_trType, qty, price, fee, memo });
+  recomputeHoldingFromTrades(accountId, etfId);
+
+  ['trQty','trPrice','trFee','trMemo'].forEach(id=>{ document.getElementById(id).value=''; });
+  document.getElementById('trPreview').style.display = 'none';
+
+  renderTradeFilterRow(); renderTradeSummary(); renderTradeByAccount(); renderTradeList();
+  recalcRender();
+  showToast(`${_trType==='buy'?'매수':'매도'} 거래가 기록되었습니다. (평단가·보유수량 자동 반영)`);
+  save();
+}
+
+function computeTradeStats(){
+  const list = (DB.trades||[]).filter(t=>t.type==='sell' && t.realizedGain!==undefined);
+  const now = new Date();
+  const thisYear = now.getFullYear();
+  let ytdGain=0, allGain=0, count=0;
+  const byYear = {};
+  list.forEach(t=>{
+    const dt = new Date(t.date+'T00:00:00');
+    if(isNaN(dt)) return;
+    const y = dt.getFullYear();
+    allGain += t.realizedGain;
+    byYear[y] = (byYear[y]||0) + t.realizedGain;
+    count++;
+    if(y===thisYear) ytdGain += t.realizedGain;
+  });
+  return { ytdGain, allGain, count, byYear };
+}
+
+function renderTradeSummary(){
+  const s = computeTradeStats();
+  const ytdEl = document.getElementById('trStatYtd');
+  const allEl = document.getElementById('trStatAll');
+  ytdEl.textContent = W2(s.ytdGain);
+  ytdEl.style.color = s.ytdGain>=0 ? 'var(--pos)' : 'var(--neg)';
+  allEl.textContent = W2(s.allGain);
+  allEl.style.color = s.allGain>=0 ? 'var(--pos)' : 'var(--neg)';
+  document.getElementById('trStatCount').textContent = s.count + '건';
+
+  // 평균 실현수익률 = 매도 거래들의 (실현손익/투입원금) 가중평균과 유사하게, 매도금액 대비 손익 비율로 단순화
+  const sells = (DB.trades||[]).filter(t=>t.type==='sell' && t.realizedGain!==undefined);
+  const totalSellAmt = sells.reduce((sum,t)=>sum + t.qty*t.price, 0);
+  const totalGain = sells.reduce((sum,t)=>sum + t.realizedGain, 0);
+  const avgRate = totalSellAmt>0 ? (totalGain/(totalSellAmt-totalGain))*100 : 0;
+  const rateEl = document.getElementById('trStatRate');
+  rateEl.textContent = sells.length ? PCT1(avgRate) : '-';
+  rateEl.style.color = avgRate>=0 ? 'var(--pos)' : 'var(--neg)';
+
+  const years = Object.keys(s.byYear).sort();
+  const labels = years.map(y=>y+'년');
+  const data   = years.map(y=>s.byYear[y]);
+  const colors = data.map(v=> v>=0 ? '#16A34A' : '#DC2626');
+
+  if(window.trChartInstance){ window.trChartInstance.destroy(); }
+  const ctx = document.getElementById('trChart')?.getContext('2d');
+  if(!ctx || !labels.length) return;
+  window.trChartInstance = new Chart(ctx, {
+    type:'bar',
+    data:{ labels, datasets:[{ label:'실현손익', data, backgroundColor:colors, borderRadius:5, maxBarThickness:40 }] },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{display:false}, tooltip:{callbacks:{label:c=>'실현손익: '+W2(c.raw)}} },
+      scales:{
+        x:{grid:{display:false}, ticks:{font:{size:10}, color:'#9396B2'}},
+        y:{ticks:{callback:v=>WK(v), font:{size:10}, color:'#9396B2'}, grid:{color:'#EBEDF6'}}
+      }
+    }
+  });
+}
+
+let _trAccMode = 'all';
+function renderTradeByAccount(){
+  const wrap = document.getElementById('trByAccList');
+  if(!wrap) return;
+  const sells = (DB.trades||[]).filter(t=>t.type==='sell' && t.realizedGain!==undefined);
+  if(!sells.length){
+    wrap.innerHTML = `<p style="text-align:center;padding:20px 0;color:var(--text-3);font-size:12px">아직 매도(실현손익) 기록이 없습니다.</p>`;
+    return;
+  }
+  const sumByAcc = {};
+  sells.forEach(t=>{ sumByAcc[t.accountId] = (sumByAcc[t.accountId]||0) + t.realizedGain; });
+
+  const items = sortAccountsByLabel(DB.accounts)
+    .map(a=>({ acc:a, val: sumByAcc[a.id]||0 }))
+    .filter(e=>e.val!==0)
+    .sort((a,b)=> Math.abs(b.val)-Math.abs(a.val));
+
+  if(!items.length){
+    wrap.innerHTML = `<p style="text-align:center;padding:20px 0;color:var(--text-3);font-size:12px">아직 매도(실현손익) 기록이 없습니다.</p>`;
+    return;
+  }
+  const maxV = Math.max(...items.map(e=>Math.abs(e.val))) || 1;
+
+  wrap.innerHTML = items.map(e=>`
+    <div class="hbar-item">
+      <div class="hbar-name" title="${e.acc.label}">${e.acc.icon||''} ${e.acc.label}</div>
+      <div class="hbar-track">
+        <div class="hbar-fill" style="width:${(Math.abs(e.val)/maxV*100).toFixed(1)}%;background:${e.val>=0?'#16A34A':'#DC2626'}"></div>
+      </div>
+      <div class="hbar-r">
+        <span class="hbar-amt" style="color:${e.val>=0?'var(--pos)':'var(--neg)'}">${W2(e.val)}</span>
+      </div>
+    </div>`).join('');
+}
+
+let _trFilter = 'ALL';
+function setTrFilter(accId){ _trFilter = accId; renderTradeList(); }
+
+function renderTradeFilterRow(){
+  const row = document.getElementById('trFilterRow');
+  if(!row) return;
+  const all = DB.trades || [];
+  const btns = [
+    {id:'ALL', label:'전체'},
+    ...sortAccountsByLabel(DB.accounts).map(a=>({id:a.id, label:a.label, color:a.color}))
+  ];
+  row.innerHTML = btns.map(b=>{
+    const isOn = _trFilter === b.id;
+    const color = b.color || 'var(--blue)';
+    const cnt = b.id==='ALL' ? all.length : all.filter(t=>t.accountId===b.id).length;
+    return `<button onclick="setTrFilter('${b.id}')"
+      style="padding:5px 11px;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;
+        border:1.5px solid ${isOn ? color : 'var(--border)'};
+        background:${isOn ? color : 'var(--surface)'};
+        color:${isOn ? '#fff' : 'var(--text-2)'};
+        transition:all .15s">${b.label}
+        <span style="font-size:10px;font-weight:500;opacity:.8;margin-left:3px">${cnt}건</span>
+    </button>`;
+  }).join('');
+}
+
+function renderTradeList(){
+  const sorted = [...(DB.trades||[])]
+    .filter(t=>_trFilter==='ALL' || t.accountId===_trFilter)
+    .sort((a,b)=> b.date.localeCompare(a.date));
+
+  const body = document.getElementById('trBody');
+  if(!sorted.length){
+    body.innerHTML = `<tr><td colspan="10" style="text-align:center;padding:20px;color:var(--text-3);font-size:12px">아직 기록된 거래가 없습니다.</td></tr>`;
+    return;
+  }
+  body.innerHTML = sorted.map(t=>{
+    const origIdx = DB.trades.indexOf(t);
+    const etf = DB.etfs.find(e=>e.id===t.etfId);
+    const amt = t.qty * t.price;
+    const typeBadge = t.type==='buy'
+      ? `<span style="background:var(--blue-soft);color:var(--blue);font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px">매수</span>`
+      : `<span style="background:#FEF3C7;color:#B45309;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px">매도</span>`;
+    const gainTxt = t.type==='sell' && t.realizedGain!==undefined
+      ? `<span style="color:${t.realizedGain>=0?'var(--pos)':'var(--neg)'};font-weight:700">${W2(t.realizedGain)}</span>`
+      : `<span style="color:var(--text-3)">-</span>`;
+    return `<tr id="trRow${origIdx}">
+      <td>${t.date}</td>
+      <td style="white-space:nowrap"><span class="acc-tag tag-${t.accountId}">${getAccLabel(t.accountId)}</span></td>
+      <td style="font-size:11px;max-width:130px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${etf?.name||t.etfId}">${etf?.name||t.etfId}</td>
+      <td>${typeBadge}</td>
+      <td style="white-space:nowrap">${t.qty.toLocaleString()}</td>
+      <td style="white-space:nowrap">${W(t.price)}</td>
+      <td style="white-space:nowrap">${W(amt)}</td>
+      <td style="white-space:nowrap">${gainTxt}</td>
+      <td style="font-size:11px;max-width:120px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${t.memo||''}">${t.memo||''}</td>
+      <td style="white-space:nowrap;position:sticky;right:0;background:var(--surface);box-shadow:-6px 0 6px -6px rgba(0,0,0,.12);z-index:2;">
+        <button class="btn-o" style="padding:4px 10px;font-size:11px;margin-right:4px" onclick="startTradeEdit(${origIdx})">수정</button>
+        <span id="delTrWrap${origIdx}">
+          <button class="btn-d" style="font-size:11px" onclick="confirmDelTrade(${origIdx})">삭제</button>
+        </span>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function renderTradesTab(){
+  if(!DB.trades) DB.trades = [];
+  const dd = document.getElementById('trDate');
+  if(dd && !dd.value) dd.value = today();
+  setTrType(_trType);
+  renderTradeSelects();
+  renderTradeFilterRow();
+  renderTradeSummary();
+  renderTradeByAccount();
+  renderTradeList();
+}
+
+function startTradeEdit(i){
+  const t = DB.trades[i];
+  if(!t) return;
+  document.getElementById('editTrIdx').value   = i;
+  document.getElementById('editTrType').value  = t.type;
+  document.getElementById('editTrDate').value  = t.date||'';
+  document.getElementById('editTrQty').value   = t.qty;
+  document.getElementById('editTrPrice').value = t.price;
+  document.getElementById('editTrFee').value   = t.fee||0;
+  document.getElementById('editTrMemo').value  = t.memo||'';
+
+  const accSel = document.getElementById('editTrAcc');
+  accSel.innerHTML = sortAccountsByLabel(DB.accounts).map(a=>`<option value="${a.id}">${a.label}</option>`).join('');
+  accSel.value = t.accountId;
+
+  const etfSel = document.getElementById('editTrEtf');
+  etfSel.innerHTML = DB.etfs.map(e=>`<option value="${e.id}">${e.name}</option>`).join('');
+  etfSel.value = t.etfId;
+
+  document.querySelectorAll('#trBody tr').forEach(r=> r.style.background = '');
+  const row = document.getElementById('trRow'+i);
+  if(row) row.style.background = 'var(--blue-soft)';
+
+  const form = document.getElementById('trEditForm');
+  form.style.display = 'block';
+  form.scrollIntoView({ behavior:'smooth', block:'nearest' });
+}
+
+function saveTradeEdit(){
+  const i = parseInt(document.getElementById('editTrIdx').value);
+  const old = DB.trades[i];
+  if(!old) return;
+
+  const type      = document.getElementById('editTrType').value;
+  const date      = document.getElementById('editTrDate').value || today();
+  const accountId = document.getElementById('editTrAcc').value;
+  const etfId     = document.getElementById('editTrEtf').value;
+  const qty       = parseFloat(document.getElementById('editTrQty').value)||0;
+  const price     = parseFloat(document.getElementById('editTrPrice').value)||0;
+  const fee       = parseFloat(document.getElementById('editTrFee').value)||0;
+  const memo      = document.getElementById('editTrMemo').value.trim();
+  if(!qty || !price){ showToast('수량과 단가를 입력해주세요.'); return; }
+
+  const oldAcc = old.accountId, oldEtf = old.etfId;
+  DB.trades[i] = { date, accountId, etfId, type, qty, price, fee, memo };
+
+  // 계좌/종목이 바뀐 경우 이전 쪽과 새 쪽 둘 다 재계산
+  recomputeHoldingFromTrades(oldAcc, oldEtf);
+  if(accountId!==oldAcc || etfId!==oldEtf) recomputeHoldingFromTrades(accountId, etfId);
+
+  cancelTradeEdit();
+  renderTradeFilterRow(); renderTradeSummary(); renderTradeByAccount(); renderTradeList();
+  recalcRender();
+  showToast('거래 기록이 수정되었습니다.');
+  save();
+}
+
+function cancelTradeEdit(){
+  document.getElementById('trEditForm').style.display = 'none';
+  document.querySelectorAll('#trBody tr').forEach(r=> r.style.background = '');
+}
+
+function confirmDelTrade(i){
+  const wrap = document.getElementById('delTrWrap'+i);
+  if(!wrap) return;
+  if(wrap.dataset.confirming==='1'){
+    wrap.dataset.confirming='0';
+    wrap.innerHTML=`<button class="btn-d" style="font-size:11px" onclick="confirmDelTrade(${i})">삭제</button>`;
+    return;
+  }
+  wrap.dataset.confirming='1';
+  wrap.innerHTML=`
+    <span style="display:inline-flex;align-items:center;gap:4px;
+      background:#FEF2F2;border:1px solid #FCA5A5;border-radius:8px;padding:3px 6px;">
+      <span style="font-size:10px;color:#DC2626;font-weight:600">삭제할까요?</span>
+      <button onclick="delTrade(${i})"
+        style="background:#EF4444;color:#fff;border:none;border-radius:5px;
+          padding:2px 8px;font-size:11px;font-weight:700;cursor:pointer">확인</button>
+      <button onclick="confirmDelTrade(${i})"
+        style="background:transparent;border:1px solid #D1D5DB;border-radius:5px;
+          padding:2px 6px;font-size:11px;cursor:pointer;color:#6B7280">취소</button>
+    </span>`;
+}
+function delTrade(i){
+  const t = DB.trades[i];
+  if(!t) return;
+  const { accountId, etfId } = t;
+  DB.trades.splice(i,1);
+  recomputeHoldingFromTrades(accountId, etfId);
+  cancelTradeEdit();
+  renderTradeFilterRow(); renderTradeSummary(); renderTradeByAccount(); renderTradeList();
+  recalcRender();
+  showToast('거래 기록이 삭제되었습니다.');
+  save();
+}
+
+function exportTradeCsv(){
+  const rows = [['날짜','계좌','종목','구분','수량','단가(원)','거래금액(원)','수수료+세금(원)','실현손익(원)','메모']];
+  const sorted = [...(DB.trades||[])].sort((a,b)=> a.date.localeCompare(b.date));
+  sorted.forEach(t=>{
+    const etf = DB.etfs.find(e=>e.id===t.etfId);
+    rows.push([
+      t.date, getAccLabel(t.accountId), etf?.name||t.etfId, t.type==='buy'?'매수':'매도',
+      t.qty, Math.round(t.price), Math.round(t.qty*t.price), Math.round(t.fee||0),
+      t.realizedGain!==undefined ? Math.round(t.realizedGain) : '', t.memo||''
+    ]);
+  });
+  const BOM = '\uFEFF';
+  const csv = BOM + rows.map(r=>r.map(v=>{
+    const s=String(v??'');
+    return /[,"\n]/.test(s)?`"${s.replace(/"/g,'""')}"`  :s;
+  }).join(',')).join('\r\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'}));
+  a.download = `거래내역_${today()}.csv`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+  showToast('거래내역 CSV 다운로드 완료');
+}
+
+
 /* export / import */
 /* ═══ CSV 내보내기 ═══ */
 function exportCsv(type){
@@ -5465,11 +6004,11 @@ function importData(ev){
 
 /* ═══ 탭/필터 ═══ */
 function switchTab(t){
-  ['dashboard','weight','data','fire','dividend','settings'].forEach(id=>{
+  ['dashboard','weight','data','trades','fire','dividend','settings'].forEach(id=>{
     document.getElementById('tab-'+id).classList.toggle('on',id===t);
   });
   document.querySelectorAll('.nav-btn').forEach((b,i)=>{
-    b.classList.toggle('on',['dashboard','weight','data','dividend','fire','settings'][i]===t);
+    b.classList.toggle('on',['dashboard','weight','data','trades','dividend','fire','settings'][i]===t);
   });
   // KPI 카드는 대시보드에서만 노출 (다른 탭에서는 숨겨서 스크롤 줄임)
   const kpiWrap = document.getElementById('kpiStripWrap');
@@ -5482,6 +6021,7 @@ function switchTab(t){
     if(cur) setWeightAcc(cur);
   }
   if(t==='data')      renderDataTab();
+  if(t==='trades')    renderTradesTab();
   if(t==='fire')      renderFireTab();
   if(t==='dividend')  renderDividendTab();
   if(t==='settings')  renderDataTab(); // 계좌/종목/딕셔너리 테이블도 동일 함수가 채움
@@ -5637,6 +6177,7 @@ async function syncDownload(){
     if(p.accEtfTargets) DB.accEtfTargets = p.accEtfTargets;
     if(p.fireSettings)  DB.fireSettings  = p.fireSettings;
     DB.dividends = p.dividends || DB.dividends || [];
+    DB.trades = p.trades || DB.trades || [];
     if(p.accounts && p.accounts.length) DB.accounts = p.accounts;
 
     save();
@@ -5772,6 +6313,7 @@ function load(){
     if(p.accEtfTargets) DB.accEtfTargets = p.accEtfTargets;
     if(p.fireSettings)  DB.fireSettings  = p.fireSettings;
     DB.dividends = p.dividends || DB.dividends || [];
+    DB.trades = p.trades || DB.trades || [];
 
     // 구버전 호환: category 없는 etf는 빈 문자열로 초기화 (name fallback 방지)
     DB.etfs.forEach(e=>{ if(e.category===undefined) e.category=''; });
