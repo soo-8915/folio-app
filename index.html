@@ -607,6 +607,42 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;
   </div>
 </header>
 
+<div id="aiBriefWrap">
+  <div id="aiBriefingCard" style="background:var(--surface);border-radius:14px;border:1px solid var(--border);padding:18px 20px;margin-bottom:20px">
+    <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:4px;gap:10px;flex-wrap:wrap">
+      <span style="font-size:10.5px;font-weight:700;color:var(--text-3);letter-spacing:.4px">PORTFOLIO BRIEF · <span id="aiBriefDate"></span></span>
+      <button onclick="toggleAiBriefDetail()" id="aiBriefMoreBtn" style="font-size:11px;font-weight:600;color:var(--blue);background:none;border:none;cursor:pointer;padding:0">자세히 보기 ▾</button>
+    </div>
+    <div style="font-size:15px;font-weight:700;color:var(--text-1);line-height:1.5;margin-bottom:14px" id="aiBriefHeadlineInsight"></div>
+
+    <div style="font-size:13px;font-weight:700;color:var(--text-1);margin-bottom:13px" id="aiBriefAgendaCount"></div>
+
+    <div id="aiBriefLines" style="display:flex;flex-direction:column;margin-bottom:6px"></div>
+
+    <div id="aiBriefDetailPanel" style="display:none;margin-top:14px;padding-top:14px;border-top:1px solid var(--border)"></div>
+
+    <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border)">
+      <div style="font-size:10px;font-weight:700;color:var(--text-3);margin-bottom:9px">오늘의 안건</div>
+      <div id="aiBriefAgenda" style="display:flex;flex-direction:column;gap:6px"></div>
+    </div>
+
+    <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border)">
+      <div style="font-size:10px;font-weight:700;color:var(--text-3);margin-bottom:9px">이런 질문이 떠오르실 수 있어요</div>
+      <div id="aiBriefQuestions" style="display:flex;flex-wrap:wrap;gap:6px"></div>
+      <div id="aiBriefAnswerPanel" style="display:none;background:var(--bg2);border-radius:10px;padding:13px 15px;margin-top:10px;font-size:12.5px;color:var(--text-2);line-height:1.65"></div>
+    </div>
+  </div>
+
+  <div id="portfolioHealthStrip" style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding:11px 16px;margin-top:10px;font-size:11.5px;color:var(--text-2);background:var(--bg2);border-radius:10px">
+    <span style="font-weight:700;color:var(--text-1);white-space:nowrap">Portfolio Health <span style="color:var(--blue)" id="phScore">-</span>점</span>
+    <span style="white-space:nowrap">목표비중 <span id="phTarget"></span></span>
+    <span style="white-space:nowrap">투자지속성 <span id="phConsist"></span></span>
+    <span style="white-space:nowrap">리밸런싱 <span id="phRebal"></span></span>
+    <span style="white-space:nowrap">FIRE <span id="phFire"></span></span>
+    <span style="white-space:nowrap">배당관리 <span id="phDiv"></span></span>
+  </div>
+</div>
+
 <div id="kpiStripWrap">
   <div style="display:flex;justify-content:flex-end;margin-bottom:6px">
     <button id="kpiCollapseBtn" onclick="toggleKpiCollapse()" style="font-size:11px;font-weight:600;color:var(--text-3);background:var(--surface);border:1px solid var(--border);border-radius:7px;padding:3px 10px;cursor:pointer">▲ 카드 접기</button>
@@ -646,10 +682,10 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;
           border-radius:8px;padding:3px;border:1px solid var(--border)">
           <button id="barModeEtf" onclick="setBarMode('etf')"
             style="padding:3px 10px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;
-              border:none;background:var(--blue);color:#fff;transition:all .15s">종목별</button>
+              border:none;background:transparent;color:var(--text-2);transition:all .15s">종목별</button>
           <button id="barModeCat" onclick="setBarMode('cat')"
             style="padding:3px 10px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;
-              border:none;background:transparent;color:var(--text-2);transition:all .15s">구분별</button>
+              border:none;background:var(--blue);color:#fff;transition:all .15s">구분별</button>
         </div>
       </div>
       <div id="hbarList" class="hbar-list"></div>
@@ -675,9 +711,12 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;
   </div>
 
   <div class="card" id="motivationCard" style="margin-top:20px">
-    <div class="card-ttl">📈 투자 동기부여 <span class="chip">전체 포트폴리오 기준 · 필터 무관</span></div>
-    <div style="display:flex;flex-wrap:wrap;gap:18px;align-items:center;margin:12px 0 14px">
-      <div style="font-size:13px;font-weight:800;color:var(--text-1);white-space:nowrap" id="motivStreakChip">🔥 -</div>
+    <div class="card-ttl" style="cursor:pointer;user-select:none" onclick="toggleSection('motivExtra')">
+      📈 투자 동기부여 <span class="chip">전체 포트폴리오 기준 · 필터 무관</span>
+      <span id="motivExtraToggle" style="margin-left:auto;font-size:11px;color:var(--text-3);font-weight:500">▼ 펼치기</span>
+    </div>
+
+    <div style="display:flex;flex-wrap:wrap;gap:18px;align-items:center;margin:14px 0 14px">
       <div style="flex:1;min-width:200px">
         <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px;gap:8px">
           <span style="font-size:11px;font-weight:700;color:var(--gold-deep)" id="motivHeroTitle">다음 마일스톤</span>
@@ -690,21 +729,64 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;
       </div>
     </div>
 
-    <div id="milestoneRow" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px"></div>
+    <div id="milestoneRow" style="display:flex;gap:6px;flex-wrap:wrap"></div>
 
-    <div style="border-top:1px solid var(--border);padding-top:14px">
-      <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:4px">
-        <div style="font-size:11px;font-weight:700;color:var(--text-2)">🗓️ 주별 매수 활동</div>
-        <div style="font-size:10px;color:var(--text-3)">최근 52주 · <b style="color:var(--text-2)" id="motivBuyCount">0</b>회</div>
+    <div id="motivExtra" style="display:none">
+      <div class="m-stat-g" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:16px 0 14px;padding-top:14px;border-top:1px solid var(--border)">
+        <div style="background:var(--bg2);border-radius:11px;padding:10px 12px">
+          <div style="font-size:9px;color:var(--text-3);font-weight:600;margin-bottom:3px">연속 적립</div>
+          <div style="font-size:13px;font-weight:800;color:var(--text-1)" id="motivStreakChip">🔥 -</div>
+        </div>
+        <div style="background:var(--bg2);border-radius:11px;padding:10px 12px">
+          <div style="font-size:9px;color:var(--text-3);font-weight:600;margin-bottom:3px">최고 기록</div>
+          <div style="font-size:13px;font-weight:800;color:var(--text-1)" id="motivMaxStreak">-</div>
+        </div>
+        <div style="background:var(--bg2);border-radius:11px;padding:10px 12px">
+          <div style="font-size:9px;color:var(--text-3);font-weight:600;margin-bottom:3px">투자 기간</div>
+          <div style="font-size:13px;font-weight:800;color:var(--text-1)" id="motivDayCount">-</div>
+        </div>
+        <div style="background:var(--bg2);border-radius:11px;padding:10px 12px">
+          <div style="font-size:9px;color:var(--text-3);font-weight:600;margin-bottom:3px">매수 일정성</div>
+          <div style="font-size:13px;font-weight:800;color:var(--text-1)" id="motivConsistency">-</div>
+        </div>
       </div>
-      <div style="overflow-x:auto;padding-bottom:4px" id="heatmapWrap"></div>
-      <div style="font-size:10px;color:var(--text-3);margin-top:8px;display:flex;align-items:center;gap:5px">
-        <span>적음</span>
-        <span class="heat-lgd" style="background:var(--bg2)"></span>
-        <span class="heat-lgd" style="background:var(--blue-light)"></span>
-        <span class="heat-lgd" style="background:var(--blue-mid)"></span>
-        <span class="heat-lgd" style="background:var(--blue)"></span>
-        <span>많음</span>
+
+      <div style="border-top:1px solid var(--border);padding-top:14px;margin-bottom:16px">
+        <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:4px">
+          <div style="font-size:11px;font-weight:700;color:var(--text-2)">🗓️ 주별 매수 활동</div>
+          <div style="font-size:10px;color:var(--text-3)">최근 52주 · <b style="color:var(--text-2)" id="motivBuyCount">0</b>회</div>
+        </div>
+        <div style="overflow-x:auto;padding-bottom:4px" id="heatmapWrap"></div>
+        <div style="font-size:10px;color:var(--text-3);margin-top:8px;display:flex;align-items:center;gap:5px">
+          <span>적음</span>
+          <span class="heat-lgd" style="background:var(--bg2)"></span>
+          <span class="heat-lgd" style="background:var(--blue-light)"></span>
+          <span class="heat-lgd" style="background:var(--blue-mid)"></span>
+          <span class="heat-lgd" style="background:var(--blue)"></span>
+          <span>많음</span>
+        </div>
+      </div>
+
+      <div id="eokGrowthSection" style="border-top:1px solid var(--border);padding-top:14px;margin-bottom:16px;display:none">
+        <div style="font-size:11px;font-weight:700;color:var(--text-2);margin-bottom:10px">🚀 억단위 성장 가속도</div>
+        <div id="eokGrowthList"></div>
+      </div>
+
+      <div id="netBuyYoySection" style="border-top:1px solid var(--border);padding-top:14px;margin-bottom:16px;display:none">
+        <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:8px">
+          <div style="font-size:11px;font-weight:700;color:var(--text-2)">📊 순매수 비교 (vs 작년의 나)</div>
+          <div style="font-size:10px;color:var(--text-3)" id="netBuyYoySummary"></div>
+        </div>
+        <div style="position:relative;height:140px"><canvas id="netBuyYoyChart"></canvas></div>
+        <div style="display:flex;gap:14px;margin-top:6px;font-size:10px;color:var(--text-3)">
+          <span style="display:flex;align-items:center;gap:4px"><span style="width:9px;height:2px;background:var(--blue);display:inline-block"></span>올해</span>
+          <span style="display:flex;align-items:center;gap:4px"><span style="width:9px;height:2px;background:var(--text-3);display:inline-block;border-top:1px dashed var(--text-3)"></span>작년</span>
+        </div>
+      </div>
+
+      <div style="border-top:1px solid var(--border);padding-top:14px">
+        <div style="font-size:11px;font-weight:700;color:var(--text-2);margin-bottom:10px">⏳ 투자 타임캡슐</div>
+        <div id="timeCapsuleGrid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px"></div>
       </div>
     </div>
   </div>
@@ -872,8 +954,18 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;
       </div>
       <div class="fr">
         <div class="fg"><label>보유수량 (주)</label><input class="fc" id="sQty" type="number" placeholder="512" oninput="onHoldingChange()"></div>
-        <div class="fg"><label>평단가 (원)</label><input class="fc" id="sAvg" type="number" placeholder="15420" oninput="onHoldingChange()"></div>
+        <div class="fg">
+          <label id="sAvgLabel">평단가 (원)</label>
+          <div style="display:flex;gap:6px">
+            <input class="fc" id="sAvg" type="number" placeholder="15420" oninput="onHoldingChange()" style="flex:1;min-width:0">
+            <select class="fc" id="sCurrency" onchange="toggleSAvgCurrency()" style="width:72px;flex-shrink:0;padding-left:6px;padding-right:2px">
+              <option value="KRW">원</option>
+              <option value="USD">달러</option>
+            </select>
+          </div>
+        </div>
       </div>
+      <div class="fg" id="sFxWrap" style="display:none"><label>적용 환율 (원/달러)</label><input class="fc" id="sFxRate" type="number" placeholder="1350" oninput="onHoldingChange()"></div>
       <div class="fg"><label>현재가 (원) <em style="font-weight:400;color:var(--text-3)">— 종목 선택 시 자동조회</em></label><input class="fc" id="sCurPrice" type="number" placeholder="종목 선택 시 자동 입력" readonly style="background:var(--bg2);color:var(--text-2);cursor:default;pointer-events:none;"></div>
       <div class="fg"><label>평가금액 (원) <em style="font-weight:400;color:var(--text-3);font-size:10px">← 수량 × 현재가 자동산출</em></label><input class="fc" id="sEval" type="number" placeholder="자동산출" readonly style="background:var(--bg2);color:var(--text-2);cursor:default;pointer-events:none;"></div>
       <div class="fg"><label>메모</label><input class="fc" id="sMemo" placeholder="선택 입력"></div>
@@ -1026,7 +1118,7 @@ function handleLoadDB(){
       </div>
       <!-- 계좌 필터 + 전체기록 토글 -->
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap;">
-        <div id="holdMgrFilterRow" style="display:flex;gap:6px;flex-wrap:nowrap;overflow-x:auto;flex:1;min-width:0;padding-bottom:2px;"></div>
+        <div id="holdMgrFilterRow" style="display:flex;gap:6px;flex-wrap:wrap;flex:1;min-width:0;"></div>
         <label style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text-2);cursor:pointer;white-space:nowrap">
           <input type="checkbox" id="holdMgrShowAllChk" onchange="toggleHoldMgrShowAll()" style="width:13px;height:13px;accent-color:var(--blue)">
           전체 입력기록 보기
@@ -1047,7 +1139,17 @@ function handleLoadDB(){
           <div class="fg" style="margin:0"><label>계좌</label><select class="fc" id="editHAcc"></select></div>
           <div class="fg" style="margin:0"><label>종목</label><select class="fc" id="editHEtf"></select></div>
           <div class="fg" style="margin:0"><label>보유수량</label><input class="fc" id="editHQty" type="number" min="0" oninput="previewHoldEdit()"></div>
-          <div class="fg" style="margin:0"><label>평단가 (원)</label><input class="fc" id="editHAvg" type="number" min="0" oninput="previewHoldEdit()"></div>
+          <div class="fg" style="margin:0">
+            <label id="editHAvgLabel">평단가 (원)</label>
+            <div style="display:flex;gap:6px">
+              <input class="fc" id="editHAvg" type="number" min="0" oninput="previewHoldEdit()" style="flex:1;min-width:0">
+              <select class="fc" id="editHCurrency" onchange="toggleEditHAvgCurrency()" style="width:72px;flex-shrink:0;padding-left:6px;padding-right:2px">
+                <option value="KRW">원</option>
+                <option value="USD">달러</option>
+              </select>
+            </div>
+          </div>
+          <div class="fg" style="margin:0" id="editHFxWrap"><label>적용 환율 (원/달러)</label><input class="fc" id="editHFxRate" type="number" min="0" oninput="previewHoldEdit()"></div>
           <div class="fg" style="margin:0"><label>현재가 (원)</label><input class="fc" id="editHCurPrice" type="number" min="0" oninput="previewHoldEdit()"></div>
           <div class="fg" style="margin:0"><label>평가금액 (원) <em style="font-weight:400;color:var(--text-3);font-size:10px">← 자동산출</em></label><input class="fc" id="editHEval" type="number" min="0" readonly style="background:var(--bg2);color:var(--text-2);cursor:default;"></div>
           <div class="fg" style="margin:0"><label>메모</label><input class="fc" id="editHMemo" placeholder="선택 입력"></div>
@@ -1368,7 +1470,41 @@ function handleLoadDB(){
       </div>
 
       <div class="fire-chart-wrap"><canvas id="fireChart"></canvas></div>
-      <p style="font-size:10px;color:var(--text-3);margin-top:10px;">* 매달 일정 수익률·투자금이 유지된다는 가정의 단순 추정이며, 실제 시장 상황에 따라 달라질 수 있습니다.</p>
+      <p style="font-size:10px;color:var(--text-3);margin-top:10px;">* 매달 일정 수익률·투자금이 유지된다는 가정의 단순 추정이며, 옅은 음영은 ±3%p 낙관/비관 시나리오예요. 실제 시장 상황에 따라 달라질 수 있습니다.</p>
+
+      <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border)">
+        <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:6px">
+          <div style="font-size:11px;font-weight:700;color:var(--text-2)">📊 나의 수익률 추이 vs 비교 기준</div>
+          <div style="display:flex;align-items:center;gap:6px">
+            <span style="font-size:10px;color:var(--text-3)">비교 기준 연수익률</span>
+            <input type="number" id="benchAnnualRate" value="8" min="0" max="30" step="0.5" oninput="renderBenchmarkCompare()"
+              style="width:48px;padding:3px 5px;border:1px solid var(--border);border-radius:6px;font-size:11px;text-align:center">
+            <span style="font-size:10px;color:var(--text-3)">%</span>
+          </div>
+        </div>
+        <div style="position:relative;height:160px"><canvas id="benchCompareChart"></canvas></div>
+        <div style="display:flex;gap:14px;margin-top:6px;font-size:10px;color:var(--text-3)">
+          <span style="display:flex;align-items:center;gap:4px"><span style="width:9px;height:2px;background:var(--blue);display:inline-block"></span>내 포트폴리오</span>
+          <span style="display:flex;align-items:center;gap:4px"><span style="width:9px;height:2px;background:var(--text-3);display:inline-block;border-top:1px dashed var(--text-3)"></span>비교 기준 (가정)</span>
+        </div>
+        <p style="font-size:9.5px;color:var(--text-3);margin-top:6px">* 실제 S&amp;P500 등 지수 데이터를 가져오는 게 아니라, 입력한 연수익률로 꾸준히 성장했다고 가정한 가상의 비교선이에요. 적립 초기에는 신규 투자금 비중이 커서 내 수익률이 0%에 가깝게 보일 수 있어요.</p>
+      </div>
+
+      <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border)">
+        <div style="font-size:11px;font-weight:700;color:var(--text-2);margin-bottom:10px">🏁 마일스톤 타임라인</div>
+        <div id="fireMilestoneTimeline" style="display:flex;gap:8px;flex-wrap:wrap"></div>
+      </div>
+
+      <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border)">
+        <div style="font-size:11px;font-weight:700;color:var(--text-2);margin-bottom:10px">🎛️ 매수증액 시뮬레이션 <span style="font-weight:500;color:var(--text-3);font-size:10px">— 저장되지 않는 가상 계산이에요</span></div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+          <span style="font-size:11px;color:var(--text-3);white-space:nowrap">월 추가매수</span>
+          <input type="range" id="fireBuySimSlider" min="0" max="2000000" step="50000" value="0"
+            oninput="renderFireBuySim()" style="flex:1">
+          <span style="font-size:12px;font-weight:700;color:var(--text-1);white-space:nowrap;min-width:70px;text-align:right" id="fireBuySimVal">₩0</span>
+        </div>
+        <div style="font-size:12px;color:var(--text-2);background:var(--bg2);border-radius:8px;padding:10px 12px" id="fireBuySimResult">슬라이더를 움직여서 월 추가매수액을 정해보세요.</div>
+      </div>
     </div>
   </div>
 </div>
@@ -1478,7 +1614,26 @@ function handleLoadDB(){
       </div>
       <div class="fr">
         <div class="fg"><label>종목</label><select class="fc" id="dvEtf"></select></div>
-        <div class="fg"><label>배당금 (원)</label><input class="fc" id="dvAmount" type="number" placeholder="50000"></div>
+        <div class="fg"><label>통화</label>
+          <select class="fc" id="dvCurrency" onchange="toggleDvFxField()">
+            <option value="KRW">원화 (KRW)</option>
+            <option value="USD">달러 (USD)</option>
+          </select>
+        </div>
+      </div>
+      <div class="fr">
+        <div class="fg"><label id="dvAmountLabel">배당금 (원)</label><input class="fc" id="dvAmount" type="number" placeholder="50000" oninput="updateDvFxPreview()"></div>
+        <div class="fg" id="dvFxWrap" style="display:none"><label>적용 환율 (원/달러)</label><input class="fc" id="dvFxRate" type="number" placeholder="1350" oninput="updateDvFxPreview()"></div>
+      </div>
+      <div id="dvFxPreview" style="display:none;font-size:11px;color:var(--text-3);margin:-4px 0 10px"></div>
+      <div class="fg">
+        <label>세전 / 세후</label>
+        <div style="display:flex;gap:4px;background:var(--bg2);border-radius:9px;padding:3px;width:fit-content">
+          <button type="button" id="dvTaxPost" onclick="setDvTaxStatus('post')"
+            style="padding:5px 14px;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;border:none;background:var(--blue);color:#fff;transition:all .15s">세후 (실수령)</button>
+          <button type="button" id="dvTaxPre" onclick="setDvTaxStatus('pre')"
+            style="padding:5px 14px;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;border:none;background:transparent;color:var(--text-2);transition:all .15s">세전</button>
+        </div>
       </div>
       <div class="fg"><label>메모</label><input class="fc" id="dvMemo" placeholder="선택 입력"></div>
       <button class="btn-p" onclick="addDividend()" style="width:100%;margin-top:10px;padding:11px;">+ 배당 추가</button>
@@ -1503,6 +1658,16 @@ function handleLoadDB(){
         <div class="fire-stat">
           <div class="fire-stat-lbl">전체 누적 배당금</div>
           <div class="fire-stat-val" id="dvStatAll">-</div>
+        </div>
+        <div class="fire-stat">
+          <div class="fire-stat-lbl">예상 연간 배당</div>
+          <div class="fire-stat-val" id="dvStatExpected">-</div>
+          <div style="font-size:9px;color:var(--text-3);font-weight:600;margin-top:1px">월 평균 × 12 추정</div>
+        </div>
+        <div class="fire-stat">
+          <div class="fire-stat-lbl">배당수익률 <span style="font-weight:500">(연환산)</span></div>
+          <div class="fire-stat-val" id="dvStatYield">-</div>
+          <div style="font-size:9px;color:var(--text-3);font-weight:600;margin-top:1px">예상 연간배당 ÷ 현재 평가금액</div>
         </div>
       </div>
       <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:14px;flex-wrap:wrap">
@@ -1535,6 +1700,20 @@ function handleLoadDB(){
   </div>
 
   <div class="card" style="margin-top:20px">
+    <div class="card-ttl">ETF별 배당금
+      <span style="margin-left:auto;display:flex;gap:4px;background:var(--bg2);border-radius:9px;padding:3px;border:1px solid var(--border)">
+        <button id="dvEtfModeAll" onclick="setDvEtfMode('all')"
+          style="padding:4px 12px;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;
+            border:none;background:var(--blue);color:#fff;transition:all .15s">전체 누적</button>
+        <button id="dvEtfMode12m" onclick="setDvEtfMode('12m')"
+          style="padding:4px 12px;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;
+            border:none;background:transparent;color:var(--text-2);transition:all .15s">최근 12개월</button>
+      </span>
+    </div>
+    <div id="dvByEtfList"></div>
+  </div>
+
+  <div class="card" style="margin-top:20px">
     <div class="card-ttl">배당 내역 <span class="chip">수정 버튼 클릭 → 인라인 편집</span>
       <button onclick="exportDividendCsv()" style="margin-left:auto;padding:4px 12px;border-radius:7px;border:1.5px solid var(--border);background:var(--surface);color:var(--text-2);font-size:11px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:4px;transition:all .15s;" onmouseover="this.style.borderColor='var(--blue)';this.style.color='var(--blue)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-2)'">⬇ CSV</button>
     </div>
@@ -1561,8 +1740,24 @@ function handleLoadDB(){
         <div class="fg" style="margin:0"><label>입금일</label><input class="fc" id="editDvDate" type="date"></div>
         <div class="fg" style="margin:0"><label>계좌</label><select class="fc" id="editDvAcc"></select></div>
         <div class="fg" style="margin:0"><label>종목</label><select class="fc" id="editDvEtf"></select></div>
-        <div class="fg" style="margin:0"><label>배당금 (원)</label><input class="fc" id="editDvAmount" type="number"></div>
+        <div class="fg" style="margin:0"><label>통화</label>
+          <select class="fc" id="editDvCurrency" onchange="toggleEditDvFxField()">
+            <option value="KRW">원화 (KRW)</option>
+            <option value="USD">달러 (USD)</option>
+          </select>
+        </div>
+        <div class="fg" style="margin:0"><label id="editDvAmountLabel">배당금 (원)</label><input class="fc" id="editDvAmount" type="number"></div>
+        <div class="fg" style="margin:0" id="editDvFxWrap"><label>적용 환율 (원/달러)</label><input class="fc" id="editDvFxRate" type="number"></div>
         <div class="fg" style="margin:0"><label>메모</label><input class="fc" id="editDvMemo"></div>
+      </div>
+      <div class="fg">
+        <label>세전 / 세후</label>
+        <div style="display:flex;gap:4px;background:var(--surface);border-radius:9px;padding:3px;width:fit-content;border:1px solid var(--border)">
+          <button type="button" id="editDvTaxPost" onclick="setEditDvTaxStatus('post')"
+            style="padding:5px 14px;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;border:none;background:var(--blue);color:#fff;transition:all .15s">세후 (실수령)</button>
+          <button type="button" id="editDvTaxPre" onclick="setEditDvTaxStatus('pre')"
+            style="padding:5px 14px;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;border:none;background:transparent;color:var(--text-2);transition:all .15s">세전</button>
+        </div>
       </div>
       <div style="display:flex;gap:8px">
         <button class="btn-p" style="flex:1" onclick="saveDivEdit()">저장</button>
@@ -1835,6 +2030,17 @@ function handleLoadDB(){
       <button class="modal-close" onclick="closeModal()">✕</button>
     </div>
     <div class="m-kpi-g" id="mKpis"></div>
+    <div class="m-section-ttl" style="margin-bottom:10px">계좌별 보유 내역</div>
+    <div style="overflow-x:auto;margin-bottom:22px">
+      <table class="m-hold-tbl" id="mHoldTbl">
+        <thead><tr><th>계좌</th><th>보유수량</th><th>평단가</th><th>현재가</th><th>평가금액</th><th>실투자금액</th><th>평가손익</th><th>수익률</th></tr></thead>
+        <tbody id="mHoldBody"></tbody>
+      </table>
+    </div>
+
+    <div class="m-section-ttl">목표비중</div>
+    <div id="mTargetWeight" style="margin-bottom:22px"></div>
+
     <div class="chun-box" id="chunBox">
       <div class="chun-top">
         <div class="chun-title">🎯 천주모으기 진행률</div>
@@ -1846,13 +2052,28 @@ function handleLoadDB(){
         <div class="chun-remain" id="chunRemain"></div>
       </div>
     </div>
-    <div class="m-section-ttl" style="margin-bottom:10px">계좌별 보유 내역</div>
-    <div style="overflow-x:auto;margin-bottom:22px">
-      <table class="m-hold-tbl" id="mHoldTbl">
-        <thead><tr><th>계좌</th><th>보유수량</th><th>평단가</th><th>현재가</th><th>평가금액</th><th>실투자금액</th><th>평가손익</th><th>수익률</th></tr></thead>
-        <tbody id="mHoldBody"></tbody>
+
+    <div class="m-section-ttl" style="display:flex;align-items:center;gap:8px">거래기록 <span id="mTradeCount" style="font-size:11px;font-weight:600;color:var(--text-3)"></span></div>
+    <div id="mTradeSummary" style="margin-bottom:10px"></div>
+    <div style="overflow-x:auto;max-height:220px;overflow-y:auto;margin-bottom:22px;border:1px solid var(--border);border-radius:10px">
+      <table class="m-hold-tbl" id="mTradeTbl">
+        <thead><tr><th>날짜</th><th>계좌</th><th>구분</th><th>수량</th><th>단가</th><th>실현손익</th></tr></thead>
+        <tbody id="mTradeBody"></tbody>
       </table>
     </div>
+
+    <div class="m-section-ttl" style="display:flex;align-items:center;gap:8px">배당기록 <span id="mDivCount" style="font-size:11px;font-weight:600;color:var(--text-3)"></span></div>
+    <div id="mDivSummary" style="margin-bottom:10px"></div>
+    <div style="overflow-x:auto;max-height:220px;overflow-y:auto;margin-bottom:22px;border:1px solid var(--border);border-radius:10px">
+      <table class="m-hold-tbl" id="mDivTbl">
+        <thead><tr><th>날짜</th><th>계좌</th><th>배당금</th><th>메모</th></tr></thead>
+        <tbody id="mDivBody"></tbody>
+      </table>
+    </div>
+
+    <div class="m-section-ttl">최근 메모</div>
+    <div id="mMemoList" style="margin-bottom:22px"></div>
+
     <div class="m-section-ttl">최근 12개월 평가금액 추이</div>
     <div class="m-chart-wrap"><canvas id="mLineChart"></canvas></div>
   </div>
@@ -1990,11 +2211,14 @@ let DB = {
 
   fireSettings:{ mode:'income', target:500000000, monthlyIncome:5000000, savingsRate:40, annualReturn:6 },
 
-  /* 컬럼: date(입금일) / accountId / etfId / amount(실수령액,원) / memo */
+  /* 컬럼: date(입금일) / accountId / etfId / amount(입력 통화 기준 금액) / currency(KRW|USD) / fxRate(USD일 때 적용환율) / taxStatus(pre|post) / memo */
   dividends:[],
 
   /* 컬럼: date / accountId / etfId / type(buy|sell) / qty / price / fee / memo / reflect(포지션 자동반영 여부, 기본 true) / realizedGain(sell·reflect=true만, 자동계산) */
   trades:[],
+
+  /* Portfolio Brief 변화감지 기준점 — 매일 처음 열 때 직전 값과 비교해서 "오늘 무엇이 달라졌는지" 판단하는 데 사용 */
+  briefSnapshot: null,
 
   /* 컬럼: baseDate / accountId / etfId / qty / avgCost / evalAmount / memo */
   holdings:[
@@ -2038,7 +2262,7 @@ let DB = {
 };
 
 /* ── 상태 ── */
-let activeFilter = 'ALL';
+let activeFilter = 'ISA';
 let chartDonut = null, chartLine = null, chartModal = null;
 // ACCS는 DB.accounts 참조 — 계좌 추가 시 DB.accounts만 수정
 const getACCS = ()=> DB.accounts;
@@ -2701,7 +2925,7 @@ function rRect(c,x,y,w,h,r){
 }
 
 /* ═══ 수평 바 ═══ */
-let _barMode = 'etf'; // 'etf' | 'cat'
+let _barMode = 'cat'; // 'etf' | 'cat'
 
 /* ═══ 투자 동기부여: 주별 매수 활동 히트맵 + 연속 적립 스트릭 + 자산 마일스톤 ═══ */
 function getWeekStartMon(dateStr){
@@ -2714,6 +2938,542 @@ function getWeekStartMon(dateStr){
 }
 function fmtWeekKey(d){
   return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+
+// 과거 특정 날짜(refDate) 기준 보유현황 재구성 — getActiveHoldings()와 동일한 로직이지만 기준일을 임의로 지정
+function getHoldingsAsOf(refDate){
+  const map = new Map();
+  DB.holdings
+    .filter(h => h.baseDate <= refDate)
+    .forEach(h=>{
+      const key = h.accountId+'|'+h.etfId;
+      const cur = map.get(key);
+      if(!cur || h.baseDate > cur.baseDate) map.set(key, h);
+    });
+  return [...map.values()].filter(h => h.qty > 0);
+}
+// 특정 시점의 평가금액/수익률/보유종목수 — 투자 타임캡슐에서 사용
+function computePortfolioStateAsOf(refDate){
+  const rows = getHoldingsAsOf(refDate);
+  const totalEval = rows.reduce((s,h)=>s+h.evalAmount,0);
+  const totalInvest = rows.reduce((s,h)=>s+h.qty*h.avgCost,0);
+  const rate = totalInvest>0 ? (totalEval-totalInvest)/totalInvest*100 : 0;
+  const etfCount = new Set(rows.map(h=>h.etfId)).size;
+  return { totalEval, totalInvest, rate, etfCount };
+}
+function addMonths(dateStr, n){
+  const d = new Date(dateStr+'T00:00:00');
+  d.setMonth(d.getMonth()+n);
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function monthDiffYM(m1,m2){ // 'YYYY-MM' 문자열 둘 사이 개월수
+  const [y1,mo1]=m1.split('-').map(Number), [y2,mo2]=m2.split('-').map(Number);
+  return (y2-y1)*12+(mo2-mo1);
+}
+
+// 억단위 자산 마일스톤을 처음 넘긴 시점들 사이의 소요 개월수 (성장 가속도)
+function computeEokGrowthSpeed(){
+  const snaps = (DB.monthlySnapshots||[]).filter(s=>s.totalAsset>0).sort((a,b)=>a.month.localeCompare(b.month));
+  if(!snaps.length) return [];
+  const firstMonth = snaps[0].month;
+  const results = [];
+  let prevMonth = firstMonth;
+  for(let eok=1; eok<=30; eok++){
+    const hit = snaps.find(s=>s.totalAsset >= eok*1e8);
+    if(!hit) break;
+    const monthsTaken = Math.max(1, monthDiffYM(prevMonth, hit.month) + (eok===1 ? 1 : 0));
+    results.push({ eok, month: hit.month, monthsTaken });
+    prevMonth = hit.month;
+  }
+  return results;
+}
+
+// 전체 거래기록(주 단위)에서 가장 길었던 연속 매수 스트릭 (현재 진행 중인 52주 히트맵보다 더 넓은 범위로 전체 기간 탐색)
+function computeMaxStreakWeeks(){
+  const buys = (DB.trades||[]).filter(t=>t.type==='buy');
+  if(!buys.length) return 0;
+  const weekKeys = new Set(buys.map(t=>fmtWeekKey(getWeekStartMon(t.date))));
+  const sortedKeys = [...weekKeys].sort();
+  let w = getWeekStartMon(sortedKeys[0]);
+  const last = getWeekStartMon(today());
+  let cur=0, max=0;
+  while(w<=last){
+    const key = fmtWeekKey(w);
+    if(weekKeys.has(key)){ cur++; max=Math.max(max,cur); } else { cur=0; }
+    w = new Date(w); w.setDate(w.getDate()+7);
+  }
+  return max;
+}
+
+// 첫 거래(또는 첫 보유기록) 날짜부터 오늘까지 누적 일수
+function getInvestmentDayCount(){
+  const dates = [
+    ...(DB.trades||[]).map(t=>t.date),
+    ...(DB.holdings||[]).map(h=>h.baseDate)
+  ].filter(Boolean).sort();
+  if(!dates.length) return { days:0, startDate:null };
+  const start = dates[0];
+  const days = Math.round((new Date(today()+'T00:00:00') - new Date(start+'T00:00:00')) / 86400000) + 1;
+  return { days, startDate:start };
+}
+
+// 최근 12개월 중 매수가 1번이라도 있었던 달의 비율 (적립 꾸준함 점수)
+function computeBuyConsistency(){
+  const buys = (DB.trades||[]).filter(t=>t.type==='buy');
+  if(!buys.length) return null;
+  const now = new Date();
+  let monthsWithBuy = 0;
+  for(let i=0;i<12;i++){
+    const d = new Date(now.getFullYear(), now.getMonth()-i, 1);
+    const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+    if(buys.some(t=>t.date.slice(0,7)===key)) monthsWithBuy++;
+  }
+  return monthsWithBuy/12*100;
+}
+
+// 올해/작년 누적 순매수(매수금액-매도금액) 월별 추이 — 작년의 나와 비교
+function computeNetBuyYoY(){
+  const trades = DB.trades||[];
+  const now = new Date();
+  const thisYear = now.getFullYear(), lastYear = thisYear-1, curMonth = now.getMonth();
+  function monthlyNetCum(year, truncateFuture){
+    const arr = Array(12).fill(0);
+    trades.forEach(t=>{
+      const d = new Date(t.date+'T00:00:00');
+      if(isNaN(d) || d.getFullYear()!==year) return;
+      const amt = t.qty*t.price;
+      arr[d.getMonth()] += (t.type==='buy' ? amt : -amt);
+    });
+    let sum=0;
+    return arr.map((v,i)=>{
+      if(truncateFuture && i>curMonth) return null;
+      sum+=v; return Math.round(sum);
+    });
+  }
+  return { thisYear: monthlyNetCum(thisYear,true), lastYear: monthlyNetCum(lastYear,false) };
+}
+
+/* ═══ Portfolio Brief — "오늘 무엇이 가장 중요한가"를 읽어주는 변화감지 엔진 ═══
+   실제 LLM을 호출하는 게 아니라, 매일 핵심 지표를 어제 값과 비교해서
+   ①변화 ②근거 ③영향 ④행동 순서로 데이터 기반 문장을 자동 구성한다. */
+
+// 오늘 시점의 핵심 지표 — 매일 이 값을 어제 스냅샷과 비교한다
+function computeBriefState(){
+  const totalEval = DB.totalEval||0;
+  const totalGainRate = DB.totalInvest>0 ? DB.totalGain/DB.totalInvest*100 : 0;
+  const snap = window._fireSnap;
+  const fireReachMonth = (snap && snap.target>0) ? snap.reachMonth : null;
+
+  const etfGaps = {};
+  DB.etfs.forEach(e=>{ if((e.etfTarget||0)>0) etfGaps[e.id] = e.etfGap||0; });
+
+  const divs = DB.dividends||[];
+  const lastDividendDate = divs.length ? [...divs].sort((a,b)=>b.date.localeCompare(a.date))[0].date : null;
+
+  // 이번 달 투자예산 사용률 (FIRE income 모드의 월 투자금액 기준)
+  let budgetUsedPct = null;
+  if(snap && snap.monthlyInvest>0){
+    const now = new Date();
+    const curMonthKey = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+    const monthNet = (DB.trades||[]).filter(t=>t.date.slice(0,7)===curMonthKey)
+      .reduce((s,t)=> s + (t.type==='buy' ? t.qty*t.price : 0), 0);
+    budgetUsedPct = monthNet/snap.monthlyInvest*100;
+  }
+
+  // 현재 리밸런싱 대상(목표비중과 5%p 이상 벌어진 종목) id 목록
+  const rebalTargets = DB.etfs.filter(e=>e.etfSignal==='buy'||e.etfSignal==='sell').map(e=>e.id);
+
+  return { totalEval, totalGainRate, fireReachMonth, etfGaps, lastDividendDate, budgetUsedPct, rebalTargets };
+}
+
+// 대략적인 권장 매수/매도 수량 (현재가 기준 추정치 — 리밸런싱 탭과 동일한 근사 방식)
+function estimateRebalQty(etf, gapPct){
+  const rows = getActiveHoldings().filter(h=>h.etfId===etf.id);
+  const qty = rows.reduce((s,h)=>s+h.qty,0);
+  const eval_ = rows.reduce((s,h)=>s+h.evalAmount,0);
+  const curPrice = qty>0 ? eval_/qty : 0;
+  if(!curPrice) return null;
+  const amt = Math.abs(gapPct)/100 * (DB.totalEval||0);
+  return Math.round(amt/curPrice);
+}
+
+// prev(어제) → cur(오늘) 비교해서 변화 목록 생성. 각 항목은 변화/근거/영향/행동/질문을 모두 갖춘다.
+function diffBriefStates(prev, cur){
+  const changes = [];
+
+  // 1) ETF별 목표비중 갭 — 새로 ±3%p 이상으로 벌어졌거나, 부호가 바뀐 경우만 "변화"로 취급
+  Object.keys(cur.etfGaps).forEach(etfId=>{
+    const etf = DB.etfs.find(e=>e.id===etfId);
+    if(!etf) return;
+    const curGap = cur.etfGaps[etfId];
+    const prevGap = prev.etfGaps?.[etfId];
+    if(prevGap===undefined) return; // 처음 보는 종목은 변화로 안 잡음 (비교 기준이 없으므로)
+    const wasSignificant = Math.abs(prevGap)>=3;
+    const isSignificant  = Math.abs(curGap)>=3;
+    if(isSignificant && (!wasSignificant || Math.sign(curGap)!==Math.sign(prevGap))){
+      const over = curGap>0;
+      const qty = estimateRebalQty(etf, curGap);
+      changes.push({
+        type: over ? 'warn' : 'warn',
+        category: Math.abs(curGap)>=8 ? 'urgent' : 'caution',
+        tab:'dashboard', anchor:'rbSummary',
+        headline: `${etf.name}이 목표비중을 ${over?'초과':'벗어나(부족)'}했습니다.`,
+        evidence: `목표비중 대비 ${curGap>=0?'+':''}${curGap.toFixed(1)}%p (어제 ${prevGap>=0?'+':''}${prevGap.toFixed(1)}%p)`,
+        impact: `${etf.name}이(가) 포함된 자산 비중이 계획보다 ${over?'많이':'적게'} 쏠리고 있어요. 그대로 두면 포트폴리오 위험도가 의도한 것과 달라질 수 있어요.`,
+        action: qty ? `약 ${qty.toLocaleString()}주 ${over?'매도':'매수'}하면 목표비중에 가까워져요.` : `리밸런싱 탭에서 구체적인 수량을 확인해보세요.`,
+        question: `${etf.name} 비중이 ${over?'높아진':'낮아진'} 이유는?`,
+        weight: 10 + Math.abs(curGap)
+      });
+    }
+  });
+
+  // 2) FIRE 예상 도달시기 변경
+  if(prev.fireReachMonth!=null && cur.fireReachMonth!=null && prev.fireReachMonth!==cur.fireReachMonth){
+    const diff = prev.fireReachMonth - cur.fireReachMonth; // 양수면 더 빨리 도달 (좋은 변화)
+    const now = new Date();
+    const prevDate = new Date(now.getFullYear(), now.getMonth()+prev.fireReachMonth, 1);
+    const curDate  = new Date(now.getFullYear(), now.getMonth()+cur.fireReachMonth, 1);
+    changes.push({
+      type: diff>0 ? 'good' : 'warn',
+      category: diff>0 ? 'opportunity' : 'caution',
+      tab:'fire',
+      headline: `FIRE 목표 도달 예상시기가 ${diff>0?'빨라':'늦춰'}졌습니다.`,
+      evidence: `${Math.abs(diff)}개월 ${diff>0?'단축':'연장'} (${prevDate.getFullYear()}년 ${prevDate.getMonth()+1}월 → ${curDate.getFullYear()}년 ${curDate.getMonth()+1}월)`,
+      impact: diff>0 ? `최근 투자 속도나 수익률이 좋아져서 목표 자산까지의 거리가 줄었어요.` : `최근 투자 속도가 줄거나 평가금액이 줄어서 목표까지의 거리가 늘었어요.`,
+      action: diff>0 ? `지금 속도를 유지하면 돼요.` : `월 투자금을 늘리면 다시 앞당길 수 있어요.`,
+      question: `FIRE 예상시기에 가장 큰 영향을 준 건 뭔가요?`,
+      weight: 9
+    });
+  }
+
+  // 3) 새로운 최고 자산 달성
+  if(cur.totalEval > (prev.maxEverEval||0) && (prev.maxEverEval||0)>0){
+    changes.push({
+      type: 'good',
+      category: 'achievement',
+      tab:'dashboard',
+      headline: `새로운 최고 자산을 달성했습니다.`,
+      evidence: `${W(cur.totalEval)} (이전 최고 ${W(prev.maxEverEval)})`,
+      impact: `꾸준한 적립과 시장 상승이 함께 작용한 결과예요.`,
+      action: `지금처럼 정기적으로 매수를 이어가면 이 흐름을 유지할 수 있어요.`,
+      question: `이번 상승을 이끈 종목은?`,
+      weight: 12
+    });
+  }
+
+  // 4) 배당 입력 공백 (마지막 입력일로부터 30일 이상)
+  if(cur.lastDividendDate){
+    const daysSince = Math.round((new Date(today()+'T00:00:00') - new Date(cur.lastDividendDate+'T00:00:00'))/86400000);
+    const prevDaysSince = prev.lastDividendDate
+      ? Math.round((new Date(prev.date+'T00:00:00') - new Date(prev.lastDividendDate+'T00:00:00'))/86400000)
+      : 0;
+    if(daysSince>=30 && prevDaysSince<30){
+      changes.push({
+        type: 'warn',
+        category: 'caution',
+        tab:'dividend',
+        headline: `배당 입력이 ${Math.floor(daysSince/30)}개월째 없습니다.`,
+        evidence: `마지막 입력일 ${cur.lastDividendDate}`,
+        impact: `실제로 받은 배당이 있다면 기록이 빠져서 배당 통계와 FIRE 계산이 부정확해질 수 있어요.`,
+        action: `배당금 탭에서 최근 받은 배당을 입력해보세요.`,
+        question: `올해 예상 배당금은 얼마인가요?`,
+        weight: 6
+      });
+    }
+  }
+
+  // 5) 이번 달 투자예산 거의 소진 (80% 이상, 어제는 80% 미만)
+  if(cur.budgetUsedPct!=null){
+    const prevPct = prev.budgetUsedPct;
+    if(cur.budgetUsedPct>=80 && (prevPct==null || prevPct<80)){
+      changes.push({
+        type: cur.budgetUsedPct>100 ? 'warn' : 'neutral',
+        category: cur.budgetUsedPct>=100 ? 'urgent' : 'caution',
+        tab:'fire',
+        headline: cur.budgetUsedPct>=100 ? `이번 달 투자예산을 초과했습니다.` : `이번 달 투자예산이 거의 소진됐습니다.`,
+        evidence: `이번 달 순매수 ${cur.budgetUsedPct.toFixed(0)}% 사용 (월 예산 대비)`,
+        impact: `계획한 적립 속도를 거의 다 썼어요. ${cur.budgetUsedPct>=100?'예산보다 더 투자하고 있어요.':''}`,
+        action: `남은 기간엔 추가매수보다 리밸런싱 위주로 점검해보는 게 좋아요.`,
+        question: `이번 달 남은 예산은 어디에 배분하면 좋을까요?`,
+        weight: 7
+      });
+    }
+  }
+
+  // 6) 리밸런싱 대상 신규 추가
+  const newTargets = cur.rebalTargets.filter(id=>!(prev.rebalTargets||[]).includes(id));
+  if(newTargets.length>0 && (prev.rebalTargets||[]).length>0){
+    const etf = DB.etfs.find(e=>e.id===newTargets[0]);
+    if(etf){
+      changes.push({
+        type: 'warn',
+        category: 'caution',
+        tab:'dashboard', anchor:'rbSummary',
+        headline: `${etf.name}${newTargets.length>1?` 등 ${newTargets.length}개 종목이`:'이'} 새로 리밸런싱 대상에 추가됐습니다.`,
+        evidence: `목표비중 대비 ${etf.etfGap>=0?'+':''}${(etf.etfGap||0).toFixed(1)}%p`,
+        impact: `보유 비중이 계획과 달라지기 시작했어요.`,
+        action: `리밸런싱 탭에서 확인해보세요.`,
+        question: `지금 리밸런싱하면 몇 주를 사야 하나요?`,
+        weight: 8
+      });
+    }
+  }
+
+  return changes.sort((a,b)=>b.weight-a.weight);
+}
+
+// 오늘 첫 호출이면 어제 스냅샷과 비교해서 변화를 감지하고, 오늘 하루 동안은 그 결과를 고정해서 보여준다.
+// (※ "변동성" 항목은 일별 가격 히스토리를 저장하지 않아 계산할 수 없어 포함하지 않음)
+function getTodaysBriefChanges(){
+  const cur = computeBriefState();
+  let snap = DB.briefSnapshot;
+
+  if(!snap){
+    // 첫 사용 — 비교 기준이 없으니 변화 없이 오늘 스냅샷만 기록
+    DB.briefSnapshot = { date: today(), ...cur, maxEverEval: cur.totalEval, todaysChanges: [] };
+    save();
+    return [];
+  }
+
+  if(snap.date !== today()){
+    // 새 날 — 어제(snap) 대비 변화 감지 후, 오늘 스냅샷으로 교체
+    const changes = diffBriefStates(snap, cur);
+    DB.briefSnapshot = { date: today(), ...cur, maxEverEval: Math.max(snap.maxEverEval||0, cur.totalEval), todaysChanges: changes };
+    save();
+    return changes;
+  }
+
+  // 같은 날 — 오늘 처음 감지했던 변화를 그대로 유지 (단, 최고자산 갱신은 그날 안에도 다시 확인)
+  if(cur.totalEval > (snap.maxEverEval||0) && (snap.maxEverEval||0)>0){
+    snap.maxEverEval = cur.totalEval;
+    if(!snap.todaysChanges.some(c=>c.question==='이번 상승을 이끈 종목은?')){
+      snap.todaysChanges.unshift({
+        type:'good', category:'achievement', tab:'dashboard', headline:'새로운 최고 자산을 달성했습니다.',
+        evidence:`${W(cur.totalEval)}`, impact:'꾸준한 적립과 시장 상승이 함께 작용한 결과예요.',
+        action:'지금처럼 정기적으로 매수를 이어가면 이 흐름을 유지할 수 있어요.',
+        question:'이번 상승을 이끈 종목은?', weight:12
+      });
+      snap.todaysChanges.sort((a,b)=>b.weight-a.weight);
+    }
+    save();
+  } else if(cur.totalEval > (snap.maxEverEval||0)){
+    snap.maxEverEval = cur.totalEval;
+  }
+  return snap.todaysChanges||[];
+}
+
+
+const BRIEF_CATEGORY = {
+  urgent:      { label:'🔴 긴급', bg:'var(--pos-soft)',   fg:'var(--pos)'   },
+  caution:     { label:'🟠 주의', bg:'var(--amber-soft)', fg:'var(--amber)' },
+  opportunity: { label:'🟢 기회', bg:'var(--green-soft)', fg:'var(--green)' },
+  achievement: { label:'🔵 성과', bg:'var(--blue-soft)',  fg:'var(--blue)'  }
+};
+const BRIEF_TAB_LABEL = { dashboard:'대시보드', fire:'FIRE 계산기', dividend:'배당금', data:'보유 포지션', trades:'거래기록' };
+
+function goToBrief(tab, anchor){
+  if(!tab) return;
+  switchTab(tab);
+  if(anchor) setTimeout(()=>document.getElementById(anchor)?.scrollIntoView({behavior:'smooth', block:'center'}), 120);
+}
+
+// 오늘 가장 중요한 변화 하나를 한 문장으로 합성 — 매번 가장 의미있는 신호를 골라 보여줌
+function generateHeadlineInsight(changes, cur){
+  if(changes.length){
+    const top = changes[0];
+    return `${top.headline} <span style="color:var(--text-3);font-weight:500;font-size:13px">${top.evidence}</span>`;
+  }
+  if(cur.budgetUsedPct!=null){
+    return `이번 달 투자금은 목표의 <b style="color:var(--blue)">${cur.budgetUsedPct.toFixed(0)}%</b>를 집행했습니다.`;
+  }
+  if(DB.totalInvest>0){
+    const rate = DB.totalGain/DB.totalInvest*100;
+    return `전체 포트폴리오 수익률은 <b style="color:var(--blue)">${rate>=0?'+':''}${rate.toFixed(1)}%</b>를 유지하고 있습니다.`;
+  }
+  return '보유 포지션을 입력하면 매일 핵심 인사이트를 보여드릴게요.';
+}
+
+function renderAiBriefing(){
+  const linesEl = document.getElementById('aiBriefLines');
+  if(!linesEl) return;
+
+  renderFireTab(); // FIRE 계산 최신화 (FIRE 탭을 한 번도 안 봤어도 window._fireSnap이 채워지도록)
+
+  document.getElementById('aiBriefDate').textContent = today();
+
+  const changes = getTodaysBriefChanges();
+  window._briefChanges = changes; // 질문 클릭/상세보기에서 재사용
+
+  document.getElementById('aiBriefHeadlineInsight').innerHTML = generateHeadlineInsight(changes, computeBriefState());
+
+  const countEl = document.getElementById('aiBriefAgendaCount');
+  countEl.textContent = changes.length ? `오늘 확인해야 할 안건 ${changes.length}건` : '오늘은 특별한 안건이 없어요';
+
+  if(!changes.length){
+    const rate = DB.totalInvest>0 ? DB.totalGain/DB.totalInvest*100 : 0;
+    linesEl.innerHTML = DB.totalEval>0
+      ? `<div style="font-size:13px;color:var(--text-2)">포트폴리오가 안정적으로 유지되고 있습니다.
+          <span style="color:var(--text-3);font-size:12px">· 전체 수익률 ${rate>=0?'+':''}${rate.toFixed(1)}%</span></div>`
+      : `<div style="font-size:13px;color:var(--text-2)">보유 포지션을 입력하면 매일 무엇이 달라졌는지 알려드릴게요.</div>`;
+  } else {
+    linesEl.innerHTML = changes.slice(0,4).map(c=>{
+      const cat = BRIEF_CATEGORY[c.category] || BRIEF_CATEGORY.caution;
+      return `<div onclick="goToBrief('${c.tab||''}','${c.anchor||''}')" style="display:flex;align-items:flex-start;gap:10px;padding:8px 4px;
+          border-bottom:1px solid var(--border);${c.tab?'cursor:pointer':''}">
+        <span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:5px;white-space:nowrap;flex-shrink:0;margin-top:1px;
+          background:${cat.bg};color:${cat.fg}">${cat.label}</span>
+        <span style="font-size:13px;color:var(--text-1);line-height:1.5"><b>${c.headline}</b>
+          <span style="color:var(--text-3);font-size:12px">· ${c.evidence}</span></span>
+      </div>`;
+    }).join('');
+  }
+
+  // 자세히 보기 패널: ①변화 ②근거 ③영향 ④행동 — 전체 변화 목록
+  const detailPanel = document.getElementById('aiBriefDetailPanel');
+  detailPanel.innerHTML = changes.length ? changes.map((c,i)=>{
+    const cat = BRIEF_CATEGORY[c.category] || BRIEF_CATEGORY.caution;
+    return `
+    <div style="margin-bottom:14px;${i<changes.length-1?'padding-bottom:14px;border-bottom:1px solid var(--border)':''}">
+      <div style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:5px;display:inline-block;margin-bottom:8px;
+        background:${cat.bg};color:${cat.fg}">${cat.label}</div>
+      <div style="font-size:12.5px;font-weight:700;color:var(--text-1);margin-bottom:6px">① 변화 — ${c.headline}</div>
+      <div style="font-size:12px;color:var(--text-2);margin-bottom:4px">② 근거 — ${c.evidence}</div>
+      <div style="font-size:12px;color:var(--text-2);margin-bottom:4px">③ 영향 — ${c.impact}</div>
+      <div style="font-size:12px;color:var(--text-2);margin-bottom:${c.tab?'8px':'0'}">④ 행동 — ${c.action}</div>
+      ${c.tab ? `<button onclick="goToBrief('${c.tab}','${c.anchor||''}')" style="font-size:11px;font-weight:600;color:var(--blue);
+        background:none;border:none;cursor:pointer;padding:0">→ ${BRIEF_TAB_LABEL[c.tab]||c.tab}에서 확인하기</button>` : ''}
+    </div>`;
+  }).join('')
+    : `<div style="font-size:12px;color:var(--text-3)">오늘은 추가로 보여드릴 상세 변화가 없어요.</div>`;
+
+  renderBriefAgenda();
+
+  // 추천 질문 (변화 기반, 최대 5개)
+  const qWrap = document.getElementById('aiBriefQuestions');
+  const qList = changes.slice(0,5);
+  if(!qList.length){
+    qWrap.innerHTML = `<span style="font-size:11px;color:var(--text-3)">변화가 쌓이면 질문도 추천해드릴게요.</span>`;
+  } else {
+    qWrap.innerHTML = qList.map((c,i)=>
+      `<button onclick="showBriefAnswer(${i})" style="font-size:11.5px;color:var(--blue);background:var(--blue-soft);
+        border:none;border-radius:20px;padding:6px 13px;cursor:pointer">${c.question}</button>`
+    ).join('');
+  }
+  document.getElementById('aiBriefAnswerPanel').style.display = 'none';
+
+  renderPortfolioHealth();
+}
+
+// 오늘의 안건 — 현재 포트폴리오 상태를 보고 "지금 해볼 만한 일"을 생성. 클릭하면 해당 화면으로 바로 이동.
+function generateTodaysAgenda(){
+  const items = [];
+
+  if(DB.etfs.some(e=>e.etfSignal==='buy'||e.etfSignal==='sell')){
+    const n = DB.etfs.filter(e=>e.etfSignal==='buy'||e.etfSignal==='sell').length;
+    items.push({ icon:'⚖️', label:`리밸런싱 검토 (${n}종목 대상)`, tab:'dashboard', anchor:'rbSummary' });
+  }
+
+  const divs = DB.dividends||[];
+  const lastDiv = divs.length ? [...divs].sort((a,b)=>b.date.localeCompare(a.date))[0].date : null;
+  const daysSinceDiv = lastDiv ? Math.round((new Date(today()+'T00:00:00')-new Date(lastDiv+'T00:00:00'))/86400000) : null;
+  if(daysSinceDiv===null || daysSinceDiv>=30){
+    items.push({ icon:'💰', label:'배당금 입력', tab:'dividend' });
+  }
+
+  const snap = window._fireSnap;
+  if(!snap || snap.target<=0 || (snap.reachMonth!=null && snap.reachMonth<0)){
+    items.push({ icon:'🔥', label:'FIRE 목표 확인', tab:'fire' });
+  }
+
+  const hasUsd = divs.some(d=>d.currency==='USD');
+  if(hasUsd){
+    items.push({ icon:'💱', label:'환율 확인', tab:'dividend' });
+  }
+
+  return items;
+}
+
+function renderBriefAgenda(){
+  const wrap = document.getElementById('aiBriefAgenda');
+  if(!wrap) return;
+  const items = generateTodaysAgenda();
+  wrap.innerHTML = items.length ? items.map(it=>`
+    <button onclick="goToBrief('${it.tab}','${it.anchor||''}')" style="display:flex;align-items:center;gap:8px;
+      width:100%;text-align:left;background:var(--bg2);border:none;border-radius:9px;padding:9px 12px;
+      font-size:12.5px;color:var(--text-1);cursor:pointer">
+      <span>${it.icon}</span><span style="flex:1">${it.label}</span><span style="color:var(--text-3);font-size:11px">→</span>
+    </button>`).join('')
+    : `<div style="font-size:12px;color:var(--text-3)">오늘은 따로 확인할 안건이 없어요.</div>`;
+}
+
+// Portfolio Health — 5개 영역을 규칙 기반으로 1~5점 채점해서 100점 만점으로 합산
+function computePortfolioHealth(){
+  const targetedEtfs = DB.etfs.filter(e=>(e.etfTarget||0)>0);
+  let targetStars = 3;
+  if(targetedEtfs.length>0){
+    const offCount = targetedEtfs.filter(e=>e.etfSignal==='buy'||e.etfSignal==='sell').length;
+    targetStars = Math.max(1, Math.round(5 - (offCount/targetedEtfs.length)*5));
+  }
+
+  const consistency = computeBuyConsistency();
+  const consistencyStars = consistency!=null ? Math.max(1, Math.round(consistency/100*5)) : 3;
+
+  let maxGap = 0;
+  targetedEtfs.forEach(e=>{ maxGap = Math.max(maxGap, Math.abs(e.etfGap||0)); });
+  const rebalStars = targetedEtfs.length===0 ? 3 : maxGap<3?5 : maxGap<6?4 : maxGap<10?3 : maxGap<15?2 : 1;
+
+  const snap = window._fireSnap;
+  let fireStars = 3;
+  if(snap && snap.target>0){
+    if(snap.reachMonth===0) fireStars=5;
+    else if(snap.reachMonth<0) fireStars=1;
+    else if(snap.reachMonth<=120) fireStars=5;
+    else if(snap.reachMonth<=240) fireStars=4;
+    else if(snap.reachMonth<=360) fireStars=3;
+    else fireStars=2;
+  }
+
+  const divs = DB.dividends||[];
+  let divStars = 3;
+  if(divs.length>0){
+    const lastDiv = [...divs].sort((a,b)=>b.date.localeCompare(a.date))[0].date;
+    const days = Math.round((new Date(today()+'T00:00:00')-new Date(lastDiv+'T00:00:00'))/86400000);
+    divStars = days<=30?5 : days<=60?4 : days<=90?3 : 2;
+  }
+
+  const total = Math.round((targetStars+consistencyStars+rebalStars+fireStars+divStars)/25*100);
+  return { total, targetStars, consistencyStars, rebalStars, fireStars, divStars };
+}
+function starsText(n){ return '★'.repeat(n) + '☆'.repeat(5-n); }
+
+function renderPortfolioHealth(){
+  const el = document.getElementById('phScore');
+  if(!el) return;
+  const h = computePortfolioHealth();
+  el.textContent = h.total;
+  document.getElementById('phTarget').textContent   = starsText(h.targetStars);
+  document.getElementById('phConsist').textContent  = starsText(h.consistencyStars);
+  document.getElementById('phRebal').textContent    = starsText(h.rebalStars);
+  document.getElementById('phFire').textContent     = starsText(h.fireStars);
+  document.getElementById('phDiv').textContent      = starsText(h.divStars);
+}
+
+function showBriefAnswer(i){
+  const c = (window._briefChanges||[])[i];
+  const panel = document.getElementById('aiBriefAnswerPanel');
+  if(!c){ panel.style.display='none'; return; }
+  panel.innerHTML = `<b style="color:var(--text-1)">${c.question}</b><br>${c.impact} (${c.evidence})<br>${c.action}`
+    + (c.tab ? `<br><button onclick="goToBrief('${c.tab}','${c.anchor||''}')" style="font-size:11px;font-weight:600;color:var(--blue);
+        background:none;border:none;cursor:pointer;padding:0;margin-top:8px">→ ${BRIEF_TAB_LABEL[c.tab]||c.tab}에서 확인하기</button>` : '');
+  panel.style.display = 'block';
+}
+
+function toggleAiBriefDetail(){
+  const panel = document.getElementById('aiBriefDetailPanel');
+  const btn = document.getElementById('aiBriefMoreBtn');
+  const open = panel.style.display !== 'none';
+  panel.style.display = open ? 'none' : 'block';
+  btn.textContent = open ? '자세히 보기 ▾' : '접기 ▴';
 }
 
 function renderMotivation(){
@@ -2813,6 +3573,111 @@ function renderMotivation(){
     if(isNext) return `<div class="ms-chip next">🎯 ${m.label}</div>`;
     return `<div class="ms-chip future">${m.label}</div>`;
   }).join('');
+
+  // 통계 미니칩: 최고기록 / 투자기간 / 매수일정성
+  const maxStreak = computeMaxStreakWeeks();
+  const maxStreakEl = document.getElementById('motivMaxStreak');
+  if(maxStreakEl) maxStreakEl.textContent = maxStreak>0 ? `${maxStreak}주` : '-';
+
+  const { days, startDate } = getInvestmentDayCount();
+  const dayCountEl = document.getElementById('motivDayCount');
+  if(dayCountEl) dayCountEl.textContent = days>0 ? `${days.toLocaleString()}일째` : '-';
+
+  const consistency = computeBuyConsistency();
+  const consistencyEl = document.getElementById('motivConsistency');
+  if(consistencyEl) consistencyEl.textContent = consistency!==null ? consistency.toFixed(0)+'%' : '-';
+
+  // 억단위 성장 가속도 (1억 이상 달성한 기록이 있을 때만 노출)
+  const eokGrowth = computeEokGrowthSpeed();
+  const eokSection = document.getElementById('eokGrowthSection');
+  if(eokGrowth.length>0){
+    eokSection.style.display = 'block';
+    const maxMonths = Math.max(...eokGrowth.map(e=>e.monthsTaken));
+    document.getElementById('eokGrowthList').innerHTML = eokGrowth.map((e,i)=>{
+      const prev = i>0 ? eokGrowth[i-1].monthsTaken : null;
+      const delta = prev!==null ? e.monthsTaken - prev : null;
+      const deltaTxt = delta===null ? '' : delta<0 ? `<span style="color:var(--pos)">${Math.abs(delta)}개월 단축</span>` : delta>0 ? `<span style="color:var(--neg)">${delta}개월 연장</span>` : `<span style="color:var(--text-3)">동일</span>`;
+      return `<div class="hbar-item" style="margin-bottom:8px">
+        <div class="hbar-name" style="width:50px">${e.eok}억</div>
+        <div class="hbar-track">
+          <div class="hbar-fill" style="width:${(e.monthsTaken/maxMonths*100).toFixed(0)}%;background:var(--blue)"></div>
+        </div>
+        <div class="hbar-r" style="min-width:140px">
+          <span class="hbar-amt">${e.monthsTaken}개월</span>
+          <span class="hbar-pct">${deltaTxt}</span>
+        </div>
+      </div>`;
+    }).join('');
+  } else {
+    eokSection.style.display = 'none';
+  }
+
+  // 순매수 비교 (vs 작년의 나) — 거래기록이 있을 때만 노출
+  const netBuySection = document.getElementById('netBuyYoySection');
+  if((DB.trades||[]).length>0){
+    netBuySection.style.display = 'block';
+    const { thisYear, lastYear } = computeNetBuyYoY();
+    const thisYearTotal = thisYear.filter(v=>v!==null).slice(-1)[0] || 0;
+    const sameMonthLastYear = lastYear[new Date().getMonth()] || 0;
+    const diff = thisYearTotal - sameMonthLastYear;
+    document.getElementById('netBuyYoySummary').innerHTML =
+      `올해 ${W(thisYearTotal)} <span style="color:${diff>=0?'var(--pos)':'var(--neg)'}">(${diff>=0?'+':''}${W(diff)})</span>`;
+
+    if(window.netBuyYoyChartInstance) window.netBuyYoyChartInstance.destroy();
+    const nbCtx = document.getElementById('netBuyYoyChart')?.getContext('2d');
+    if(nbCtx){
+      window.netBuyYoyChartInstance = new Chart(nbCtx, {
+        type:'line',
+        data:{
+          labels:['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'],
+          datasets:[
+            { data:thisYear, borderColor:'#37339C', borderWidth:2.5, pointRadius:0, tension:.3, spanGaps:false },
+            { data:lastYear, borderColor:'#9396B2', borderWidth:1.5, borderDash:[4,3], pointRadius:0, tension:.3 }
+          ]
+        },
+        options:{
+          responsive:true, maintainAspectRatio:false,
+          plugins:{ legend:{display:false}, tooltip:{callbacks:{label:c=>(c.datasetIndex===0?'올해: ':'작년: ')+W(c.raw)}} },
+          scales:{
+            x:{ grid:{display:false}, ticks:{font:{size:9},color:'#9396B2'} },
+            y:{ grid:{color:'#EBEDF6'}, ticks:{font:{size:9},color:'#9396B2', callback:v=>WK(v)} }
+          }
+        }
+      });
+    }
+  } else {
+    netBuySection.style.display = 'none';
+  }
+
+  // 투자 타임캡슐: 1개월/3개월/6개월/1년 전 대비
+  const tcWrap = document.getElementById('timeCapsuleGrid');
+  if(tcWrap){
+    const earliestBaseDate = DB.holdings.length ? [...DB.holdings].sort((a,b)=>a.baseDate.localeCompare(b.baseDate))[0].baseDate : null;
+    const curState = computePortfolioStateAsOf(today());
+    const periods = [
+      { label:'1개월 전', months:1 }, { label:'3개월 전', months:3 },
+      { label:'6개월 전', months:6 }, { label:'1년 전', months:12 }
+    ];
+    tcWrap.innerHTML = periods.map(p=>{
+      const refDate = addMonths(today(), -p.months);
+      if(!earliestBaseDate || refDate < earliestBaseDate){
+        return `<div style="background:var(--bg2);border-radius:12px;padding:12px 10px">
+          <div style="font-size:10px;color:var(--text-3);font-weight:600;margin-bottom:6px">${p.label}</div>
+          <div style="font-size:11px;color:var(--text-3)">기록 없음</div>
+        </div>`;
+      }
+      const past = computePortfolioStateAsOf(refDate);
+      const diffEval = curState.totalEval - past.totalEval;
+      const diffRate = curState.rate - past.rate;
+      const diffCnt  = curState.etfCount - past.etfCount;
+      return `<div style="background:var(--bg2);border-radius:12px;padding:12px 10px">
+        <div style="font-size:10px;color:var(--text-3);font-weight:600;margin-bottom:6px">${p.label}</div>
+        <div style="font-size:13px;font-weight:800;color:${diffEval>=0?'var(--pos)':'var(--neg)'}">${W2(diffEval)}</div>
+        <div style="font-size:9px;color:var(--text-3);margin-top:2px">${WK(past.totalEval)} → ${WK(curState.totalEval)}</div>
+        <div style="font-size:9px;color:var(--text-2);margin-top:6px">수익률 ${diffRate>=0?'+':''}${diffRate.toFixed(1)}%p · 종목 ${past.etfCount}→${curState.etfCount}</div>
+      </div>`;
+    }).join('');
+  }
 }
 
 function setBarMode(mode){
@@ -3428,6 +4293,24 @@ function openModal(etfId){
     <div class="m-kpi-v ${k.cls}">${k.v}</div>
   </div>`).join('');
 
+  // 목표비중 (현재 필터 기준 — calcDerived에서 계산해둔 e.etfTarget/e.etfCurW/e.etfGap 사용)
+  const twWrap = document.getElementById('mTargetWeight');
+  const etfTarget = e.etfTarget||0, etfCurW = e.etfCurW||0, etfGap = e.etfGap||0;
+  if(etfTarget>0){
+    const gapCls = etfGap>1 ? 'neg' : etfGap<-1 ? 'pos' : '';
+    twWrap.innerHTML = `
+      <div style="display:flex;gap:18px;align-items:center;flex-wrap:wrap">
+        <div><span style="font-size:11px;color:var(--text-3)">목표</span> <b style="font-size:14px">${etfTarget.toFixed(0)}%</b></div>
+        <div><span style="font-size:11px;color:var(--text-3)">현재</span> <b style="font-size:14px">${etfCurW.toFixed(1)}%</b></div>
+        <div><span style="font-size:11px;color:var(--text-3)">차이</span> <b style="font-size:14px" class="${gapCls}">${(etfGap>=0?'+':'')+etfGap.toFixed(1)}p</b></div>
+      </div>
+      <div style="height:6px;border-radius:99px;background:var(--bg2);overflow:hidden;margin-top:8px">
+        <div style="height:100%;border-radius:99px;background:var(--blue);width:${Math.min(100,etfCurW/etfTarget*100).toFixed(0)}%"></div>
+      </div>`;
+  } else {
+    twWrap.innerHTML = `<p style="font-size:11px;color:var(--text-3)">설정된 목표비중이 없습니다. (목표비중 탭에서 설정할 수 있어요)</p>`;
+  }
+
   // 천주모으기
   const chunBox = document.getElementById('chunBox');
   if(e.goalQty>0){
@@ -3445,6 +4328,74 @@ function openModal(etfId){
   } else {
     chunBox.style.display='none';
   }
+
+  // 거래기록 (해당 종목의 매수/매도 내역 — 모든 계좌 합산, 날짜 내림차순)
+  const etfTrades = (DB.trades||[]).filter(t=>t.etfId===etfId).sort((a,b)=>b.date.localeCompare(a.date));
+  document.getElementById('mTradeCount').textContent = etfTrades.length ? `(${etfTrades.length}건)` : '';
+  if(etfTrades.length){
+    const buyAmt  = etfTrades.filter(t=>t.type==='buy').reduce((s,t)=>s+t.qty*t.price,0);
+    const sellAmt = etfTrades.filter(t=>t.type==='sell').reduce((s,t)=>s+t.qty*t.price,0);
+    const realized = etfTrades.filter(t=>t.type==='sell'&&t.realizedGain!==undefined).reduce((s,t)=>s+t.realizedGain,0);
+    document.getElementById('mTradeSummary').innerHTML = `
+      <div style="display:flex;gap:16px;flex-wrap:wrap;font-size:11px;color:var(--text-3)">
+        <span>총매수 <b style="color:var(--text-1)">${W(buyAmt)}</b></span>
+        <span>총매도 <b style="color:var(--text-1)">${W(sellAmt)}</b></span>
+        <span>실현손익 <b style="color:${realized>=0?'var(--pos)':'var(--neg)'}">${W2(realized)}</b></span>
+      </div>`;
+    document.getElementById('mTradeBody').innerHTML = etfTrades.map(t=>{
+      const typeBadge = t.type==='buy'
+        ? `<span style="background:var(--blue-soft);color:var(--blue);font-size:10px;font-weight:700;padding:2px 6px;border-radius:10px">매수</span>`
+        : `<span style="background:#FEF3C7;color:#B45309;font-size:10px;font-weight:700;padding:2px 6px;border-radius:10px">매도</span>`;
+      const gainTxt = t.realizedGain!==undefined ? `<span style="color:${t.realizedGain>=0?'var(--pos)':'var(--neg)'}">${W2(t.realizedGain)}</span>` : '-';
+      return `<tr>
+        <td style="white-space:nowrap">${t.date}</td>
+        <td style="white-space:nowrap"><span class="acc-tag tag-${t.accountId}">${getAccLabel(t.accountId)}</span></td>
+        <td>${typeBadge}</td>
+        <td>${t.qty.toLocaleString()}</td>
+        <td style="white-space:nowrap">${W(t.price)}</td>
+        <td style="white-space:nowrap">${gainTxt}</td>
+      </tr>`;
+    }).join('');
+  } else {
+    document.getElementById('mTradeSummary').innerHTML = '';
+    document.getElementById('mTradeBody').innerHTML = `<tr><td colspan="6" style="text-align:center;padding:14px;color:var(--text-3);font-size:11px">기록된 거래가 없습니다.</td></tr>`;
+  }
+
+  // 배당기록 (해당 종목의 배당 내역 — 모든 계좌 합산, 날짜 내림차순)
+  const etfDivs = (DB.dividends||[]).filter(d=>d.etfId===etfId).sort((a,b)=>b.date.localeCompare(a.date));
+  document.getElementById('mDivCount').textContent = etfDivs.length ? `(${etfDivs.length}건)` : '';
+  if(etfDivs.length){
+    const totalDiv = etfDivs.reduce((s,d)=>s+getDividendKrwAmount(d),0);
+    document.getElementById('mDivSummary').innerHTML = `
+      <div style="font-size:11px;color:var(--text-3)">누적 배당금 <b style="color:var(--text-1)">${W(totalDiv)}</b></div>`;
+    document.getElementById('mDivBody').innerHTML = etfDivs.map(d=>{
+      const krwAmt = getDividendKrwAmount(d);
+      const amtTxt = d.currency==='USD' ? `$${(d.amount||0).toLocaleString()} (≈${W(krwAmt)})` : W(d.amount);
+      return `<tr>
+        <td style="white-space:nowrap">${d.date}</td>
+        <td style="white-space:nowrap"><span class="acc-tag tag-${d.accountId}">${getAccLabel(d.accountId)}</span></td>
+        <td style="white-space:nowrap;color:var(--pos);font-weight:700">${amtTxt}</td>
+        <td style="font-size:11px;color:var(--text-3)">${d.memo||''}</td>
+      </tr>`;
+    }).join('');
+  } else {
+    document.getElementById('mDivSummary').innerHTML = '';
+    document.getElementById('mDivBody').innerHTML = `<tr><td colspan="4" style="text-align:center;padding:14px;color:var(--text-3);font-size:11px">기록된 배당금이 없습니다.</td></tr>`;
+  }
+
+  // 최근 메모 (보유포지션/거래기록/배당기록에 남긴 메모 중 최근 5개, 출처와 함께)
+  const memoItems = [
+    ...allRows.filter(h=>h.memo).map(h=>({date:h.baseDate, src:'보유', memo:h.memo})),
+    ...etfTrades.filter(t=>t.memo).map(t=>({date:t.date, src:t.type==='buy'?'매수':'매도', memo:t.memo})),
+    ...etfDivs.filter(d=>d.memo).map(d=>({date:d.date, src:'배당', memo:d.memo}))
+  ].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,5);
+  const memoWrap = document.getElementById('mMemoList');
+  memoWrap.innerHTML = memoItems.length ? memoItems.map(m=>`
+    <div style="display:flex;gap:8px;align-items:baseline;padding:7px 0;border-bottom:1px solid var(--border);font-size:11.5px">
+      <span style="color:var(--text-3);white-space:nowrap">${m.date}</span>
+      <span style="font-size:9px;font-weight:700;color:var(--blue);background:var(--blue-soft);padding:1px 6px;border-radius:8px;white-space:nowrap">${m.src}</span>
+      <span style="color:var(--text-1)">${m.memo}</span>
+    </div>`).join('') : `<p style="font-size:11px;color:var(--text-3)">남겨진 메모가 없습니다.</p>`;
 
   // 계좌별 보유 내역 테이블
   const accOrder = sortAccountsByLabel(DB.accounts).map(a=>a.id);
@@ -4500,9 +5451,26 @@ async function autofillCurPrice(){
 }
 
 /* 자동계산 미리보기 */
+// 평단가 통화가 달러면 환율을 곱해 원화 평단가로 환산 (보유 포지션은 항상 원화로 저장 — 이미 모든 계산 로직이 원화 기준이라 입력 시점에만 환산)
+function getEffectiveAvgCost(){
+  const raw = parseFloat(document.getElementById('sAvg').value)||0;
+  const currency = document.getElementById('sCurrency')?.value || 'KRW';
+  if(currency==='USD'){
+    const fx = parseFloat(document.getElementById('sFxRate').value)||0;
+    return raw*fx;
+  }
+  return raw;
+}
+function toggleSAvgCurrency(){
+  const isUsd = document.getElementById('sCurrency').value==='USD';
+  document.getElementById('sFxWrap').style.display = isUsd ? '' : 'none';
+  document.getElementById('sAvgLabel').textContent = isUsd ? '평단가 (달러)' : '평단가 (원)';
+  onHoldingChange();
+}
+
 function onHoldingChange(){
   const qty  = parseFloat(document.getElementById('sQty').value)||0;
-  const avg  = parseFloat(document.getElementById('sAvg').value)||0;
+  const avg  = getEffectiveAvgCost();
   const cp   = parseFloat(document.getElementById('sCurPrice').value)||0;
   // 현재가 입력 시 평가금액 자동산출
   if(qty>0 && cp>0){
@@ -4685,7 +5653,12 @@ function addHolding(){
   const accountId  = document.getElementById('sAcc').value;
   const etfId      = document.getElementById('sEtf').value;
   const qty        = parseFloat(document.getElementById('sQty').value)||0;
-  const avgCost    = parseFloat(document.getElementById('sAvg').value)||0;
+  const currency   = document.getElementById('sCurrency').value;
+  if(currency==='USD' && !(parseFloat(document.getElementById('sFxRate').value)||0)){
+    showToast('달러로 입력할 땐 적용 환율을 입력해주세요.');
+    return;
+  }
+  const avgCost    = getEffectiveAvgCost();
   const cp         = parseFloat(document.getElementById('sCurPrice').value)||0;
   const evalAmount = parseFloat(document.getElementById('sEval').value) || (qty*cp) || 0;
   const memo       = document.getElementById('sMemo').value.trim();
@@ -4705,9 +5678,11 @@ function addHolding(){
   document.getElementById('hdrDateInput').value  = baseDate;
 
   // 폼 초기화
-  ['sQty','sAvg','sCurPrice','sEval','sMemo'].forEach(id=>{
+  ['sQty','sAvg','sFxRate','sCurPrice','sEval','sMemo'].forEach(id=>{
     const _el=document.getElementById(id); if(_el) _el.value='';
   });
+  document.getElementById('sCurrency').value = 'KRW';
+  toggleSAvgCurrency();
   document.getElementById('calcPreview').style.display='none';
 
   renderDataTab(); recalcRender();
@@ -4776,7 +5751,7 @@ function delHolding(i){
   save();
 }
 
-let _holdMgrFilter = 'ALL';
+let _holdMgrFilter = 'ISA';
 let _holdMgrShowAll = false; // false: 기준일 기준 최신(보유중) 건만 / true: 전체 입력기록
 
 function setHoldMgrFilter(accId){
@@ -4885,6 +5860,9 @@ function startHoldEdit(i){
   document.getElementById('editHDate').value      = h.baseDate||'';
   document.getElementById('editHQty').value       = h.qty;
   document.getElementById('editHAvg').value       = h.avgCost;
+  document.getElementById('editHCurrency').value  = 'KRW';
+  document.getElementById('editHFxRate').value    = '';
+  toggleEditHAvgCurrency();
   document.getElementById('editHCurPrice').value  = hcp;
   document.getElementById('editHEval').value      = h.evalAmount;
   document.getElementById('editHMemo').value      = h.memo||'';
@@ -4910,9 +5888,25 @@ function startHoldEdit(i){
   previewHoldEdit();
 }
 
+function getEffectiveEditAvgCost(){
+  const raw = parseFloat(document.getElementById('editHAvg').value)||0;
+  const currency = document.getElementById('editHCurrency')?.value || 'KRW';
+  if(currency==='USD'){
+    const fx = parseFloat(document.getElementById('editHFxRate').value)||0;
+    return raw*fx;
+  }
+  return raw;
+}
+function toggleEditHAvgCurrency(){
+  const isUsd = document.getElementById('editHCurrency').value==='USD';
+  document.getElementById('editHFxWrap').style.display = isUsd ? '' : 'none';
+  document.getElementById('editHAvgLabel').textContent = isUsd ? '평단가 (달러)' : '평단가 (원)';
+  previewHoldEdit();
+}
+
 function previewHoldEdit(){
   const qty  = parseFloat(document.getElementById('editHQty').value)||0;
-  const avg  = parseFloat(document.getElementById('editHAvg').value)||0;
+  const avg  = getEffectiveEditAvgCost();
   const cp   = parseFloat(document.getElementById('editHCurPrice').value)||0;
   // 현재가 입력 시 평가금액 자동산출
   if(qty>0 && cp>0){
@@ -4943,7 +5937,12 @@ function previewHoldEdit(){
 function saveHoldEdit(){
   const i     = parseInt(document.getElementById('editHoldIdx').value);
   const qty   = parseFloat(document.getElementById('editHQty').value)||0;
-  const avg   = parseFloat(document.getElementById('editHAvg').value)||0;
+  const currency = document.getElementById('editHCurrency').value;
+  if(currency==='USD' && !(parseFloat(document.getElementById('editHFxRate').value)||0)){
+    showToast('달러로 입력할 땐 적용 환율을 입력해주세요.');
+    return;
+  }
+  const avg   = getEffectiveEditAvgCost();
   const ecp   = parseFloat(document.getElementById('editHCurPrice').value)||0;
   const eval_ = parseFloat(document.getElementById('editHEval').value) || (qty*ecp) || 0;
   if(!qty||!avg||!ecp){ showToast('보유수량, 평단가, 현재가를 입력해주세요.'); return; }
@@ -5166,6 +6165,45 @@ function renderFireTab(){
   document.getElementById('fireMonthlyIncome').value  = fs.monthlyIncome ?? 5000000;
   document.getElementById('fireSavingsRate').value    = fs.savingsRate ?? 40;
   setFireMode(fs.mode || 'income');
+  renderBenchmarkCompare();
+}
+
+// 나의 수익률 추이(과거 보유기록 재구성) vs 가정 비교기준 — 실제 지수 데이터가 아니라 입력한 연수익률로 가정한 비교선
+function renderBenchmarkCompare(){
+  const ctx = document.getElementById('benchCompareChart')?.getContext('2d');
+  if(!ctx) return;
+  const months = 12;
+  const benchRate = parseFloat(document.getElementById('benchAnnualRate')?.value)||0;
+  const now = new Date();
+  const labels = [], myReturn = [], benchmark = [];
+  for(let i=months; i>=0; i--){
+    const d = new Date(now.getFullYear(), now.getMonth()-i, now.getDate());
+    const refDate = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    labels.push(`${d.getMonth()+1}월`);
+    myReturn.push(Math.round(computePortfolioStateAsOf(refDate).rate*10)/10);
+    const j = months-i;
+    benchmark.push(Math.round((Math.pow(1+benchRate/100, j/12)-1)*1000)/10);
+  }
+
+  if(window.benchCompareChartInstance) window.benchCompareChartInstance.destroy();
+  window.benchCompareChartInstance = new Chart(ctx, {
+    type:'line',
+    data:{
+      labels,
+      datasets:[
+        { data:myReturn, borderColor:'#37339C', borderWidth:2.5, pointRadius:0, tension:.3, fill:false },
+        { data:benchmark, borderColor:'#9396B2', borderDash:[4,3], borderWidth:1.5, pointRadius:0, tension:.3, fill:false }
+      ]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{display:false}, tooltip:{callbacks:{label:c=>(c.datasetIndex===0?'내 수익률: ':'비교 기준: ')+c.raw+'%'}} },
+      scales:{
+        x:{ grid:{display:false}, ticks:{font:{size:9},color:'#9396B2'} },
+        y:{ grid:{color:'#EBEDF6'}, ticks:{font:{size:9},color:'#9396B2', callback:v=>v+'%'} }
+      }
+    }
+  });
 }
 
 function setFireMode(mode){
@@ -5218,17 +6256,23 @@ function calcFire(){
   DB.fireSettings = { mode, target, current, annualReturn, monthlyIncome, savingsRate };
   save();
 
-  // 월 단위 시뮬레이션 (최대 50년 = 600개월)
-  const monthlyRate = Math.pow(1+annualReturn/100, 1/12) - 1;
+  // 월 단위 시뮬레이션 (최대 50년 = 600개월) — 기준 + 낙관(+3%p) + 비관(-3%p) 3가지 시나리오
   const MAXM = 600;
-  let bal = current;
-  const series = [bal];
-  let reachMonth = (target>0 && current>=target) ? 0 : -1;
-  for(let m=1; m<=MAXM; m++){
-    bal = bal*(1+monthlyRate) + monthlyInvest;
-    series.push(bal);
-    if(reachMonth===-1 && target>0 && bal>=target) reachMonth = m;
+  function simulate(rate){
+    const monthlyRate = Math.pow(1+rate/100, 1/12) - 1;
+    let b = current;
+    const arr = [b];
+    let rm = (target>0 && current>=target) ? 0 : -1;
+    for(let m=1; m<=MAXM; m++){
+      b = b*(1+monthlyRate) + monthlyInvest;
+      arr.push(b);
+      if(rm===-1 && target>0 && b>=target) rm = m;
+    }
+    return { series:arr, reachMonth:rm };
   }
+  const { series, reachMonth } = simulate(annualReturn);
+  const optimistic  = simulate(Math.min(30, annualReturn+3));
+  const pessimistic = simulate(Math.max(0,  annualReturn-3));
 
   // 진행률 바
   const pct = target>0 ? Math.min(100, current/target*100) : 0;
@@ -5267,10 +6311,17 @@ function calcFire(){
     ? (monthlyInvest>0 ? W(Math.round(monthlyInvest)) : '-')
     : PCT1(annualReturn);
 
-  renderFireChart(series, target, reachMonth);
+  renderFireChart(series, target, reachMonth, optimistic.series, pessimistic.series);
+  renderFireMilestoneTimeline(series, current);
+
+  // 대시보드 AI 브리핑 카드 등 다른 화면에서도 재사용할 수 있도록 결과 캐싱
+  window._fireSnap = { target, current, reachMonth, monthlyInvest, pct: target>0 ? Math.min(100, current/target*100) : 0 };
+  // 매수증액 시뮬레이션 슬라이더가 재사용할 기준값 (연수익률, 현재금액, 목표금액)
+  window._fireBase = { current, target, annualReturn, monthlyInvest };
+  renderFireBuySim();
 }
 
-function renderFireChart(series, target, reachMonth){
+function renderFireChart(series, target, reachMonth, optimisticSeries, pessimisticSeries){
   const wrap = document.querySelector('.fire-chart-wrap');
   if(!wrap) return;
   wrap.innerHTML = '<canvas id="fireChart"></canvas>';
@@ -5284,19 +6335,23 @@ function renderFireChart(series, target, reachMonth){
     labels.push(d.getMonth()===0 ? d.getFullYear()+'년' : '');
   }
   const data = series.slice(0, showM+1);
+  const dataHigh = optimisticSeries  ? optimisticSeries.slice(0, showM+1)  : null;
+  const dataLow  = pessimisticSeries ? pessimisticSeries.slice(0, showM+1) : null;
+
+  const datasets = [];
+  if(dataHigh && dataLow){
+    datasets.push({ label:'낙관(+3%p)', data:dataHigh, borderColor:'transparent', pointRadius:0, fill:'+1', backgroundColor:'rgba(55,51,156,.08)' });
+    datasets.push({ label:'비관(-3%p)', data:dataLow,  borderColor:'transparent', pointRadius:0, fill:false });
+  }
+  datasets.push({ label:'예상 자산', data, borderColor:'#37339C', backgroundColor:'rgba(55,51,156,.08)',
+    fill:!dataHigh, tension:.3, pointRadius:0, borderWidth:2.5 });
+  datasets.push({ label:'목표', data:data.map(()=>target), borderColor:'#C09A3E',
+    borderDash:[6,5], borderWidth:1.5, pointRadius:0, fill:false });
 
   if(window.fireChartInstance){ window.fireChartInstance.destroy(); }
   window.fireChartInstance = new Chart(ctx, {
     type:'line',
-    data:{
-      labels,
-      datasets:[
-        { label:'예상 자산', data, borderColor:'#37339C', backgroundColor:'rgba(55,51,156,.08)',
-          fill:true, tension:.3, pointRadius:0, borderWidth:2.5 },
-        { label:'목표', data:data.map(()=>target), borderColor:'#C09A3E',
-          borderDash:[6,5], borderWidth:1.5, pointRadius:0, fill:false }
-      ]
-    },
+    data:{ labels, datasets },
     options:{
       responsive:true, maintainAspectRatio:false,
       plugins:{
@@ -5315,8 +6370,70 @@ function renderFireChart(series, target, reachMonth){
   });
 }
 
+// 마일스톤 타임라인 — 1년/3년/5년/10년 후 예상 자산 (기준 시나리오)
+function renderFireMilestoneTimeline(series, current){
+  const wrap = document.getElementById('fireMilestoneTimeline');
+  if(!wrap) return;
+  const points = [
+    { label:'1년 후', m:12 }, { label:'3년 후', m:36 },
+    { label:'5년 후', m:60 }, { label:'10년 후', m:120 }
+  ];
+  wrap.innerHTML = points.map(p=>{
+    const val = series[Math.min(p.m, series.length-1)] || 0;
+    const pct = current>0 ? (val-current)/current*100 : 0;
+    return `<div style="background:var(--bg2);border-radius:12px;padding:12px 10px;text-align:center;flex:1">
+      <div style="font-size:10px;color:var(--text-3);font-weight:600;margin-bottom:6px">${p.label}</div>
+      <div style="font-size:13px;font-weight:800;color:var(--text-1)">${WK(val)}</div>
+      <div style="font-size:9px;color:var(--pos);margin-top:3px">+${pct.toFixed(0)}%</div>
+    </div>`;
+  }).join('');
+}
+
+// 매수증액 시뮬레이션 슬라이더 — 저장된 설정은 건드리지 않고 "만약 월 투자금을 더 늘리면" 가상의 결과만 보여줌
+function renderFireBuySim(){
+  const slider = document.getElementById('fireBuySimSlider');
+  if(!slider) return;
+  const extra = parseFloat(slider.value)||0;
+  document.getElementById('fireBuySimVal').textContent = W(extra);
+
+  const base = window._fireBase;
+  if(!base || base.target<=0){
+    document.getElementById('fireBuySimResult').textContent = '목표 자산을 먼저 설정해주세요.';
+    return;
+  }
+  const monthlyRate = Math.pow(1+base.annualReturn/100, 1/12) - 1;
+  const newMonthlyInvest = base.monthlyInvest + extra;
+  let bal = base.current;
+  let newReachMonth = (base.target>0 && bal>=base.target) ? 0 : -1;
+  for(let m=1; m<=600; m++){
+    bal = bal*(1+monthlyRate) + newMonthlyInvest;
+    if(newReachMonth===-1 && bal>=base.target){ newReachMonth=m; break; }
+  }
+  const resEl = document.getElementById('fireBuySimResult');
+  if(extra<=0){
+    resEl.textContent = '슬라이더를 움직여서 월 추가매수액을 정해보세요.';
+    return;
+  }
+  if(newReachMonth<0){ resEl.textContent = '이 조건으로도 50년 안에는 도달이 어려워요.'; return; }
+  const now = new Date();
+  const newDate = new Date(now.getFullYear(), now.getMonth()+newReachMonth, 1);
+  const oldSnap = window._fireSnap;
+  let diffTxt = '';
+  if(oldSnap && oldSnap.reachMonth>0){
+    const diff = oldSnap.reachMonth - newReachMonth;
+    if(diff>0) diffTxt = ` (기존보다 ${diff}개월 앞당겨져요)`;
+  }
+  resEl.innerHTML = `월 ${W(extra)}을 추가하면 <b style="color:var(--blue)">${newDate.getFullYear()}년 ${newDate.getMonth()+1}월</b>경 도달 예상이에요.${diffTxt}`;
+}
+
 
 /* ═══ 배당금 관리 ═══ */
+// 배당 1건을 원화로 환산한 금액 — 통화가 KRW면 그대로, USD면 입력해둔 환율로 환산
+function getDividendKrwAmount(d){
+  if(d.currency==='USD') return Math.round((d.amount||0) * (d.fxRate||0));
+  return d.amount||0;
+}
+
 // 최근 N개월(기본 12) 배당 합계 — FIRE 계산기에서도 재사용
 function computeDividendStats(){
   const list = DB.dividends || [];
@@ -5332,7 +6449,7 @@ function computeDividendStats(){
     byMonth[`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`] = 0;
   }
   list.forEach(d=>{
-    const amt = d.amount||0;
+    const amt = getDividendKrwAmount(d);
     allTotal += amt;
     const dt = new Date(d.date+'T00:00:00');
     if(isNaN(dt)) return;
@@ -5421,6 +6538,13 @@ function renderDivSummary(){
   document.getElementById('dvStatAvgSub').textContent = s.monthsElapsed<12 ? `최근 ${s.monthsElapsed}개월 기준` : '';
   document.getElementById('dvStatAll').textContent  = W(s.allTotal);
 
+  // 예상 연간 배당 = 월 평균(기록 기간 기준) × 12, 배당수익률 = 그 값 ÷ 현재 평가금액
+  const expectedAnnual = s.monthlyAvg * 12;
+  document.getElementById('dvStatExpected').textContent = W(Math.round(expectedAnnual));
+  const totalEval = DB.totalEval||0;
+  const divYield = totalEval>0 ? expectedAnnual/totalEval*100 : 0;
+  document.getElementById('dvStatYield').textContent = totalEval>0 ? PCT1(divYield) : '-';
+
   let labels, data, tooltipPrefix;
   if(_dvChartMode==='year'){
     const years = Object.keys(s.byYear).sort();
@@ -5466,12 +6590,19 @@ function renderDivList(){
   body.innerHTML = sorted.map(d=>{
     const origIdx = DB.dividends.indexOf(d);
     const etf = DB.etfs.find(e=>e.id===d.etfId);
+    const krwAmt = getDividendKrwAmount(d);
+    const taxBadge = d.taxStatus==='pre'
+      ? `<span style="font-size:9px;font-weight:700;color:var(--amber);background:var(--amber-soft);padding:1px 5px;border-radius:8px;margin-left:4px">세전</span>` : '';
+    const amtCell = d.currency==='USD'
+      ? `<div style="white-space:nowrap;color:var(--pos);font-weight:700">$${(d.amount||0).toLocaleString()}${taxBadge}</div>
+         <div style="font-size:10px;color:var(--text-3)">≈ ${W(krwAmt)} (환율 ${d.fxRate||'-'})</div>`
+      : `<div style="white-space:nowrap;color:var(--pos);font-weight:700">${W(d.amount)}${taxBadge}</div>`;
     return `<tr id="dvRow${origIdx}">
       <td>${d.date}</td>
       <td style="white-space:nowrap"><span class="acc-tag tag-${d.accountId}">${getAccLabel(d.accountId)}</span></td>
       <td style="font-size:11px;max-width:130px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"
           title="${etf?.name||'(미지정)'}">${etf?.name||'(미지정)'}</td>
-      <td style="white-space:nowrap;color:var(--pos);font-weight:700">${W(d.amount)}</td>
+      <td>${amtCell}</td>
       <td style="font-size:11px;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${d.memo||''}">${d.memo||''}</td>
       <td style="white-space:nowrap;position:sticky;right:0;background:var(--surface);box-shadow:-6px 0 6px -6px rgba(0,0,0,.12);z-index:2;">
         <button class="btn-o" style="padding:4px 10px;font-size:11px;margin-right:4px"
@@ -5511,7 +6642,7 @@ function renderDivByAccount(){
     return;
   }
   const sumByAcc = {};
-  list.forEach(d=>{ sumByAcc[d.accountId] = (sumByAcc[d.accountId]||0) + (d.amount||0); });
+  list.forEach(d=>{ sumByAcc[d.accountId] = (sumByAcc[d.accountId]||0) + getDividendKrwAmount(d); });
 
   const items = sortAccountsByLabel(DB.accounts)
     .map(a=>({ acc:a, val: sumByAcc[a.id]||0 }))
@@ -5539,6 +6670,60 @@ function renderDivByAccount(){
     </div>`).join('');
 }
 
+let _dvEtfMode = 'all'; // 'all': 전체 누적 / '12m': 최근 12개월
+function setDvEtfMode(mode){
+  _dvEtfMode = mode;
+  const onCol='var(--blue)', offCol='transparent';
+  const allBtn=document.getElementById('dvEtfModeAll'), mBtn=document.getElementById('dvEtfMode12m');
+  if(allBtn){ allBtn.style.background = mode==='all' ? onCol : offCol; allBtn.style.color = mode==='all' ? '#fff' : 'var(--text-2)'; }
+  if(mBtn){ mBtn.style.background = mode==='12m' ? onCol : offCol; mBtn.style.color = mode==='12m' ? '#fff' : 'var(--text-2)'; }
+  renderDivByEtf();
+}
+
+function renderDivByEtf(){
+  const wrap = document.getElementById('dvByEtfList');
+  if(!wrap) return;
+  let list = DB.dividends || [];
+  if(_dvEtfMode==='12m'){
+    const now = new Date();
+    const cut12 = new Date(now.getFullYear(), now.getMonth()-11, 1);
+    list = list.filter(d=>{
+      const dt = new Date(d.date+'T00:00:00');
+      return !isNaN(dt) && dt >= cut12;
+    });
+  }
+  const emptyMsg = `<p style="text-align:center;padding:20px 0;color:var(--text-3);font-size:12px">${_dvEtfMode==='12m' ? '최근 12개월 동안 기록된 배당금이 없습니다.' : '아직 기록된 배당금이 없습니다.'}</p>`;
+  if(!list.length){ wrap.innerHTML = emptyMsg; return; }
+
+  const sumByEtf = {};
+  list.forEach(d=>{
+    const key = d.etfId || '__none__';
+    sumByEtf[key] = (sumByEtf[key]||0) + getDividendKrwAmount(d);
+  });
+
+  const items = Object.entries(sumByEtf)
+    .map(([etfId,val])=>({ etf: DB.etfs.find(e=>e.id===etfId), etfId, val }))
+    .filter(e=>e.val>0)
+    .sort((a,b)=>b.val-a.val);
+
+  if(!items.length){ wrap.innerHTML = emptyMsg; return; }
+
+  const maxV = items[0].val || 1;
+  const tot  = items.reduce((s,e)=>s+e.val,0) || 1;
+
+  wrap.innerHTML = items.map((e,i)=>`
+    <div class="hbar-item">
+      <div class="hbar-name" title="${e.etf?.name||'(미지정)'}">${e.etf?.name||'(종목 미지정)'}</div>
+      <div class="hbar-track">
+        <div class="hbar-fill" style="width:${(e.val/maxV*100).toFixed(1)}%;background:${BAR_COLORS[i%BAR_COLORS.length]}"></div>
+      </div>
+      <div class="hbar-r">
+        <span class="hbar-amt">${W(e.val)}</span>
+        <span class="hbar-pct">(${(e.val/tot*100).toFixed(1)}%)</span>
+      </div>
+    </div>`).join('');
+}
+
 function renderDividendTab(){
   if(!DB.dividends) DB.dividends = [];
   const dd = document.getElementById('dvDate');
@@ -5547,7 +6732,49 @@ function renderDividendTab(){
   renderDivFilterRow();
   renderDivSummary();
   renderDivByAccount();
+  renderDivByEtf();
   renderDivList();
+}
+
+// 배당 입력폼: 통화가 USD면 환율 입력칸을 보여주고 라벨도 바꿔줌
+function toggleDvFxField(){
+  const isUsd = document.getElementById('dvCurrency').value==='USD';
+  document.getElementById('dvFxWrap').style.display = isUsd ? '' : 'none';
+  document.getElementById('dvAmountLabel').textContent = isUsd ? '배당금 (달러)' : '배당금 (원)';
+  updateDvFxPreview();
+}
+function updateDvFxPreview(){
+  const isUsd = document.getElementById('dvCurrency').value==='USD';
+  const prev = document.getElementById('dvFxPreview');
+  if(!isUsd){ prev.style.display='none'; return; }
+  const amount = parseFloat(document.getElementById('dvAmount').value)||0;
+  const fxRate = parseFloat(document.getElementById('dvFxRate').value)||0;
+  if(!amount || !fxRate){ prev.style.display='none'; return; }
+  prev.textContent = `≈ ${W(Math.round(amount*fxRate))} 원 환산`;
+  prev.style.display = 'block';
+}
+let _dvTaxStatus = 'post';
+function setDvTaxStatus(status){
+  _dvTaxStatus = status;
+  const onCol='var(--blue)', offCol='transparent';
+  const postBtn=document.getElementById('dvTaxPost'), preBtn=document.getElementById('dvTaxPre');
+  postBtn.style.background = status==='post' ? onCol : offCol; postBtn.style.color = status==='post' ? '#fff' : 'var(--text-2)';
+  preBtn.style.background  = status==='pre'  ? onCol : offCol; preBtn.style.color  = status==='pre'  ? '#fff' : 'var(--text-2)';
+}
+
+// 배당 수정폼: 동일 패턴
+function toggleEditDvFxField(){
+  const isUsd = document.getElementById('editDvCurrency').value==='USD';
+  document.getElementById('editDvFxWrap').style.display = isUsd ? '' : 'none';
+  document.getElementById('editDvAmountLabel').textContent = isUsd ? '배당금 (달러)' : '배당금 (원)';
+}
+let _editDvTaxStatus = 'post';
+function setEditDvTaxStatus(status){
+  _editDvTaxStatus = status;
+  const onCol='var(--blue)', offCol='transparent';
+  const postBtn=document.getElementById('editDvTaxPost'), preBtn=document.getElementById('editDvTaxPre');
+  postBtn.style.background = status==='post' ? onCol : offCol; postBtn.style.color = status==='post' ? '#fff' : 'var(--text-2)';
+  preBtn.style.background  = status==='pre'  ? onCol : offCol; preBtn.style.color  = status==='pre'  ? '#fff' : 'var(--text-2)';
 }
 
 function addDividend(){
@@ -5555,17 +6782,24 @@ function addDividend(){
   const accountId = document.getElementById('dvAcc').value;
   const etfId     = document.getElementById('dvEtf').value;
   const amount    = parseFloat(document.getElementById('dvAmount').value)||0;
+  const currency  = document.getElementById('dvCurrency').value;
+  const fxRate    = currency==='USD' ? (parseFloat(document.getElementById('dvFxRate').value)||0) : 0;
+  const taxStatus = _dvTaxStatus;
   const memo      = document.getElementById('dvMemo').value.trim();
-  if(!amount){ showToast('배당금(원)을 입력해주세요.'); return; }
+  if(!amount){ showToast('배당금을 입력해주세요.'); return; }
+  if(currency==='USD' && !fxRate){ showToast('달러 배당은 적용 환율을 입력해주세요.'); return; }
 
-  DB.dividends.push({ date, accountId, etfId, amount, memo });
+  DB.dividends.push({ date, accountId, etfId, amount, currency, fxRate, taxStatus, memo });
 
   document.getElementById('dvAmount').value = '';
+  document.getElementById('dvFxRate').value = '';
   document.getElementById('dvMemo').value   = '';
+  document.getElementById('dvFxPreview').style.display = 'none';
 
-  renderDivFilterRow(); renderDivSummary(); renderDivByAccount(); renderDivList();
+  renderDivFilterRow(); renderDivSummary(); renderDivByAccount(); renderDivByEtf(); renderDivList();
   calcFire(); // FIRE 계산기 월 투자금액에도 즉시 반영
-  showToast(`배당금 ${W(amount)}이 기록되었습니다.`);
+  const krwAmt = getDividendKrwAmount({amount, currency, fxRate});
+  showToast(`배당금 ${currency==='USD' ? '$'+amount.toLocaleString()+' (≈'+W(krwAmt)+')' : W(amount)}이 기록되었습니다.`);
   save();
 }
 
@@ -5575,7 +6809,11 @@ function startDivEdit(i){
   document.getElementById('editDivIdx').value   = i;
   document.getElementById('editDvDate').value   = d.date||'';
   document.getElementById('editDvAmount').value = d.amount;
+  document.getElementById('editDvCurrency').value = d.currency||'KRW';
+  document.getElementById('editDvFxRate').value = d.fxRate||'';
   document.getElementById('editDvMemo').value   = d.memo||'';
+  toggleEditDvFxField();
+  setEditDvTaxStatus(d.taxStatus==='pre' ? 'pre' : 'post');
 
   const accSel = document.getElementById('editDvAcc');
   accSel.innerHTML = sortAccountsByLabel(DB.accounts).map(a=>`<option value="${a.id}">${a.label}</option>`).join('');
@@ -5600,13 +6838,17 @@ function saveDivEdit(){
   const accountId = document.getElementById('editDvAcc').value;
   const etfId     = document.getElementById('editDvEtf').value;
   const amount = parseFloat(document.getElementById('editDvAmount').value)||0;
+  const currency  = document.getElementById('editDvCurrency').value;
+  const fxRate    = currency==='USD' ? (parseFloat(document.getElementById('editDvFxRate').value)||0) : 0;
+  const taxStatus = _editDvTaxStatus;
   const memo   = document.getElementById('editDvMemo').value.trim();
-  if(!amount){ showToast('배당금(원)을 입력해주세요.'); return; }
+  if(!amount){ showToast('배당금을 입력해주세요.'); return; }
+  if(currency==='USD' && !fxRate){ showToast('달러 배당은 적용 환율을 입력해주세요.'); return; }
 
-  DB.dividends[i] = { date, accountId, etfId, amount, memo };
+  DB.dividends[i] = { date, accountId, etfId, amount, currency, fxRate, taxStatus, memo };
 
   cancelDivEdit();
-  renderDivFilterRow(); renderDivSummary(); renderDivByAccount(); renderDivList();
+  renderDivFilterRow(); renderDivSummary(); renderDivByAccount(); renderDivByEtf(); renderDivList();
   calcFire();
   showToast('배당 기록이 수정되었습니다.');
   save();
@@ -5641,21 +6883,25 @@ function confirmDelDividend(i){
 function delDividend(i){
   DB.dividends.splice(i,1);
   cancelDivEdit();
-  renderDivFilterRow(); renderDivSummary(); renderDivByAccount(); renderDivList();
+  renderDivFilterRow(); renderDivSummary(); renderDivByAccount(); renderDivByEtf(); renderDivList();
   calcFire();
   showToast('배당 기록이 삭제되었습니다.');
   save();
 }
 
 function exportDividendCsv(){
-  const rows = [['입금일','계좌','종목','배당금(원)','메모']];
+  const rows = [['입금일','계좌','종목','통화','배당금','환율','원화환산액','세전/세후','메모']];
   const sorted = [...(DB.dividends||[])].sort((a,b)=> a.date.localeCompare(b.date));
   sorted.forEach(d=>{
     const etf = DB.etfs.find(e=>e.id===d.etfId);
-    rows.push([d.date, getAccLabel(d.accountId), etf?.name||'(미지정)', d.amount, d.memo||'']);
+    rows.push([
+      d.date, getAccLabel(d.accountId), etf?.name||'(미지정)',
+      d.currency==='USD'?'USD':'KRW', d.amount, d.currency==='USD'?(d.fxRate||''):'',
+      getDividendKrwAmount(d), d.taxStatus==='pre'?'세전':'세후', d.memo||''
+    ]);
   });
   rows.push([]);
-  rows.push(['합계','','', sorted.reduce((s,d)=>s+d.amount,0), '']);
+  rows.push(['합계','','','','','', sorted.reduce((s,d)=>s+getDividendKrwAmount(d),0), '', '']);
   const BOM = '\uFEFF';
   const csv = BOM + rows.map(r=>r.map(v=>{
     const s=String(v??'');
@@ -5796,13 +7042,13 @@ function applyDivPaste(){
       d.date===r.dateNorm && d.accountId===accountId && (d.etfId||'')===etfId && d.amount===r.amount
     );
     if(dup){ dupSkipped++; return; }
-    DB.dividends.push({ date:r.dateNorm, accountId, etfId, amount:r.amount, memo:r.memo||'' });
+    DB.dividends.push({ date:r.dateNorm, accountId, etfId, amount:r.amount, currency:'KRW', fxRate:0, taxStatus:'post', memo:r.memo||'' });
     added++;
   });
 
   _divParsedRows = [];
   toggleDivPaste();
-  renderDivFilterRow(); renderDivSummary(); renderDivByAccount(); renderDivList();
+  renderDivFilterRow(); renderDivSummary(); renderDivByAccount(); renderDivByEtf(); renderDivList();
   calcFire();
   showToast(`배당금 ${added}건을 가져왔습니다.${dupSkipped?` (중복 ${dupSkipped}건 건너뜀)`:''}`);
   save();
@@ -6604,9 +7850,11 @@ function switchTab(t){
   document.querySelectorAll('.nav-btn').forEach((b,i)=>{
     b.classList.toggle('on',['dashboard','weight','data','trades','dividend','fire','settings'][i]===t);
   });
-  // KPI 카드는 대시보드에서만 노출 (다른 탭에서는 숨겨서 스크롤 줄임)
+  // KPI 카드 / AI 브리핑은 대시보드에서만 노출 (다른 탭에서는 숨겨서 스크롤 줄임)
   const kpiWrap = document.getElementById('kpiStripWrap');
   if(kpiWrap) kpiWrap.style.display = (t==='dashboard') ? '' : 'none';
+  const aiBriefWrap = document.getElementById('aiBriefWrap');
+  if(aiBriefWrap) aiBriefWrap.style.display = (t==='dashboard') ? '' : 'none';
   if(t==='weight'){
     renderWeightSubtabs();
     // 이미 선택된 계좌 있으면 유지, 없으면 첫 계좌
@@ -6894,6 +8142,7 @@ function mergeImportedDB(p){
   DB.fireSettings     = { mode:'income', target:500000000, monthlyIncome:5000000, savingsRate:40, annualReturn:6, ...(p.fireSettings||{}) };
   DB.dividends        = Array.isArray(p.dividends) ? p.dividends : [];
   DB.trades           = Array.isArray(p.trades)    ? p.trades    : [];
+  DB.briefSnapshot    = p.briefSnapshot || DB.briefSnapshot || null;
 
   // ── 누락 필드 자동 보정 (구버전 데이터 마이그레이션) ──
   DB.etfs.forEach(e=>{
@@ -6918,8 +8167,11 @@ function mergeImportedDB(p){
     if(t.reflect===undefined) t.reflect = true; // 이 필드가 생기기 전 거래는 항상 포지션에 반영되는 거래였음
   });
   DB.dividends.forEach(d=>{
-    if(d.etfId===undefined) d.etfId = '';
-    if(d.memo===undefined)  d.memo = '';
+    if(d.etfId===undefined)     d.etfId = '';
+    if(d.memo===undefined)      d.memo = '';
+    if(d.currency===undefined)  d.currency = 'KRW';  // 이 필드가 생기기 전 기록은 모두 원화로 입력된 것
+    if(d.fxRate===undefined)    d.fxRate = 0;
+    if(d.taxStatus===undefined) d.taxStatus = 'post'; // 입금된 실수령액 기준으로 입력했을 것으로 간주
   });
 
   return true;
@@ -6963,6 +8215,7 @@ function recalcRender(){
   renderKpi(); renderDonut(); renderLine();
   renderBar(); renderWtTable(); renderRebal(); renderHoldings();
   renderMotivation();
+  renderAiBriefing();
   if(document.getElementById('tab-weight').classList.contains('on'))
     renderWeightEditor();
   renderDataTab();
