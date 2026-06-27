@@ -1,4 +1,4 @@
-const CACHE_NAME = 'folio-v3';
+const CACHE_NAME = 'folio-v4';
 const CORE_ASSETS = [
   './',
   './index.html',

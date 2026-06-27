@@ -6706,7 +6706,21 @@ function toggleSection(id){
 /* ═══ PWA: 서비스워커 등록 (오프라인/홈화면 설치 지원) ═══ */
 if('serviceWorker' in navigator){
   window.addEventListener('load', ()=>{
-    navigator.serviceWorker.register('sw.js').catch(err=>console.warn('SW 등록 실패:', err));
+    // updateViaCache:'none' → sw.js 자체를 확인할 때 브라우저 HTTP 캐시를 절대 쓰지 않고
+    // 항상 서버에 직접 물어봄. 이게 없으면 새 sw.js를 올려도 브라우저가 "안 바뀜"으로
+    // 오판해서 예전 서비스워커가 계속 페이지를 가로채는 문제가 생김(반영 안 되는 원인).
+    navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' })
+      .then(()=>{
+        // 새 서비스워커가 컨트롤을 넘겨받는 순간 자동으로 한 번만 새로고침 →
+        // 사용자가 강력 새로고침 안 해도 최신 버전이 바로 보임
+        let refreshed = false;
+        navigator.serviceWorker.addEventListener('controllerchange', ()=>{
+          if(refreshed) return;
+          refreshed = true;
+          location.reload();
+        });
+      })
+      .catch(err=>console.warn('SW 등록 실패:', err));
   });
 }
 </script>
