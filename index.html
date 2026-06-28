@@ -1037,11 +1037,11 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;
           <div style="position:relative">
             <button onclick="copyPriceApiCode()" style="position:absolute;top:6px;right:6px;padding:3px 10px;font-size:10px;font-weight:700;border-radius:6px;border:1px solid var(--border2);background:var(--surface);color:var(--text-2);cursor:pointer;z-index:1">복사</button>
             <div style="font-size:10px;color:var(--text-3);margin-bottom:6px">↕ 코드가 길어서 박스 안에서 스크롤해야 끝까지 보여요. (복사 버튼은 안 보이는 부분까지 전체 복사돼요)</div>
-            <pre id="priceApiCodeBlock" style="background:#0F172A;color:#E2E8F0;border-radius:8px;padding:14px 14px 14px;font-size:11px;line-height:1.6;overflow-x:auto;overflow-y:auto;max-height:400px;white-space:pre">// ⚠️ 아래 줄을 위 입력칸의 "보안 토큰"과 똑같은 값으로 바꿔주세요. (랜덤 생성 버튼 사용 추천)
+            <pre id="priceApiCodeBlock" style="background:#0F172A;color:#E2E8F0;border-radius:8px;padding:14px 14px 14px;font-size:11px;line-height:1.6;overflow-x:auto;overflow-y:auto;-webkit-overflow-scrolling:touch;max-height:400px;white-space:pre">// ⚠️ 아래 줄을 위 입력칸의 "보안 토큰"과 똑같은 값으로 바꿔주세요. (랜덤 생성 버튼 사용 추천)
 var SECRET_TOKEN = 'PUT_YOUR_OWN_RANDOM_TOKEN_HERE';
 
 function checkToken(e){
-  return e.parameter.token === SECRET_TOKEN && SECRET_TOKEN !== 'PUT_YOUR_OWN_RANDOM_TOKEN_HERE';
+  return e.parameter.token === SECRET_TOKEN &amp;&amp; SECRET_TOKEN !== 'PUT_YOUR_OWN_RANDOM_TOKEN_HERE';
 }
 
 function doGet(e){
@@ -1081,14 +1081,14 @@ function doPost(e){
 function getKrPrice(code){
   var url = 'https://finance.naver.com/item/main.naver?code=' + code;
   var html = UrlFetchApp.fetch(url, {muteHttpExceptions:true}).getContentText('UTF-8');
-  var m = html.match(/class="no_today"[\s\S]*?class="blind">([\d,]+)<\/span>/);
+  var m = html.match(/class="no_today"[\s\S]*?class="blind">([\d,]+)&lt;\/span>/);
   return m ? Number(m[1].replace(/,/g,'')) : null;
 }
 
 function getUsPrice(ticker, fxRate){
   var url = 'https://query1.finance.yahoo.com/v8/finance/chart/' + encodeURIComponent(ticker);
   var json = JSON.parse(UrlFetchApp.fetch(url, {muteHttpExceptions:true}).getContentText());
-  var r = json.chart && json.chart.result && json.chart.result[0];
+  var r = json.chart &amp;&amp; json.chart.result &amp;&amp; json.chart.result[0];
   if(!r) return null;
   var usd = r.meta.regularMarketPrice;
   return fxRate ? Math.round(usd * fxRate) : usd; // 원화로 환산
@@ -1097,23 +1097,23 @@ function getUsPrice(ticker, fxRate){
 function getUsdKrwRate(){
   var url = 'https://query1.finance.yahoo.com/v8/finance/chart/KRW=X';
   var json = JSON.parse(UrlFetchApp.fetch(url, {muteHttpExceptions:true}).getContentText());
-  var r = json.chart && json.chart.result && json.chart.result[0];
+  var r = json.chart &amp;&amp; json.chart.result &amp;&amp; json.chart.result[0];
   return r ? r.meta.regularMarketPrice : null;
 }
 
-/* 지수 비교 차트용: 코스피(^KS11)/코스닥(^KQ11)/S&P500(^GSPC)/나스닥(^IXIC) 등의
+/* 지수 비교 차트용: 코스피(^KS11)/코스닥(^KQ11)/S&amp;P500(^GSPC)/나스닥(^IXIC) 등의
    최근 13개월 월별 종가를 가져옴. 야후 파이낸스는 국내 지수도 함께 제공함. */
 function handleIndexHistory(ticker){
   try{
-    var url = 'https://query1.finance.yahoo.com/v8/finance/chart/' + encodeURIComponent(ticker) + '?range=13mo&interval=1mo';
+    var url = 'https://query1.finance.yahoo.com/v8/finance/chart/' + encodeURIComponent(ticker) + '?range=13mo&amp;interval=1mo';
     var json = JSON.parse(UrlFetchApp.fetch(url, {muteHttpExceptions:true}).getContentText());
-    var r = json.chart && json.chart.result && json.chart.result[0];
+    var r = json.chart &amp;&amp; json.chart.result &amp;&amp; json.chart.result[0];
     if(!r) return ContentService.createTextOutput(JSON.stringify({error:'no data'}))
       .setMimeType(ContentService.MimeType.JSON);
     var ts = r.timestamp || [];
-    var closes = (r.indicators && r.indicators.quote && r.indicators.quote[0] && r.indicators.quote[0].close) || [];
+    var closes = (r.indicators &amp;&amp; r.indicators.quote &amp;&amp; r.indicators.quote[0] &amp;&amp; r.indicators.quote[0].close) || [];
     var points = [];
-    for(var i=0;i<ts.length;i++){
+    for(var i=0;i&lt;ts.length;i++){
       if(closes[i]==null) continue;
       points.push({ t: ts[i]*1000, c: closes[i] });
     }
@@ -1144,7 +1144,7 @@ function handleSaveDB(jsonStr){
   sheet.clear();
   var CHUNK = 45000; // 셀당 글자수 한도 안에서 분할 저장
   var chunks = [];
-  for(var i=0;i<jsonStr.length;i+=CHUNK) chunks.push([jsonStr.substr(i,CHUNK)]);
+  for(var i=0;i&lt;jsonStr.length;i+=CHUNK) chunks.push([jsonStr.substr(i,CHUNK)]);
   if(!chunks.length) chunks = [['']];
   sheet.getRange(1,1,chunks.length,1).setValues(chunks);
   var savedAt = new Date().toISOString();
