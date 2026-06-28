@@ -963,11 +963,11 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;
         <div class="fg"><label>종목</label><select class="fc" id="sEtf" onchange="onHoldingChange(); autofillCurPrice();"></select></div>
       </div>
       <div class="fr">
-        <div class="fg"><label>보유수량 (주)</label><input class="fc" id="sQty" type="number" placeholder="512" oninput="onHoldingChange()"></div>
+        <div class="fg"><label>보유수량 (주)</label><input class="fc" id="sQty" type="text" placeholder="512" oninput="onHoldingChange()"></div>
         <div class="fg">
           <label id="sAvgLabel">평단가 (원)</label>
           <div style="display:flex;gap:6px">
-            <input class="fc" id="sAvg" type="number" placeholder="15420" oninput="onHoldingChange()" style="flex:1;min-width:0">
+            <input class="fc" id="sAvg" type="text" placeholder="15420" oninput="onHoldingChange()" style="flex:1;min-width:0">
             <select class="fc" id="sCurrency" onchange="toggleSAvgCurrency()" style="width:72px;flex-shrink:0;padding-left:6px;padding-right:2px">
               <option value="KRW">원</option>
               <option value="USD">달러</option>
@@ -975,9 +975,9 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;
           </div>
         </div>
       </div>
-      <div class="fg" id="sFxWrap" style="display:none"><label>적용 환율 (원/달러)</label><input class="fc" id="sFxRate" type="number" placeholder="1350" oninput="onHoldingChange()"></div>
-      <div class="fg"><label>현재가 (원) <em style="font-weight:400;color:var(--text-3)">— 종목 선택 시 자동조회</em></label><input class="fc" id="sCurPrice" type="number" placeholder="종목 선택 시 자동 입력" readonly style="background:var(--bg2);color:var(--text-2);cursor:default;pointer-events:none;"></div>
-      <div class="fg"><label>평가금액 (원) <em style="font-weight:400;color:var(--text-3);font-size:10px">← 수량 × 현재가 자동산출</em></label><input class="fc" id="sEval" type="number" placeholder="자동산출" readonly style="background:var(--bg2);color:var(--text-2);cursor:default;pointer-events:none;"></div>
+      <div class="fg" id="sFxWrap" style="display:none"><label>적용 환율 (원/달러)</label><input class="fc" id="sFxRate" type="text" placeholder="1350" oninput="onHoldingChange()"></div>
+      <div class="fg"><label>현재가 (원) <em style="font-weight:400;color:var(--text-3)">— 종목 선택 시 자동조회</em></label><input class="fc" id="sCurPrice" type="text" placeholder="종목 선택 시 자동 입력" readonly style="background:var(--bg2);color:var(--text-2);cursor:default;pointer-events:none;"></div>
+      <div class="fg"><label>평가금액 (원) <em style="font-weight:400;color:var(--text-3);font-size:10px">← 수량 × 현재가 자동산출</em></label><input class="fc" id="sEval" type="text" placeholder="자동산출" readonly style="background:var(--bg2);color:var(--text-2);cursor:default;pointer-events:none;"></div>
       <div class="fg"><label>메모</label><input class="fc" id="sMemo" placeholder="선택 입력"></div>
       <div class="calc-preview" id="calcPreview">
         현재가 <b id="cpCurPrice">-</b> &nbsp;·&nbsp; 실투자금액 <b id="cpInvest">-</b> &nbsp;·&nbsp; 평가손익 <b id="cpGain">-</b> &nbsp;·&nbsp; 수익률 <b id="cpRate">-</b>
@@ -1049,6 +1049,7 @@ function doGet(e){
       .setMimeType(ContentService.MimeType.JSON);
   }
   if(e.parameter.action === 'loadDB') return handleLoadDB();
+  if(e.parameter.action === 'indexHistory') return handleIndexHistory(e.parameter.ticker);
   var tickers = (e.parameter.tickers||'').split(',').map(function(s){return s.trim();}).filter(Boolean);
   var out = {};
   var fxRate = null; // USD→KRW 환율, 해외종목이 있을 때만 1회 조회해서 재사용
@@ -1097,6 +1098,30 @@ function getUsdKrwRate(){
   var json = JSON.parse(UrlFetchApp.fetch(url, {muteHttpExceptions:true}).getContentText());
   var r = json.chart && json.chart.result && json.chart.result[0];
   return r ? r.meta.regularMarketPrice : null;
+}
+
+/* 지수 비교 차트용: 코스피(^KS11)/코스닥(^KQ11)/S&P500(^GSPC)/나스닥(^IXIC) 등의
+   최근 13개월 월별 종가를 가져옴. 야후 파이낸스는 국내 지수도 함께 제공함. */
+function handleIndexHistory(ticker){
+  try{
+    var url = 'https://query1.finance.yahoo.com/v8/finance/chart/' + encodeURIComponent(ticker) + '?range=13mo&interval=1mo';
+    var json = JSON.parse(UrlFetchApp.fetch(url, {muteHttpExceptions:true}).getContentText());
+    var r = json.chart && json.chart.result && json.chart.result[0];
+    if(!r) return ContentService.createTextOutput(JSON.stringify({error:'no data'}))
+      .setMimeType(ContentService.MimeType.JSON);
+    var ts = r.timestamp || [];
+    var closes = (r.indicators && r.indicators.quote && r.indicators.quote[0] && r.indicators.quote[0].close) || [];
+    var points = [];
+    for(var i=0;i<ts.length;i++){
+      if(closes[i]==null) continue;
+      points.push({ t: ts[i]*1000, c: closes[i] });
+    }
+    return ContentService.createTextOutput(JSON.stringify({points:points}))
+      .setMimeType(ContentService.MimeType.JSON);
+  }catch(err){
+    return ContentService.createTextOutput(JSON.stringify({error:String(err)}))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
 }
 
 /* ── 여러 기기 동기화: 구글시트에 전체 데이터를 JSON으로 저장/조회 ── */
@@ -1171,20 +1196,20 @@ function handleLoadDB(){
           <div class="fg" style="margin:0"><label>입력일 <span style="font-weight:400;color:var(--text-3)">(자동)</span></label><input class="fc" id="editHDate" type="date" readonly style="background:var(--bg2);color:var(--text-3);cursor:default;"></div>
           <div class="fg" style="margin:0"><label>계좌</label><select class="fc" id="editHAcc"></select></div>
           <div class="fg" style="margin:0"><label>종목</label><select class="fc" id="editHEtf"></select></div>
-          <div class="fg" style="margin:0"><label>보유수량</label><input class="fc" id="editHQty" type="number" min="0" oninput="previewHoldEdit()"></div>
+          <div class="fg" style="margin:0"><label>보유수량</label><input class="fc" id="editHQty" type="text" min="0" oninput="previewHoldEdit()"></div>
           <div class="fg" style="margin:0">
             <label id="editHAvgLabel">평단가 (원)</label>
             <div style="display:flex;gap:6px">
-              <input class="fc" id="editHAvg" type="number" min="0" oninput="previewHoldEdit()" style="flex:1;min-width:0">
+              <input class="fc" id="editHAvg" type="text" min="0" oninput="previewHoldEdit()" style="flex:1;min-width:0">
               <select class="fc" id="editHCurrency" onchange="toggleEditHAvgCurrency()" style="width:72px;flex-shrink:0;padding-left:6px;padding-right:2px">
                 <option value="KRW">원</option>
                 <option value="USD">달러</option>
               </select>
             </div>
           </div>
-          <div class="fg" style="margin:0" id="editHFxWrap"><label>적용 환율 (원/달러)</label><input class="fc" id="editHFxRate" type="number" min="0" oninput="previewHoldEdit()"></div>
-          <div class="fg" style="margin:0"><label>현재가 (원)</label><input class="fc" id="editHCurPrice" type="number" min="0" oninput="previewHoldEdit()"></div>
-          <div class="fg" style="margin:0"><label>평가금액 (원) <em style="font-weight:400;color:var(--text-3);font-size:10px">← 자동산출</em></label><input class="fc" id="editHEval" type="number" min="0" readonly style="background:var(--bg2);color:var(--text-2);cursor:default;"></div>
+          <div class="fg" style="margin:0" id="editHFxWrap"><label>적용 환율 (원/달러)</label><input class="fc" id="editHFxRate" type="text" min="0" oninput="previewHoldEdit()"></div>
+          <div class="fg" style="margin:0"><label>현재가 (원)</label><input class="fc" id="editHCurPrice" type="text" min="0" oninput="previewHoldEdit()"></div>
+          <div class="fg" style="margin:0"><label>평가금액 (원) <em style="font-weight:400;color:var(--text-3);font-size:10px">← 자동산출</em></label><input class="fc" id="editHEval" type="text" min="0" readonly style="background:var(--bg2);color:var(--text-2);cursor:default;"></div>
           <div class="fg" style="margin:0"><label>메모</label><input class="fc" id="editHMemo" placeholder="선택 입력"></div>
         </div>
         <div id="holdEditPreview" style="display:none;background:var(--surface);border-radius:9px;padding:9px 13px;margin-bottom:12px;font-size:12px;color:var(--text-2);border:1px solid var(--border);">
@@ -1320,11 +1345,11 @@ function handleLoadDB(){
       </div>
       <div class="fr">
         <div class="fg"><label>종목</label><select class="fc" id="trEtf" onchange="updateTrPreview()"></select></div>
-        <div class="fg"><label>수량 (주)</label><input class="fc" id="trQty" type="number" placeholder="100" oninput="updateTrPreview()"></div>
+        <div class="fg"><label>수량 (주)</label><input class="fc" id="trQty" type="text" placeholder="100" oninput="updateTrPreview()"></div>
       </div>
       <div class="fr">
-        <div class="fg"><label id="trPriceLabel">매수 단가 (원)</label><input class="fc" id="trPrice" type="number" placeholder="15000" oninput="updateTrPreview()"></div>
-        <div class="fg"><label>수수료+세금 합계 (원) <em style="font-weight:400;color:var(--text-3);font-size:10px">선택</em></label><input class="fc" id="trFee" type="number" placeholder="0" oninput="updateTrPreview()"></div>
+        <div class="fg"><label id="trPriceLabel">매수 단가 (원)</label><input class="fc" id="trPrice" type="text" placeholder="15000" oninput="updateTrPreview()"></div>
+        <div class="fg"><label>수수료+세금 합계 (원) <em style="font-weight:400;color:var(--text-3);font-size:10px">선택</em></label><input class="fc" id="trFee" type="text" placeholder="0" oninput="updateTrPreview()"></div>
       </div>
       <div class="fg"><label>메모</label><input class="fc" id="trMemo" placeholder="선택 입력"></div>
       <label style="display:flex;align-items:center;gap:7px;margin-top:8px;cursor:pointer;font-size:12px;color:var(--text-2)">
@@ -1397,9 +1422,9 @@ function handleLoadDB(){
         <div class="fg" style="margin:0"><label>거래일</label><input class="fc" id="editTrDate" type="date"></div>
         <div class="fg" style="margin:0"><label>계좌</label><select class="fc" id="editTrAcc"></select></div>
         <div class="fg" style="margin:0"><label>종목</label><select class="fc" id="editTrEtf"></select></div>
-        <div class="fg" style="margin:0"><label>수량 (주)</label><input class="fc" id="editTrQty" type="number"></div>
-        <div class="fg" style="margin:0"><label>단가 (원)</label><input class="fc" id="editTrPrice" type="number"></div>
-        <div class="fg" style="margin:0"><label>수수료+세금 (원)</label><input class="fc" id="editTrFee" type="number"></div>
+        <div class="fg" style="margin:0"><label>수량 (주)</label><input class="fc" id="editTrQty" type="text"></div>
+        <div class="fg" style="margin:0"><label>단가 (원)</label><input class="fc" id="editTrPrice" type="text"></div>
+        <div class="fg" style="margin:0"><label>수수료+세금 (원)</label><input class="fc" id="editTrFee" type="text"></div>
         <div class="fg" style="margin:0"><label>메모</label><input class="fc" id="editTrMemo"></div>
       </div>
       <label style="display:flex;align-items:center;gap:7px;margin-bottom:12px;cursor:pointer;font-size:12px;color:var(--text-2)">
@@ -1433,11 +1458,11 @@ function handleLoadDB(){
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:6px">
         <div class="fg" style="margin:0">
           <label>목표 자산 (원)</label>
-          <input class="fc" id="fireTarget" type="number" min="0" step="1000000" oninput="calcFire()">
+          <input class="fc" id="fireTarget" type="text" min="0" step="1000000" oninput="calcFire()">
         </div>
         <div class="fg" style="margin:0">
           <label>현재 평가금액 (원)</label>
-          <input class="fc" id="fireCurrent" type="number" readonly
+          <input class="fc" id="fireCurrent" type="text" readonly
             style="background:var(--bg2);color:var(--text-2);cursor:default;">
           <div id="fireCurrentHint" style="font-size:10px;color:var(--text-3);margin-top:4px"></div>
         </div>
@@ -1447,7 +1472,7 @@ function handleLoadDB(){
         </div>
         <div class="fg" id="fireIncomeFields1" style="margin:0">
           <label>월 총소득 (원)</label>
-          <input class="fc" id="fireMonthlyIncome" type="number" min="0" step="100000" oninput="calcFire()">
+          <input class="fc" id="fireMonthlyIncome" type="text" min="0" step="100000" oninput="calcFire()">
         </div>
         <div class="fg" id="fireIncomeFields2" style="margin:0">
           <label>저축(투자)율 (%)<em style="display:block;font-weight:400;color:var(--text-3);font-size:10px;margin-top:2px">← 소득 중 투자 비중</em></label>
@@ -1501,18 +1526,28 @@ function handleLoadDB(){
         <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:6px">
           <div style="font-size:11px;font-weight:700;color:var(--text-2)">📊 나의 수익률 추이 vs 비교 기준</div>
           <div style="display:flex;align-items:center;gap:6px">
-            <span style="font-size:10px;color:var(--text-3)">비교 기준 연수익률</span>
-            <input type="number" id="benchAnnualRate" value="8" min="0" max="30" step="0.5" oninput="renderBenchmarkCompare()"
-              style="width:48px;padding:3px 5px;border:1px solid var(--border);border-radius:6px;font-size:11px;text-align:center">
-            <span style="font-size:10px;color:var(--text-3)">%</span>
+            <select id="benchIndexSelect" onchange="onBenchIndexChange()"
+              style="padding:3px 6px;border:1px solid var(--border);border-radius:6px;font-size:11px;color:var(--text-1);background:var(--surface)">
+              <option value="^KS11">코스피</option>
+              <option value="^KQ11">코스닥</option>
+              <option value="^GSPC">S&amp;P500</option>
+              <option value="^IXIC">나스닥</option>
+              <option value="custom">직접 입력 (가정 수익률)</option>
+            </select>
+            <span id="benchCustomRateWrap" style="display:none;align-items:center;gap:4px">
+              <input type="text" id="benchAnnualRate" value="8" oninput="renderBenchmarkCompare()"
+                style="width:40px;padding:3px 5px;border:1px solid var(--border);border-radius:6px;font-size:11px;text-align:center">
+              <span style="font-size:10px;color:var(--text-3)">%</span>
+            </span>
+            <span id="benchLoadingTag" style="display:none;font-size:10px;color:var(--text-3)">조회 중...</span>
           </div>
         </div>
         <div style="position:relative;height:160px"><canvas id="benchCompareChart"></canvas></div>
         <div style="display:flex;gap:14px;margin-top:6px;font-size:10px;color:var(--text-3)">
           <span style="display:flex;align-items:center;gap:4px"><span style="width:9px;height:2px;background:var(--blue);display:inline-block"></span>내 포트폴리오</span>
-          <span style="display:flex;align-items:center;gap:4px"><span style="width:9px;height:2px;background:var(--text-3);display:inline-block;border-top:1px dashed var(--text-3)"></span>비교 기준 (가정)</span>
+          <span style="display:flex;align-items:center;gap:4px"><span style="width:9px;height:2px;background:var(--text-3);display:inline-block;border-top:1px dashed var(--text-3)"></span><span id="benchLegendLabel">비교 기준</span></span>
         </div>
-        <p style="font-size:10px;color:var(--text-3);margin-top:6px">* 실제 S&amp;P500 등 지수 데이터를 가져오는 게 아니라, 입력한 연수익률로 꾸준히 성장했다고 가정한 가상의 비교선이에요. 적립 초기에는 신규 투자금 비중이 커서 내 수익률이 0%에 가깝게 보일 수 있어요.</p>
+        <p style="font-size:10px;color:var(--text-3);margin-top:6px" id="benchFootnote">* ⚙️ 설정에서 현재가 자동조회 URL을 등록하면 코스피/S&amp;P500 등 실제 지수의 최근 1년 추이를 가져와 비교해요. 미등록 시에는 입력한 연수익률로 꾸준히 성장했다고 가정한 가상선으로 대신 보여줘요. 적립 초기에는 신규 투자금 비중이 커서 내 수익률이 0%에 가깝게 보일 수 있어요.</p>
       </div>
 
       <div style="margin-top:var(--sp-3);padding-top:16px;border-top:1px solid var(--border)">
@@ -1639,8 +1674,8 @@ function handleLoadDB(){
         </div>
       </div>
       <div class="fr">
-        <div class="fg"><label id="dvAmountLabel">배당금 (원)</label><input class="fc" id="dvAmount" type="number" placeholder="50000" oninput="updateDvFxPreview()"></div>
-        <div class="fg" id="dvFxWrap" style="display:none"><label>적용 환율 (원/달러)</label><input class="fc" id="dvFxRate" type="number" placeholder="1350" oninput="updateDvFxPreview()"></div>
+        <div class="fg"><label id="dvAmountLabel">배당금 (원)</label><input class="fc" id="dvAmount" type="text" placeholder="50000" oninput="updateDvFxPreview()"></div>
+        <div class="fg" id="dvFxWrap" style="display:none"><label>적용 환율 (원/달러)</label><input class="fc" id="dvFxRate" type="text" placeholder="1350" oninput="updateDvFxPreview()"></div>
       </div>
       <div id="dvFxPreview" style="display:none;font-size:11px;color:var(--text-3);margin:-4px 0 10px"></div>
       <div class="fg">
@@ -1763,8 +1798,8 @@ function handleLoadDB(){
             <option value="USD">달러 (USD)</option>
           </select>
         </div>
-        <div class="fg" style="margin:0"><label id="editDvAmountLabel">배당금 (원)</label><input class="fc" id="editDvAmount" type="number"></div>
-        <div class="fg" style="margin:0" id="editDvFxWrap"><label>적용 환율 (원/달러)</label><input class="fc" id="editDvFxRate" type="number"></div>
+        <div class="fg" style="margin:0"><label id="editDvAmountLabel">배당금 (원)</label><input class="fc" id="editDvAmount" type="text"></div>
+        <div class="fg" style="margin:0" id="editDvFxWrap"><label>적용 환율 (원/달러)</label><input class="fc" id="editDvFxRate" type="text"></div>
         <div class="fg" style="margin:0"><label>메모</label><input class="fc" id="editDvMemo"></div>
       </div>
       <div class="fg">
@@ -1840,7 +1875,7 @@ function handleLoadDB(){
           </button>
           <div class="color-picker-dropdown" id="editAccColorDrop"></div>
         </div>
-        <div class="fg" style="margin:0"><label>총금액 (원) <em style="font-weight:400;color:var(--text-3);font-size:10px">입금 포함</em></label><input class="fc" id="editAccTotal" type="number" min="0" placeholder="자동산출"></div>
+        <div class="fg" style="margin:0"><label>총금액 (원) <em style="font-weight:400;color:var(--text-3);font-size:10px">입금 포함</em></label><input class="fc" id="editAccTotal" type="text" min="0" placeholder="자동산출"></div>
         <div style="display:flex;gap:6px;padding-bottom:1px;"><button class="btn-p" onclick="saveAccEdit()">저장</button><button class="btn-o" onclick="cancelAccEdit()">취소</button></div>
       </div>
     </div>
@@ -1921,7 +1956,7 @@ function handleLoadDB(){
           background:var(--surface);border:1.5px solid var(--blue-mid);border-radius:10px;
           box-shadow:var(--sh-md);max-height:220px;overflow-y:auto;margin-top:3px"></div>
       </div>
-      <div class="fg" style="margin:0"><label>목표수량 (주)</label><input class="fc" id="nEtfGoal" type="number" placeholder="1000" min="0"></div>
+      <div class="fg" style="margin:0"><label>목표수량 (주)</label><input class="fc" id="nEtfGoal" type="text" placeholder="1000" min="0"></div>
       <div style="padding-bottom:1px"><button class="btn-p" style="white-space:nowrap" onclick="addEtf()">+ 추가</button></div>
     </div>
     <div id="etfMgrBody_wrap" style="overflow-x:auto"><table class="dm-tbl" style="min-width:480px">
@@ -1935,7 +1970,7 @@ function handleLoadDB(){
         <div class="fg" style="margin:0"><label>종목명</label><input class="fc" id="editEtfName"></div>
         <div class="fg" style="margin:0"><label>종목구분</label><input class="fc" id="editEtfCategory" list="catDatalist" autocomplete="off"></div>
         <div class="fg" style="margin:0"><label>티커</label><input class="fc" id="editEtfTicker"></div>
-        <div class="fg" style="margin:0"><label>목표수량 (주)</label><input class="fc" id="editEtfGoal" type="number" min="0"></div>
+        <div class="fg" style="margin:0"><label>목표수량 (주)</label><input class="fc" id="editEtfGoal" type="text" min="0"></div>
         <div style="display:flex;gap:6px;padding-bottom:1px;"><button class="btn-p" onclick="saveEtfEdit()">저장</button><button class="btn-o" onclick="cancelEtfEdit()">취소</button></div>
       </div>
     </div>
@@ -2177,7 +2212,7 @@ function handleLoadDB(){
    천주달성률 = 보유수량 ÷ 목표수량  (자동)
 ═══════════════════════════════════════════════════════════ */
 let DB = {
-  meta:{ baseDate:"2026-08-10", lastUpdated:"2026-08-10 21:30", priceApiUrl:"", priceApiToken:"" },
+  meta:{ baseDate:"2026-08-10", lastUpdated:"2026-08-10 21:30", priceApiUrl:"", priceApiToken:"", benchIndex:"^KS11" },
 
   // 계좌 정의 — 여기에만 추가/삭제하면 전체 자동 반영
   accounts:[
@@ -2458,6 +2493,46 @@ function calcDerived(){
 const W   = n => '₩' + Math.round(n).toLocaleString();
 /* 부호 포함 원단위: +₩5,210,000 */
 const W2  = n => (n >= 0 ? '+₩' : '-₩') + Math.abs(Math.round(n)).toLocaleString();
+
+/* ── 입력칸 천단위 콤마 ──
+   목표자산/평단가/보유수량처럼 큰 숫자를 직접 타이핑하는 입력칸에
+   타이핑 중 실시간으로 콤마(,)를 넣어주는 유틸. type=number는 콤마를
+   표시할 수 없어서 type=text + inputmode로 바꿔서 처리함. */
+function _commaFmt(v){
+  if(v==null) return '';
+  let s = String(v).replace(/[^\d.-]/g,'');
+  if(s===''||s==='-') return s;
+  const neg = s.startsWith('-'); if(neg) s = s.slice(1);
+  const parts = s.split('.');
+  parts[0] = parts[0].replace(/^0+(?=\d)/,'').replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  return (neg?'-':'') + parts.join('.');
+}
+// 콤마 입력칸에서 실제 숫자값을 읽을 때 사용 (parseFloat 전에 콤마 제거)
+function numVal(id){
+  const el = document.getElementById(id);
+  if(!el) return 0;
+  return parseFloat(String(el.value||'').replace(/,/g,'')) || 0;
+}
+function bindCommaInputs(ids){
+  ids.forEach(id=>{
+    const el = document.getElementById(id);
+    if(!el) return;
+    el.type = 'text';
+    el.setAttribute('inputmode','decimal');
+    if(el.value) el.value = _commaFmt(el.value);
+    el.addEventListener('input', function(){
+      const before = this.value;
+      const pos = this.selectionStart;
+      const raw = before.replace(/[^\d.-]/g,'');
+      const formatted = _commaFmt(raw);
+      const diff = formatted.length - before.length;
+      this.value = formatted;
+      let newPos = pos + diff;
+      if(newPos<0) newPos=0; if(newPos>formatted.length) newPos=formatted.length;
+      this.setSelectionRange(newPos,newPos);
+    });
+  });
+}
 /* 약식 (도넛 중앙 등 공간 부족한 곳만) */
 const WK  = n => {
   const a = Math.abs(n);
@@ -4757,7 +4832,7 @@ function startEtfEdit(i){
   document.getElementById('editEtfName').value=e.name;
   document.getElementById('editEtfCategory').value=e.category||'';
   document.getElementById('editEtfTicker').value=e.ticker||'';
-  document.getElementById('editEtfGoal').value=e.goalQty||0;
+  document.getElementById('editEtfGoal').value=_commaFmt(e.goalQty||0);
   document.getElementById('etfEditForm').style.display='block';
   // 해당 행 하이라이트
   document.querySelectorAll('#etfMgrBody tr').forEach((r,ri)=>
@@ -4771,7 +4846,7 @@ function saveEtfEdit(){
   DB.etfs[i].name        = name;
   DB.etfs[i].category    = document.getElementById('editEtfCategory').value.trim() || name;
   DB.etfs[i].ticker      = document.getElementById('editEtfTicker').value.trim();
-  DB.etfs[i].goalQty     = parseInt(document.getElementById('editEtfGoal').value)||0;
+  DB.etfs[i].goalQty     = parseInt(document.getElementById('editEtfGoal').value.replace(/,/g,''))||0;
   cancelEtfEdit();
   renderDataTab(); recalcRender(); showToast('종목이 수정되었습니다.'); save();
 }
@@ -5378,7 +5453,7 @@ function addEtf(){
   const name     = document.getElementById('nEtfName').value.trim();
   const category = document.getElementById('nEtfCategory').value.trim();
   const ticker   = document.getElementById('nEtfTicker').value.trim();
-  const goal     = parseInt(document.getElementById('nEtfGoal').value)||0;
+  const goal     = parseInt(document.getElementById('nEtfGoal').value.replace(/,/g,''))||0;
   if(!name){ showToast('종목명을 입력해주세요.'); return; }
   DB.etfs.push({ id:'ETF_'+Date.now(), name, category:category||name, ticker, targetWeight:0, goalQty:goal });
   ['nEtfName','nEtfCategory','nEtfTicker','nEtfGoal'].forEach(id=>{
@@ -5430,7 +5505,7 @@ async function autofillCurPrice(){
     const priceMap = await fetchPriceMap([etf.ticker]);
     const price = priceMap ? Number(priceMap[etf.ticker]) : NaN;
     if(price > 0){
-      field.value = price;
+      field.value = _commaFmt(price);
       onHoldingChange();
     }
   }catch(err){
@@ -5443,10 +5518,10 @@ async function autofillCurPrice(){
 /* 자동계산 미리보기 */
 // 평단가 통화가 달러면 환율을 곱해 원화 평단가로 환산 (보유 포지션은 항상 원화로 저장 — 이미 모든 계산 로직이 원화 기준이라 입력 시점에만 환산)
 function getEffectiveAvgCost(){
-  const raw = parseFloat(document.getElementById('sAvg').value)||0;
+  const raw = parseFloat(document.getElementById('sAvg').value.replace(/,/g,''))||0;
   const currency = document.getElementById('sCurrency')?.value || 'KRW';
   if(currency==='USD'){
-    const fx = parseFloat(document.getElementById('sFxRate').value)||0;
+    const fx = parseFloat(document.getElementById('sFxRate').value.replace(/,/g,''))||0;
     return raw*fx;
   }
   return raw;
@@ -5459,19 +5534,19 @@ function toggleSAvgCurrency(){
 }
 
 function onHoldingChange(){
-  const qty  = parseFloat(document.getElementById('sQty').value)||0;
+  const qty  = parseFloat(document.getElementById('sQty').value.replace(/,/g,''))||0;
   const avg  = getEffectiveAvgCost();
-  const cp   = parseFloat(document.getElementById('sCurPrice').value)||0;
+  const cp   = parseFloat(document.getElementById('sCurPrice').value.replace(/,/g,''))||0;
   // 현재가 입력 시 평가금액 자동산출
   if(qty>0 && cp>0){
     const _sEval=document.getElementById('sEval');
     if(_sEval){
       _sEval.removeAttribute('readonly');
-      _sEval.value = Math.round(qty*cp);
+      _sEval.value = _commaFmt(Math.round(qty*cp));
       _sEval.setAttribute('readonly','');
     }
   }
-  const eval_ = parseFloat(document.getElementById('sEval').value)||0;
+  const eval_ = parseFloat(document.getElementById('sEval').value.replace(/,/g,''))||0;
   const prev  = document.getElementById('calcPreview');
   if(qty>0 && avg>0 && eval_>0){
     const curP = cp>0 ? cp : eval_/qty;
@@ -5670,15 +5745,15 @@ function applyHoldPaste(){
 function addHolding(){
   const accountId  = document.getElementById('sAcc').value;
   const etfId      = document.getElementById('sEtf').value;
-  const qty        = parseFloat(document.getElementById('sQty').value)||0;
+  const qty        = parseFloat(document.getElementById('sQty').value.replace(/,/g,''))||0;
   const currency   = document.getElementById('sCurrency').value;
-  if(currency==='USD' && !(parseFloat(document.getElementById('sFxRate').value)||0)){
+  if(currency==='USD' && !(parseFloat(document.getElementById('sFxRate').value.replace(/,/g,''))||0)){
     showToast('달러로 입력할 땐 적용 환율을 입력해주세요.');
     return;
   }
   const avgCost    = getEffectiveAvgCost();
-  const cp         = parseFloat(document.getElementById('sCurPrice').value)||0;
-  const evalAmount = parseFloat(document.getElementById('sEval').value) || (qty*cp) || 0;
+  const cp         = parseFloat(document.getElementById('sCurPrice').value.replace(/,/g,''))||0;
+  const evalAmount = parseFloat(document.getElementById('sEval').value.replace(/,/g,'')) || (qty*cp) || 0;
   const memo       = document.getElementById('sMemo').value.trim();
   if(!qty||!avgCost){ showToast('보유수량, 평단가를 입력해주세요.'); return; }
   if(!cp){
@@ -5876,13 +5951,13 @@ function startHoldEdit(i){
   const hcp = h.curPrice>0 ? h.curPrice : (h.qty>0 ? Math.round(h.evalAmount/h.qty) : 0);
   document.getElementById('editHoldIdx').value    = i;
   document.getElementById('editHDate').value      = h.baseDate||'';
-  document.getElementById('editHQty').value       = h.qty;
-  document.getElementById('editHAvg').value       = h.avgCost;
+  document.getElementById('editHQty').value       = _commaFmt(h.qty);
+  document.getElementById('editHAvg').value       = _commaFmt(h.avgCost);
   document.getElementById('editHCurrency').value  = 'KRW';
   document.getElementById('editHFxRate').value    = '';
   toggleEditHAvgCurrency();
-  document.getElementById('editHCurPrice').value  = hcp;
-  document.getElementById('editHEval').value      = h.evalAmount;
+  document.getElementById('editHCurPrice').value  = _commaFmt(hcp);
+  document.getElementById('editHEval').value      = _commaFmt(h.evalAmount);
   document.getElementById('editHMemo').value      = h.memo||'';
 
   // 계좌 셀렉트 채우기
@@ -5907,10 +5982,10 @@ function startHoldEdit(i){
 }
 
 function getEffectiveEditAvgCost(){
-  const raw = parseFloat(document.getElementById('editHAvg').value)||0;
+  const raw = parseFloat(document.getElementById('editHAvg').value.replace(/,/g,''))||0;
   const currency = document.getElementById('editHCurrency')?.value || 'KRW';
   if(currency==='USD'){
-    const fx = parseFloat(document.getElementById('editHFxRate').value)||0;
+    const fx = parseFloat(document.getElementById('editHFxRate').value.replace(/,/g,''))||0;
     return raw*fx;
   }
   return raw;
@@ -5923,19 +5998,19 @@ function toggleEditHAvgCurrency(){
 }
 
 function previewHoldEdit(){
-  const qty  = parseFloat(document.getElementById('editHQty').value)||0;
+  const qty  = parseFloat(document.getElementById('editHQty').value.replace(/,/g,''))||0;
   const avg  = getEffectiveEditAvgCost();
-  const cp   = parseFloat(document.getElementById('editHCurPrice').value)||0;
+  const cp   = parseFloat(document.getElementById('editHCurPrice').value.replace(/,/g,''))||0;
   // 현재가 입력 시 평가금액 자동산출
   if(qty>0 && cp>0){
     const _eEval=document.getElementById('editHEval');
     if(_eEval){
       _eEval.removeAttribute('readonly');
-      _eEval.value = Math.round(qty*cp);
+      _eEval.value = _commaFmt(Math.round(qty*cp));
       _eEval.setAttribute('readonly','');
     }
   }
-  const eval_ = parseFloat(document.getElementById('editHEval').value)||0;
+  const eval_ = parseFloat(document.getElementById('editHEval').value.replace(/,/g,''))||0;
   const prev  = document.getElementById('holdEditPreview');
   if(qty>0 && avg>0 && eval_>0){
     const curP = cp>0 ? cp : eval_/qty;
@@ -5954,15 +6029,15 @@ function previewHoldEdit(){
 
 function saveHoldEdit(){
   const i     = parseInt(document.getElementById('editHoldIdx').value);
-  const qty   = parseFloat(document.getElementById('editHQty').value)||0;
+  const qty   = parseFloat(document.getElementById('editHQty').value.replace(/,/g,''))||0;
   const currency = document.getElementById('editHCurrency').value;
-  if(currency==='USD' && !(parseFloat(document.getElementById('editHFxRate').value)||0)){
+  if(currency==='USD' && !(parseFloat(document.getElementById('editHFxRate').value.replace(/,/g,''))||0)){
     showToast('달러로 입력할 땐 적용 환율을 입력해주세요.');
     return;
   }
   const avg   = getEffectiveEditAvgCost();
-  const ecp   = parseFloat(document.getElementById('editHCurPrice').value)||0;
-  const eval_ = parseFloat(document.getElementById('editHEval').value) || (qty*ecp) || 0;
+  const ecp   = parseFloat(document.getElementById('editHCurPrice').value.replace(/,/g,''))||0;
+  const eval_ = parseFloat(document.getElementById('editHEval').value.replace(/,/g,'')) || (qty*ecp) || 0;
   if(!qty||!avg||!ecp){ showToast('보유수량, 평단가, 현재가를 입력해주세요.'); return; }
 
   const baseDate  = today();
@@ -6064,7 +6139,7 @@ function startAccEdit(i){
   if(editPreview) editPreview.querySelector('span').textContent = a.icon||'🏦';
   document.getElementById('editAccColor').value = a.color;
   const _etTotal = document.getElementById('editAccTotal');
-  if(_etTotal) _etTotal.value = a.totalAmount>0 ? a.totalAmount : '';
+  if(_etTotal) _etTotal.value = a.totalAmount>0 ? _commaFmt(a.totalAmount) : '';
   // 색상 피커 미리보기 갱신
   const csw = document.getElementById('editAccColorSwatch');
   const clb = document.getElementById('editAccColorLabel');
@@ -6085,7 +6160,7 @@ function saveAccEdit(){
   const icon  = document.getElementById('editAccIcon').value.trim()||'💰';
   const color = document.getElementById('editAccColor').value;
   if(!label){ showToast('계좌명을 입력해주세요.'); return; }
-  const _newTotal = parseFloat(document.getElementById('editAccTotal')?.value)||0;
+  const _newTotal = parseFloat(document.getElementById('editAccTotal')?.value.replace(/,/g,''))||0;
   DB.accounts[i].label       = label;
   DB.accounts[i].icon        = icon;
   DB.accounts[i].color       = color;
@@ -6169,7 +6244,7 @@ function computeHistoricalCAGR(){
 
 function renderFireTab(){
   const fs = DB.fireSettings || {};
-  document.getElementById('fireTarget').value        = fs.target ?? 500000000;
+  document.getElementById('fireTarget').value        = _commaFmt(fs.target ?? 500000000);
 
   // 예상 연 수익률: 이전에 직접 입력한 값이 있으면 유지, 없으면 최근 자산추이 기준 CAGR을 기본값으로 제안
   const cagr = computeHistoricalCAGR();
@@ -6180,28 +6255,97 @@ function renderFireTab(){
     ? `참고: 최근 ${cagr.months}개월 자산 추이 기준 환산 수익률은 약 ${suggested.toFixed(1)}%예요. 직접 값을 바꿔도 돼요.`
     : '자산 추이 데이터가 충분하지 않아 기본값 6%를 제안했어요. 직접 값을 바꿔도 돼요.';
 
-  document.getElementById('fireMonthlyIncome').value  = fs.monthlyIncome ?? 5000000;
+  document.getElementById('fireMonthlyIncome').value  = _commaFmt(fs.monthlyIncome ?? 5000000);
   document.getElementById('fireSavingsRate').value    = fs.savingsRate ?? 40;
   setFireMode(fs.mode || 'income');
+
+  const benchSel = document.getElementById('benchIndexSelect');
+  if(benchSel){
+    benchSel.value = DB.meta.benchIndex || '^KS11';
+    document.getElementById('benchCustomRateWrap').style.display = benchSel.value==='custom' ? 'inline-flex' : 'none';
+  }
   renderBenchmarkCompare();
 }
 
-// 나의 수익률 추이(과거 보유기록 재구성) vs 가정 비교기준 — 실제 지수 데이터가 아니라 입력한 연수익률로 가정한 비교선
-function renderBenchmarkCompare(){
+// 나의 수익률 추이(과거 보유기록 재구성) vs 실제 지수(코스피/S&P500 등) 또는 가정 비교기준
+let _benchIndexCache = {}; // ticker -> {points:[{t,c}], fetchedAt}
+
+function onBenchIndexChange(){
+  const sel = document.getElementById('benchIndexSelect').value;
+  DB.meta.benchIndex = sel;
+  document.getElementById('benchCustomRateWrap').style.display = sel==='custom' ? 'inline-flex' : 'none';
+  save();
+  renderBenchmarkCompare();
+}
+
+async function fetchIndexHistory(ticker){
+  const cached = _benchIndexCache[ticker];
+  if(cached && (Date.now()-cached.fetchedAt) < 1000*60*60*6) return cached.points; // 6시간 캐시
+  const url = (DB.meta.priceApiUrl||'').trim();
+  if(!url) return null;
+  const res = await fetch(withToken(url, 'action=indexHistory&ticker='+encodeURIComponent(ticker)));
+  const data = await res.json();
+  if(!data.points || !data.points.length) return null;
+  _benchIndexCache[ticker] = { points:data.points, fetchedAt:Date.now() };
+  return data.points;
+}
+
+async function renderBenchmarkCompare(){
   const ctx = document.getElementById('benchCompareChart')?.getContext('2d');
   if(!ctx) return;
   const months = 12;
-  const benchRate = parseFloat(document.getElementById('benchAnnualRate')?.value)||0;
   const now = new Date();
-  const labels = [], myReturn = [], benchmark = [];
+  const labels = [], myReturn = [];
   for(let i=months; i>=0; i--){
     const d = new Date(now.getFullYear(), now.getMonth()-i, now.getDate());
     const refDate = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
     labels.push(`${d.getMonth()+1}월`);
     myReturn.push(Math.round(computePortfolioStateAsOf(refDate).rate*10)/10);
-    const j = months-i;
-    benchmark.push(Math.round((Math.pow(1+benchRate/100, j/12)-1)*1000)/10);
   }
+
+  const sel = document.getElementById('benchIndexSelect')?.value || 'custom';
+  const indexNames = {'^KS11':'코스피','^KQ11':'코스닥','^GSPC':'S&P500','^IXIC':'나스닥'};
+  let benchmark = [];
+  let usedRealIndex = false;
+
+  if(sel !== 'custom' && (DB.meta.priceApiUrl||'').trim()){
+    const loadingTag = document.getElementById('benchLoadingTag');
+    if(loadingTag) loadingTag.style.display = 'inline';
+    try{
+      const points = await fetchIndexHistory(sel);
+      if(points && points.length>=2){
+        // 각 월(labels)에 가장 가까운 지수 시점을 찾아 첫 시점 대비 누적 수익률(%)로 환산
+        const base = points[0].c;
+        for(let i=months; i>=0; i--){
+          const d = new Date(now.getFullYear(), now.getMonth()-i, now.getDate());
+          const target = d.getTime();
+          let closest = points[0];
+          for(const p of points){ if(Math.abs(p.t-target) < Math.abs(closest.t-target)) closest = p; }
+          benchmark.push(Math.round((closest.c/base-1)*1000)/10);
+        }
+        usedRealIndex = true;
+      }
+    }catch(err){
+      console.warn('지수 데이터 조회 실패:', err);
+    }
+    if(loadingTag) loadingTag.style.display = 'none';
+  }
+
+  if(!usedRealIndex){
+    const benchRate = parseFloat((document.getElementById('benchAnnualRate')?.value||'').replace(/,/g,''))||0;
+    benchmark = [];
+    for(let i=months; i>=0; i--){
+      const j = months-i;
+      benchmark.push(Math.round((Math.pow(1+benchRate/100, j/12)-1)*1000)/10);
+    }
+  }
+
+  const legendLabel = document.getElementById('benchLegendLabel');
+  const footnote = document.getElementById('benchFootnote');
+  if(legendLabel) legendLabel.textContent = usedRealIndex ? indexNames[sel]+' (실제 지수)' : '비교 기준 (가정)';
+  if(footnote) footnote.textContent = usedRealIndex
+    ? `* ${indexNames[sel]} 지수의 최근 1년 실제 등락을 가져와 비교한 거예요. 적립 초기에는 신규 투자금 비중이 커서 내 수익률이 0%에 가깝게 보일 수 있어요.`
+    : '* ⚙️ 설정에서 현재가 자동조회 URL을 등록하면 코스피/S&P500 등 실제 지수의 최근 1년 추이를 가져와 비교해요. 미등록 시에는 입력한 연수익률로 꾸준히 성장했다고 가정한 가상선으로 대신 보여줘요. 적립 초기에는 신규 투자금 비중이 커서 내 수익률이 0%에 가깝게 보일 수 있어요.';
 
   if(window.benchCompareChartInstance) window.benchCompareChartInstance.destroy();
   window.benchCompareChartInstance = new Chart(ctx, {
@@ -6215,7 +6359,7 @@ function renderBenchmarkCompare(){
     },
     options:{
       responsive:true, maintainAspectRatio:false,
-      plugins:{ legend:{display:false}, tooltip:{callbacks:{label:c=>(c.datasetIndex===0?'내 수익률: ':'비교 기준: ')+c.raw+'%'}} },
+      plugins:{ legend:{display:false}, tooltip:{callbacks:{label:c=>(c.datasetIndex===0?'내 수익률: ':(usedRealIndex?indexNames[sel]+': ':'비교 기준: '))+c.raw+'%'}} },
       scales:{
         x:{ grid:{display:false}, ticks:{font:{size:9},color:'#9396B2'} },
         y:{ grid:{color:'#EBEDF6'}, ticks:{font:{size:9},color:'#9396B2', callback:v=>v+'%'} }
@@ -6243,7 +6387,7 @@ function setFireMode(mode){
   // 현재 평가금액: 모드별로 기준이 다름
   // 총소득 기준 → 계좌관리 총금액 합계 (수동입력 포함, 대시보드 표시 끈 계좌도 포함)
   // 평가금액 기준 → 보유종목(주수×현재가) 합계만 (수동입력 제외)
-  document.getElementById('fireCurrent').value = Math.round(showIncome ? getAccTotalSum() : DB.totalEval) || 0;
+  document.getElementById('fireCurrent').value = _commaFmt(Math.round(showIncome ? getAccTotalSum() : DB.totalEval) || 0);
   document.getElementById('fireCurrentHint').textContent = showIncome
     ? '← 자동산출 · 계좌관리 총금액 합계 (수동입력 포함)'
     : '← 자동산출 · 보유종목 평가금액 합계 (수동입력 제외)';
@@ -6252,15 +6396,15 @@ function setFireMode(mode){
 }
 
 function calcFire(){
-  const target  = parseFloat(document.getElementById('fireTarget').value)||0;
-  const current = parseFloat(document.getElementById('fireCurrent').value)||0;
+  const target  = parseFloat(document.getElementById('fireTarget').value.replace(/,/g,''))||0;
+  const current = parseFloat(document.getElementById('fireCurrent').value.replace(/,/g,''))||0;
   const annualReturn = parseFloat(document.getElementById('fireReturn').value)||0;
   const mode = (DB.fireSettings && DB.fireSettings.mode) || 'income';
 
   let monthlyIncome=0, savingsRate=0, monthlyInvest=0;
   const hintEl = document.getElementById('fireMonthlyInvestHint');
   // 월 투자금액은 두 모드 공통으로 항상 총소득 × 저축율로 계산 (모드는 '현재 평가금액' 산출 기준만 다름)
-  monthlyIncome = parseFloat(document.getElementById('fireMonthlyIncome').value)||0;
+  monthlyIncome = parseFloat(document.getElementById('fireMonthlyIncome').value.replace(/,/g,''))||0;
   savingsRate   = parseFloat(document.getElementById('fireSavingsRate').value)||0;
   const divStats = computeDividendStats();
   const monthlyDividend = divStats.monthlyAvg||0; // 배당 기록 기간(최대 12개월) 평균 — 재투자 가정으로 자동 합산
@@ -6765,8 +6909,8 @@ function updateDvFxPreview(){
   const isUsd = document.getElementById('dvCurrency').value==='USD';
   const prev = document.getElementById('dvFxPreview');
   if(!isUsd){ prev.style.display='none'; return; }
-  const amount = parseFloat(document.getElementById('dvAmount').value)||0;
-  const fxRate = parseFloat(document.getElementById('dvFxRate').value)||0;
+  const amount = parseFloat(document.getElementById('dvAmount').value.replace(/,/g,''))||0;
+  const fxRate = parseFloat(document.getElementById('dvFxRate').value.replace(/,/g,''))||0;
   if(!amount || !fxRate){ prev.style.display='none'; return; }
   prev.textContent = `≈ ${W(Math.round(amount*fxRate))} 원 환산`;
   prev.style.display = 'block';
@@ -6799,9 +6943,9 @@ function addDividend(){
   const date      = document.getElementById('dvDate').value || today();
   const accountId = document.getElementById('dvAcc').value;
   const etfId     = document.getElementById('dvEtf').value;
-  const amount    = parseFloat(document.getElementById('dvAmount').value)||0;
+  const amount    = parseFloat(document.getElementById('dvAmount').value.replace(/,/g,''))||0;
   const currency  = document.getElementById('dvCurrency').value;
-  const fxRate    = currency==='USD' ? (parseFloat(document.getElementById('dvFxRate').value)||0) : 0;
+  const fxRate    = currency==='USD' ? (parseFloat(document.getElementById('dvFxRate').value.replace(/,/g,''))||0) : 0;
   const taxStatus = _dvTaxStatus;
   const memo      = document.getElementById('dvMemo').value.trim();
   if(!amount){ showToast('배당금을 입력해주세요.'); return; }
@@ -6826,9 +6970,9 @@ function startDivEdit(i){
   if(!d) return;
   document.getElementById('editDivIdx').value   = i;
   document.getElementById('editDvDate').value   = d.date||'';
-  document.getElementById('editDvAmount').value = d.amount;
+  document.getElementById('editDvAmount').value = _commaFmt(d.amount);
   document.getElementById('editDvCurrency').value = d.currency||'KRW';
-  document.getElementById('editDvFxRate').value = d.fxRate||'';
+  document.getElementById('editDvFxRate').value = _commaFmt(d.fxRate||'');
   document.getElementById('editDvMemo').value   = d.memo||'';
   toggleEditDvFxField();
   setEditDvTaxStatus(d.taxStatus==='pre' ? 'pre' : 'post');
@@ -6855,9 +6999,9 @@ function saveDivEdit(){
   const date   = document.getElementById('editDvDate').value || today();
   const accountId = document.getElementById('editDvAcc').value;
   const etfId     = document.getElementById('editDvEtf').value;
-  const amount = parseFloat(document.getElementById('editDvAmount').value)||0;
+  const amount = parseFloat(document.getElementById('editDvAmount').value.replace(/,/g,''))||0;
   const currency  = document.getElementById('editDvCurrency').value;
-  const fxRate    = currency==='USD' ? (parseFloat(document.getElementById('editDvFxRate').value)||0) : 0;
+  const fxRate    = currency==='USD' ? (parseFloat(document.getElementById('editDvFxRate').value.replace(/,/g,''))||0) : 0;
   const taxStatus = _editDvTaxStatus;
   const memo   = document.getElementById('editDvMemo').value.trim();
   if(!amount){ showToast('배당금을 입력해주세요.'); return; }
@@ -7101,9 +7245,9 @@ function getCurrentHoldingState(accountId, etfId){
 function updateTrPreview(){
   const accountId = document.getElementById('trAcc')?.value;
   const etfId     = document.getElementById('trEtf')?.value;
-  const qty       = parseFloat(document.getElementById('trQty').value)||0;
-  const price     = parseFloat(document.getElementById('trPrice').value)||0;
-  const fee       = parseFloat(document.getElementById('trFee').value)||0;
+  const qty       = parseFloat(document.getElementById('trQty').value.replace(/,/g,''))||0;
+  const price     = parseFloat(document.getElementById('trPrice').value.replace(/,/g,''))||0;
+  const fee       = parseFloat(document.getElementById('trFee').value.replace(/,/g,''))||0;
   const reflect   = document.getElementById('trReflect')?.checked;
   const prev = document.getElementById('trPreview');
   if(!accountId || !etfId || !qty || !price){ prev.style.display='none'; return; }
@@ -7128,7 +7272,7 @@ function updateTrPreview(){
     prev.innerHTML = `현재 보유 <b>${cur.qty.toLocaleString()}주</b> (평단가 ${W(Math.round(cur.avgCost))})
       &nbsp;→&nbsp; 매도 후 <b>${Math.max(0,cur.qty-qty).toLocaleString()}주</b>
       &nbsp;·&nbsp; 예상 실현손익 <b style="color:${realizedGain>=0?'var(--pos)':'var(--neg)'}">${W2(realizedGain)}</b> (${PCT1(rate)})
-      ${qty>cur.qty ? `<br><span style="color:var(--pos);font-weight:700">⚠ 보유수량(${cur.qty}주)보다 많아 저장할 수 없어요.</span>` : ''}`;
+      ${qty>cur.qty ? `<br><span style="color:var(--pos);font-weight:700">⚠ 보유수량(${cur.qty.toLocaleString()}주)보다 많아 저장할 수 없어요.</span>` : ''}`;
   }
   prev.style.display = 'block';
 }
@@ -7210,9 +7354,9 @@ function addTrade(){
   const accountId = document.getElementById('trAcc').value;
   const etfId     = document.getElementById('trEtf').value;
   const date      = document.getElementById('trDate').value || today();
-  const qty       = parseFloat(document.getElementById('trQty').value)||0;
-  const price     = parseFloat(document.getElementById('trPrice').value)||0;
-  const fee       = parseFloat(document.getElementById('trFee').value)||0;
+  const qty       = parseFloat(document.getElementById('trQty').value.replace(/,/g,''))||0;
+  const price     = parseFloat(document.getElementById('trPrice').value.replace(/,/g,''))||0;
+  const fee       = parseFloat(document.getElementById('trFee').value.replace(/,/g,''))||0;
   const memo      = document.getElementById('trMemo').value.trim();
   const reflect   = document.getElementById('trReflect').checked;
   if(!qty || !price){ showToast('수량과 단가를 입력해주세요.'); return; }
@@ -7417,9 +7561,9 @@ function startTradeEdit(i){
   document.getElementById('editTrIdx').value   = i;
   document.getElementById('editTrType').value  = t.type;
   document.getElementById('editTrDate').value  = t.date||'';
-  document.getElementById('editTrQty').value   = t.qty;
-  document.getElementById('editTrPrice').value = t.price;
-  document.getElementById('editTrFee').value   = t.fee||0;
+  document.getElementById('editTrQty').value   = _commaFmt(t.qty);
+  document.getElementById('editTrPrice').value = _commaFmt(t.price);
+  document.getElementById('editTrFee').value   = _commaFmt(t.fee||0);
   document.getElementById('editTrMemo').value  = t.memo||'';
   document.getElementById('editTrReflect').checked = t.reflect !== false;
 
@@ -7449,9 +7593,9 @@ function saveTradeEdit(){
   const date      = document.getElementById('editTrDate').value || today();
   const accountId = document.getElementById('editTrAcc').value;
   const etfId     = document.getElementById('editTrEtf').value;
-  const qty       = parseFloat(document.getElementById('editTrQty').value)||0;
-  const price     = parseFloat(document.getElementById('editTrPrice').value)||0;
-  const fee       = parseFloat(document.getElementById('editTrFee').value)||0;
+  const qty       = parseFloat(document.getElementById('editTrQty').value.replace(/,/g,''))||0;
+  const price     = parseFloat(document.getElementById('editTrPrice').value.replace(/,/g,''))||0;
+  const fee       = parseFloat(document.getElementById('editTrFee').value.replace(/,/g,''))||0;
   const memo      = document.getElementById('editTrMemo').value.trim();
   const reflect   = document.getElementById('editTrReflect').checked;
   if(!qty || !price){ showToast('수량과 단가를 입력해주세요.'); return; }
@@ -8296,6 +8440,15 @@ renderFilterRow();
 renderWeightSubtabs();
 renderAccSelect();
 recalcRender();
+// 큰 금액/수량을 직접 입력하는 칸들에 천단위 콤마 자동 포맷 적용
+bindCommaInputs([
+  'sQty','sAvg','sFxRate','sCurPrice','sEval',
+  'editHQty','editHAvg','editHFxRate','editHCurPrice','editHEval',
+  'trQty','trPrice','trFee','editTrQty','editTrPrice','editTrFee',
+  'fireTarget','fireCurrent','fireMonthlyIncome',
+  'dvAmount','dvFxRate','editDvAmount','editDvFxRate',
+  'editAccTotal','nEtfGoal','editEtfGoal'
+]);
 const _d = DB.meta.baseDate;
 document.getElementById('hdrDate').textContent = _d;
 document.getElementById('hdrDateInput').value  = _d;
