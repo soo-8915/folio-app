@@ -35,11 +35,16 @@
   --grad-navy:linear-gradient(135deg,#1B1840 0%,#2C2779 50%,#37339C 100%);
   --grad-gold:linear-gradient(135deg,#E0C26F 0%,#C09A3E 60%,#9A7826 100%);
   --grad-signature:linear-gradient(90deg,#433D9E 0%,#7A6BC4 50%,#C09A3E 100%);
-  /* 하위호환 별칭 */
-  --red:        #D6394A;
-  --red-soft:   #FCEEEF;
-  --green:      #0F6E66;
-  --green-soft: #EAF5F3;
+
+  /* 기능별 Accent Color — 색만 보고도 영역을 구분할 수 있도록 */
+  --acc-ai:#2E6BE6;      --acc-ai-soft:#EAF1FE;     /* AI 브리핑 */
+  --acc-rebal:#7C3AED;   --acc-rebal-soft:#F3EEFD;  /* 리밸런싱 */
+  --acc-div:#0F8A6E;     --acc-div-soft:#E8F6F1;    /* 배당 */
+  --acc-fire:#E0651B;    --acc-fire-soft:#FDEEE3;   /* FIRE */
+  --acc-weight:#C09A3E;  --acc-weight-soft:#FBF5E6; /* 목표비중 */
+
+  /* Spacing System — 8 / 16 / 24 / 32 단위만 사용 */
+  --sp-1:8px; --sp-2:16px; --sp-3:24px; --sp-4:32px;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 html{overflow-x:hidden;}
@@ -55,12 +60,12 @@ body{font-family:'Pretendard','Apple SD Gothic Neo',-apple-system,system-ui,sans
 button{cursor:pointer;border:none;background:none;font-family:inherit;font-size:inherit;}
 input,select,textarea{font-family:inherit;font-size:inherit;}
 table{border-collapse:collapse;width:100%;}
-.wrap{max-width:1400px;margin:0 auto;padding:0 28px 72px;}
+.wrap{max-width:1400px;margin:0 auto;padding:0 var(--sp-3) 64px;}
 
 /* 헤더 */
 .hdr{display:flex;align-items:center;justify-content:space-between;
-  padding:22px 0 20px;gap:16px;flex-wrap:wrap;
-  border-bottom:1px solid var(--border);margin-bottom:28px;}
+  padding:var(--sp-3) 0 var(--sp-2);gap:var(--sp-2);flex-wrap:wrap;
+  border-bottom:1px solid var(--border);margin-bottom:var(--sp-4);}
 .hdr-l{display:flex;align-items:center;gap:12px;}
 .hdr-logo{width:38px;height:38px;border-radius:12px;
   background:var(--grad-navy);
@@ -70,9 +75,11 @@ table{border-collapse:collapse;width:100%;}
 .hdr-text h1{font-size:16px;font-weight:800;letter-spacing:-.2px;}
 .hdr-text p{font-size:11px;color:var(--text-3);margin-top:1px;letter-spacing:.1px;}
 .hdr-nav{display:flex;align-items:center;gap:2px;background:var(--surface);
-  border:1px solid var(--border);border-radius:12px;padding:4px;box-shadow:var(--sh-xs);}
+  border:1px solid var(--border);border-radius:12px;padding:4px;box-shadow:var(--sh-xs);
+  max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+.hdr-nav::-webkit-scrollbar{display:none;}
 .nav-btn{padding:7px 16px;border-radius:9px;font-size:13px;font-weight:600;
-  color:var(--text-2);transition:all .18s;white-space:nowrap;}
+  color:var(--text-2);transition:all .18s;white-space:nowrap;flex-shrink:0;}
 .nav-btn:hover{color:var(--blue);background:var(--blue-soft);}
 .nav-btn.on{background:var(--grad-navy);color:#fff;box-shadow:0 4px 14px rgba(27,24,64,.32);}
 .hdr-r{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
@@ -92,8 +99,8 @@ table{border-collapse:collapse;width:100%;}
 .icon-btn:hover{background:var(--blue-soft);color:var(--blue);border-color:var(--blue-mid);}
 
 /* KPI */
-.kpi-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:12px;margin-bottom:22px;}
-.kpi{background:var(--surface);border-radius:var(--r);padding:16px 14px 14px;
+.kpi-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:var(--sp-1);margin-bottom:var(--sp-3);}
+.kpi{background:var(--surface);border-radius:var(--r);padding:13px 14px 11px;
   box-shadow:var(--sh);border:1px solid transparent;
   display:block;
   transition:transform .22s cubic-bezier(.22,.9,.3,1),box-shadow .22s,border-color .22s;
@@ -101,24 +108,24 @@ table{border-collapse:collapse;width:100%;}
 .kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;
   background:var(--grad-signature);
   opacity:0;transition:opacity .22s;}
-.kpi:hover{transform:translateY(-4px);box-shadow:var(--sh-md);border-color:var(--blue-light);}
+.kpi:hover{transform:translateY(-3px);box-shadow:var(--sh-md);border-color:var(--blue-light);}
 .kpi:hover::before{opacity:1;}
-.kpi-lbl{font-size:11.5px;font-weight:600;color:var(--text-2);margin-bottom:6px;letter-spacing:.1px;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:30px;}
-.kpi-val{font-size:clamp(13px,1.3vw,19px);font-weight:900;letter-spacing:-.4px;line-height:1.2;
+.kpi-lbl{font-size:11px;font-weight:600;color:var(--text-2);margin-bottom:4px;letter-spacing:.1px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:26px;}
+.kpi-val{font-size:clamp(14px,1.3vw,19px);font-weight:900;letter-spacing:-.4px;line-height:1.15;
   color:var(--text-1);word-break:break-all;}
-.kpi-sub{font-size:10.5px;color:var(--text-3);margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.kpi-sub{font-size:10px;color:var(--text-3);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .kpi-sub.pos{color:var(--pos);}.kpi-sub.neg{color:var(--neg);}
 .kpi-val.pos{color:var(--pos);}.kpi-val.neg{color:var(--neg);}
-.kpi-ico{width:26px;height:26px;border-radius:8px;
-  display:flex;align-items:center;justify-content:center;font-size:13px;
-  position:absolute;top:14px;right:14px;}
+.kpi-ico{width:22px;height:22px;border-radius:7px;
+  display:flex;align-items:center;justify-content:center;font-size:11px;
+  position:absolute;top:12px;right:12px;}
 .kpi-body{min-width:0;}
 .ico-t{background:linear-gradient(135deg,#EEEEFA,#DEDDF5);color:var(--blue);}
 .ico-g{background:linear-gradient(135deg,var(--gold-soft),var(--gold-mid));color:var(--gold-deep);}
 
 /* 필터 */
-.filter-row{display:flex;align-items:center;gap:7px;margin-bottom:20px;flex-wrap:nowrap;overflow-x:auto;padding-bottom:2px;}
+.filter-row{display:flex;align-items:center;gap:7px;margin-bottom:var(--sp-3);flex-wrap:nowrap;overflow-x:auto;padding-bottom:2px;}
 .filter-row .f-btn{flex-shrink:0;}
 .f-btn{padding:7px 18px;border-radius:20px;font-size:13px;font-weight:600;
   background:var(--surface);color:var(--text-2);border:1.5px solid var(--border);
@@ -129,17 +136,17 @@ table{border-collapse:collapse;width:100%;}
 .f-hint{font-size:11px;color:var(--text-3);margin-left:4px;flex-shrink:0;white-space:nowrap;}
 
 /* 카드 */
-.card{background:var(--surface);border-radius:var(--r-lg);padding:26px;
+.card{background:var(--surface);border-radius:var(--r-lg);padding:var(--sp-3);
   box-shadow:var(--sh);border:1px solid var(--border);min-width:0;
   transition:box-shadow .22s;}
 .card-ttl{font-size:13px;font-weight:800;color:var(--text-1);letter-spacing:.1px;
-  display:flex;align-items:center;gap:8px;margin-bottom:20px;flex-wrap:wrap;row-gap:6px;}
+  display:flex;align-items:center;gap:var(--sp-1);margin-bottom:var(--sp-2);flex-wrap:wrap;row-gap:6px;}
 .chip{font-size:10px;font-weight:600;color:var(--text-2);
   background:var(--bg2);border-radius:6px;padding:2px 8px;border:1px solid var(--border2);}
 
 /* 그리드 */
-.g3{display:grid;grid-template-columns:1fr 2fr 1.3fr;gap:16px;margin-bottom:16px;}
-.g2{display:grid;grid-template-columns:1.1fr 1fr;gap:16px;margin-bottom:16px;}
+.g3{display:grid;grid-template-columns:1fr 2fr 1.3fr;gap:var(--sp-2);margin-bottom:var(--sp-2);}
+.g2{display:grid;grid-template-columns:1.1fr 1fr;gap:var(--sp-2);margin-bottom:var(--sp-2);}
 
 /* 도넛 */
 .donut-wrap{position:relative;width:180px;height:180px;margin:0 auto 20px;}
@@ -194,6 +201,17 @@ table{border-collapse:collapse;width:100%;}
 .st-buy{background:var(--pos-soft);color:var(--pos);}
 .st-sell{background:var(--amber-soft);color:var(--amber);}
 .st-hold{background:var(--green-soft);color:var(--green);}
+
+/* 공용 뱃지(칩) — 붙여넣기 미리보기/계좌·종목 태그 등에서 공통 사용 */
+.badge{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;
+  border-radius:20px;white-space:nowrap;line-height:1.5;}
+.badge-ok{background:var(--green-soft);color:var(--green);}
+.badge-err{background:var(--pos-soft);color:var(--pos);}
+.badge-info{background:var(--blue-soft);color:var(--blue);}
+.badge-buy{background:var(--blue-soft);color:var(--blue);}
+.badge-sell{background:var(--amber-soft);color:var(--amber);}
+.badge-warn{background:var(--amber-soft);color:var(--amber);}
+.badge-neutral{background:var(--bg2);color:var(--text-3);}
 
 /* 리밸런싱 */
 .rb-summary{display:flex;gap:7px;margin-bottom:12px;flex-wrap:wrap;align-items:center;}
@@ -252,7 +270,7 @@ table{border-collapse:collapse;width:100%;}
 .hd-tbl tbody tr{cursor:pointer;transition:background .14s;}
 .hd-tbl tbody tr:hover td{background:var(--blue-soft);}
 .acc-tag{display:inline-block;font-size:10px;font-weight:700;
-  padding:2px 7px;border-radius:20px;margin:0 2px;}
+  padding:2px 8px;border-radius:20px;margin:0 2px;}
 .prg-wrap{display:flex;align-items:center;gap:7px;justify-content:flex-end;}
 .prg-track{width:60px;height:5px;background:var(--bg2);border-radius:99px;overflow:hidden;}
 .prg-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--teal),var(--gold));transition:width .4s;}
@@ -286,14 +304,14 @@ table{border-collapse:collapse;width:100%;}
   transform:translateY(16px);transition:transform .22s;}
 .modal-ov.open .modal{transform:translateY(0);}
 .modal-hdr{display:flex;align-items:flex-start;justify-content:space-between;
-  margin-bottom:22px;padding-bottom:18px;border-bottom:1px solid var(--border);}
+  margin-bottom:var(--sp-3);padding-bottom:18px;border-bottom:1px solid var(--border);}
 .modal-ttl{font-size:18px;font-weight:900;letter-spacing:-.3px;color:var(--text-1);}
 .modal-sub{font-size:11px;color:var(--text-3);margin-top:4px;}
 .modal-close{width:30px;height:30px;border-radius:9px;background:var(--bg2);
   border:1px solid var(--border);display:flex;align-items:center;justify-content:center;
   font-size:14px;color:var(--text-2);transition:background .14s;flex-shrink:0;}
 .modal-close:hover{background:var(--border);}
-.m-kpi-g{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:20px;}
+.m-kpi-g{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:var(--sp-3);}
 .m-kpi{background:var(--bg);border-radius:13px;padding:14px 16px;border:1px solid var(--border);}
 .m-kpi-big{background:var(--surface);border:1px solid var(--border);
   padding:14px 16px;border-radius:12px;overflow:hidden;}
@@ -306,7 +324,7 @@ table{border-collapse:collapse;width:100%;}
 .m-kpi-v{font-size:14px;font-weight:900;letter-spacing:-.3px;color:var(--text-1);}
 .m-kpi-v.pos{color:var(--pos);}.m-kpi-v.neg{color:var(--neg);}
 .chun-box{background:var(--grad-navy);
-  border-radius:18px;padding:20px 22px;margin-bottom:20px;color:#fff;
+  border-radius:18px;padding:20px 22px;margin-bottom:var(--sp-3);color:#fff;
   position:relative;overflow:hidden;box-shadow:0 16px 40px rgba(27,24,64,.28);}
 .chun-box::before{content:'';position:absolute;top:-30px;right:-30px;
   width:160px;height:160px;border-radius:50%;
@@ -333,7 +351,7 @@ table{border-collapse:collapse;width:100%;}
 .ms-chip.done{background:linear-gradient(135deg,var(--gold-soft),var(--gold-mid));color:var(--gold-deep);}
 .ms-chip.next{background:var(--gold-soft);color:var(--gold-deep);border:1.5px dashed var(--gold-mid);}
 .ms-chip.future{background:var(--bg2);color:var(--text-3);opacity:.7;}
-.ms-chip .ms-date{font-size:9px;font-weight:600;opacity:.75}
+.ms-chip .ms-date{font-size:10px;font-weight:600;opacity:.75}
 .m-hold-tbl{width:100%;border-collapse:collapse;}
 .m-hold-tbl th{font-size:10px;font-weight:600;color:var(--text-3);
   padding:0 10px 9px;text-align:right;white-space:nowrap;}
@@ -349,7 +367,7 @@ table{border-collapse:collapse;width:100%;}
 
 /* 목표비중 탭 */
 .we-wrap{max-width:720px;margin:0 auto;}
-.we-subtab-row{display:flex;gap:6px;margin-bottom:18px;flex-wrap:nowrap;overflow-x:auto;padding-bottom:2px;}
+.we-subtab-row{display:flex;gap:6px;margin-bottom:var(--sp-2);flex-wrap:nowrap;overflow-x:auto;padding-bottom:2px;}
 .we-stab{flex-shrink:0;}
 .we-stab{padding:8px 22px;border-radius:20px;font-size:13px;font-weight:700;
   background:var(--surface);color:var(--text-2);
@@ -358,7 +376,7 @@ table{border-collapse:collapse;width:100%;}
   border-color:var(--acc-color,var(--blue));
   box-shadow:0 3px 12px color-mix(in srgb,var(--acc-color,var(--blue)) 40%,transparent);}
 .we-total{background:var(--surface);border-radius:var(--r-lg);padding:20px 24px;
-  box-shadow:var(--sh);border:1px solid var(--border);margin-bottom:18px;
+  box-shadow:var(--sh);border:1px solid var(--border);margin-bottom:var(--sp-2);
   display:flex;align-items:center;justify-content:space-between;gap:16px;}
 .we-total-l .lbl{font-size:13px;font-weight:700;color:var(--text-1);}
 .we-total-l .val{font-size:26px;font-weight:900;letter-spacing:-.8px;}
@@ -372,19 +390,19 @@ table{border-collapse:collapse;width:100%;}
 /* FIRE 계산기 탭 */
 .fire-wrap{display:grid;grid-template-columns:1fr 1.15fr;gap:16px;align-items:start;}
 @media(max-width:900px){.fire-wrap{grid-template-columns:1fr;}}
-.fire-progress-wrap{margin-bottom:18px;}
+.fire-progress-wrap{margin-bottom:var(--sp-2);}
 .fire-bar-track{height:8px;background:var(--bg2);border-radius:99px;overflow:hidden;margin-bottom:8px;}
 .fire-bar-fill{height:100%;border-radius:99px;background:var(--grad-gold);transition:width .5s ease;}
 .fire-progress-lbl{display:flex;align-items:baseline;gap:8px;}
 .fire-progress-lbl span:first-child{font-size:15px;font-weight:900;color:var(--text-1);letter-spacing:-.3px;}
-.fire-hero{background:var(--grad-navy);border-radius:18px;padding:22px 22px 20px;margin-bottom:18px;
+.fire-hero{background:var(--grad-navy);border-radius:18px;padding:22px 22px 20px;margin-bottom:var(--sp-2);
   color:#fff;position:relative;overflow:hidden;box-shadow:0 16px 40px rgba(27,24,64,.28);text-align:center;}
 .fire-hero::before{content:'';position:absolute;top:-30px;right:-30px;width:160px;height:160px;
   border-radius:50%;background:radial-gradient(circle,rgba(192,154,62,.18),transparent 70%);}
 .fire-hero-lbl{font-size:11px;font-weight:700;opacity:.65;letter-spacing:.8px;text-transform:uppercase;position:relative;z-index:1;}
 .fire-hero-val{font-size:32px;font-weight:900;letter-spacing:-.8px;margin-top:6px;position:relative;z-index:1;}
 .fire-hero-sub{font-size:12px;font-weight:600;opacity:.75;margin-top:6px;position:relative;z-index:1;}
-.fire-stat-g{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-bottom:18px;}
+.fire-stat-g{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-bottom:var(--sp-2);}
 .fire-stat{background:var(--bg);border-radius:13px;padding:13px 15px;border:1px solid var(--border);}
 .fire-stat-lbl{font-size:10px;color:var(--text-3);margin-bottom:5px;font-weight:600;}
 .fire-stat-val{font-size:15px;font-weight:900;letter-spacing:-.3px;color:var(--text-1);}
@@ -430,6 +448,9 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;
 .btn-o{padding:8px 15px;border-radius:9px;border:1.5px solid var(--border2);
   color:var(--text-1);font-size:12px;font-weight:600;transition:all .14s;background:var(--surface);}
 .btn-o:hover{border-color:var(--blue);color:var(--blue);background:var(--blue-soft);}
+.btn-ghost{padding:8px 15px;border-radius:9px;border:none;background:none;
+  color:var(--text-2);font-size:12px;font-weight:600;transition:all .14s;}
+.btn-ghost:hover{background:var(--bg2);color:var(--text-1);}
 .dm-tbl th{font-size:11px;font-weight:700;color:var(--text-2);padding:0 9px 10px;text-align:left;letter-spacing:.2px;}
 .dm-tbl td{padding:10px 9px;font-size:12px;border-top:1px solid var(--border);vertical-align:middle;}
 .io-row{display:flex;gap:9px;margin-top:13px;flex-wrap:wrap;}
@@ -528,7 +549,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;
   display:flex;flex-direction:column;}
 .fail-price-box .fpb-hdr{display:flex;align-items:center;gap:6px;padding:11px 14px;
   background:#FEF2F2;border-bottom:1px solid #FCA5A5;flex-shrink:0;}
-.fail-price-box .fpb-hdr strong{font-size:12.5px;color:#B91C1C;}
+.fail-price-box .fpb-hdr strong{font-size:13px;color:#B91C1C;}
 .fail-price-box .fpb-close{margin-left:auto;width:20px;height:20px;border-radius:6px;
   display:flex;align-items:center;justify-content:center;color:#B91C1C;font-size:14px;
   cursor:pointer;flex-shrink:0;}
@@ -539,7 +560,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;
 .fail-price-box .fpb-item:hover{background:var(--bg2);}
 .fail-price-box .fpb-item .tk{font-size:10px;color:var(--text-3);background:var(--bg2);
   border-radius:4px;padding:1px 5px;flex-shrink:0;}
-.fail-price-box .fpb-foot{padding:8px 14px;font-size:10.5px;color:var(--text-3);
+.fail-price-box .fpb-foot{padding:8px 14px;font-size:11px;color:var(--text-3);
   border-top:1px solid var(--border);flex-shrink:0;}
 .tab-p{display:none;}.tab-p.on{display:block;}
 
@@ -550,6 +571,8 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;
   .data-g{grid-template-columns:1fr;}
   .m-kpi-g{grid-template-columns:repeat(2,1fr);}
   .hdr{flex-direction:column;align-items:flex-start;}
+  .hdr-nav{width:100%;}
+  .nav-btn{padding:7px 12px;font-size:12px;}
   .insight-banner{flex-direction:column;text-align:center;}
   .f-hint{display:none;}
   .add-form-grid{grid-template-columns:1fr 1fr !important;}
@@ -571,7 +594,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;
     </div>
     <div class="hdr-text">
       <h1>Folio</h1>
-      <p>ETF Portfolio</p>
+      <p>나의 ETF 자산관리</p>
     </div>
   </div>
   <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
@@ -586,17 +609,12 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;
     </nav>
   </div>
   <div class="hdr-r">
-    <button id="btnRefreshPrices" onclick="refreshAllPrices()"
-      style="padding:6px 12px;border-radius:7px;border:1.5px solid var(--blue-mid);background:var(--blue-soft);
-        color:var(--blue);font-size:11px;font-weight:700;cursor:pointer;display:flex;align-items:center;
-        gap:4px;white-space:nowrap;transition:all .15s;"
-      onmouseover="this.style.borderColor='var(--blue)'" onmouseout="this.style.borderColor='var(--blue-mid)'">🔄 현재가 갱신</button>
-    <button onclick="switchTab('data');setTimeout(()=>{togglePriceApiSettings();document.getElementById('priceApiPanel').scrollIntoView({behavior:'smooth'});},120)"
+    <button id="btnRefreshPrices" class="btn-o" onclick="refreshAllPrices()"
+      style="font-size:11px;padding:6px 12px;display:flex;align-items:center;gap:4px;white-space:nowrap;
+        border-color:var(--blue-mid);background:var(--blue-soft);color:var(--blue)">🔄 현재가 갱신</button>
+    <button class="btn-ghost" onclick="switchTab('data');setTimeout(()=>{togglePriceApiSettings();document.getElementById('priceApiPanel').scrollIntoView({behavior:'smooth'});},120)"
       title="현재가 자동갱신 / 동기화 설정"
-      style="padding:6px 9px;border-radius:7px;border:1.5px solid var(--border);background:var(--surface);
-        color:var(--text-2);font-size:11px;font-weight:600;cursor:pointer;"
-      onmouseover="this.style.borderColor='var(--blue)';this.style.color='var(--blue)'"
-      onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-2)'">⚙️</button>
+      style="font-size:13px;padding:6px 9px">⚙️</button>
     <div class="date-chip-wrap">
       <div class="date-chip">
         <span class="cal-icon">📅</span><em>기준일</em><strong id="hdrDate">-</strong>
@@ -608,38 +626,40 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;
 </header>
 
 <div id="aiBriefWrap">
-  <div id="aiBriefingCard" style="background:var(--surface);border-radius:14px;border:1px solid var(--border);padding:18px 20px;margin-bottom:20px">
+  <div id="aiBriefingCard" style="background:var(--surface);border-radius:14px;border:1px solid var(--border);border-left:3px solid var(--acc-ai);padding:18px 20px;margin-bottom:16px">
     <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:4px;gap:10px;flex-wrap:wrap">
-      <span style="font-size:10.5px;font-weight:700;color:var(--text-3);letter-spacing:.4px">PORTFOLIO BRIEF · <span id="aiBriefDate"></span></span>
-      <button onclick="toggleAiBriefDetail()" id="aiBriefMoreBtn" style="font-size:11px;font-weight:600;color:var(--blue);background:none;border:none;cursor:pointer;padding:0">자세히 보기 ▾</button>
+      <span style="font-size:11px;font-weight:700;color:var(--acc-ai);letter-spacing:.4px">🤖 PORTFOLIO BRIEF · <span id="aiBriefDate"></span></span>
     </div>
-    <div style="font-size:15px;font-weight:700;color:var(--text-1);line-height:1.5;margin-bottom:14px" id="aiBriefHeadlineInsight"></div>
+    <div style="font-size:15px;font-weight:700;color:var(--text-1);line-height:1.5;margin-bottom:var(--sp-2)" id="aiBriefHeadlineInsight"></div>
 
-    <div style="font-size:13px;font-weight:700;color:var(--text-1);margin-bottom:13px" id="aiBriefAgendaCount"></div>
+    <div style="font-size:11px;font-weight:700;color:var(--text-3);margin-bottom:8px">오늘의 안건</div>
+    <div id="aiBriefAgenda" style="display:flex;flex-direction:column;gap:6px;margin-bottom:4px"></div>
 
-    <div id="aiBriefLines" style="display:flex;flex-direction:column;margin-bottom:6px"></div>
+    <button onclick="toggleAiBriefDetail()" id="aiBriefMoreBtn" style="font-size:11px;font-weight:600;color:var(--acc-ai);background:none;border:none;cursor:pointer;padding:10px 0 0;width:100%;text-align:left">더보기 ▾</button>
 
-    <div id="aiBriefDetailPanel" style="display:none;margin-top:14px;padding-top:14px;border-top:1px solid var(--border)"></div>
+    <div id="aiBriefMore" style="display:none">
+      <div style="margin-top:10px;padding-top:var(--sp-2);border-top:1px solid var(--border)">
+        <div style="font-size:13px;font-weight:700;color:var(--text-1);margin-bottom:13px" id="aiBriefAgendaCount"></div>
+        <div id="aiBriefLines" style="display:flex;flex-direction:column;margin-bottom:6px"></div>
+      </div>
 
-    <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border)">
-      <div style="font-size:10px;font-weight:700;color:var(--text-3);margin-bottom:9px">오늘의 안건</div>
-      <div id="aiBriefAgenda" style="display:flex;flex-direction:column;gap:6px"></div>
+      <div id="aiBriefDetailPanel" style="margin-top:var(--sp-2);padding-top:var(--sp-2);border-top:1px solid var(--border)"></div>
+
+      <div style="margin-top:16px;padding-top:var(--sp-2);border-top:1px solid var(--border)">
+        <div style="font-size:10px;font-weight:700;color:var(--text-3);margin-bottom:9px">이런 질문이 떠오르실 수 있어요</div>
+        <div id="aiBriefQuestions" style="display:flex;flex-wrap:wrap;gap:6px"></div>
+        <div id="aiBriefAnswerPanel" style="display:none;background:var(--bg2);border-radius:10px;padding:13px 15px;margin-top:10px;font-size:13px;color:var(--text-2);line-height:1.65"></div>
+      </div>
+
+      <div id="portfolioHealthStrip" style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding:11px 16px;margin-top:16px;font-size:12px;color:var(--text-2);background:var(--bg2);border-radius:10px">
+        <span style="font-weight:700;color:var(--text-1);white-space:nowrap">Portfolio Health <span style="color:var(--acc-ai)" id="phScore">-</span>점</span>
+        <span style="white-space:nowrap">목표비중 <span id="phTarget"></span></span>
+        <span style="white-space:nowrap">투자지속성 <span id="phConsist"></span></span>
+        <span style="white-space:nowrap">리밸런싱 <span id="phRebal"></span></span>
+        <span style="white-space:nowrap">FIRE <span id="phFire"></span></span>
+        <span style="white-space:nowrap">배당관리 <span id="phDiv"></span></span>
+      </div>
     </div>
-
-    <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border)">
-      <div style="font-size:10px;font-weight:700;color:var(--text-3);margin-bottom:9px">이런 질문이 떠오르실 수 있어요</div>
-      <div id="aiBriefQuestions" style="display:flex;flex-wrap:wrap;gap:6px"></div>
-      <div id="aiBriefAnswerPanel" style="display:none;background:var(--bg2);border-radius:10px;padding:13px 15px;margin-top:10px;font-size:12.5px;color:var(--text-2);line-height:1.65"></div>
-    </div>
-  </div>
-
-  <div id="portfolioHealthStrip" style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding:11px 16px;margin-top:10px;font-size:11.5px;color:var(--text-2);background:var(--bg2);border-radius:10px">
-    <span style="font-weight:700;color:var(--text-1);white-space:nowrap">Portfolio Health <span style="color:var(--blue)" id="phScore">-</span>점</span>
-    <span style="white-space:nowrap">목표비중 <span id="phTarget"></span></span>
-    <span style="white-space:nowrap">투자지속성 <span id="phConsist"></span></span>
-    <span style="white-space:nowrap">리밸런싱 <span id="phRebal"></span></span>
-    <span style="white-space:nowrap">FIRE <span id="phFire"></span></span>
-    <span style="white-space:nowrap">배당관리 <span id="phDiv"></span></span>
   </div>
 </div>
 
@@ -692,8 +712,8 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;
     </div>
   </div>
   <div class="g2">
-    <div class="card">
-      <div class="card-ttl">목표비중 vs 현재비중 <span class="chip" id="wtChip">전체</span></div>
+    <div class="card" style="border-left:3px solid var(--acc-weight)">
+      <div class="card-ttl">🎯 목표비중 vs 현재비중 <span class="chip" id="wtChip">전체</span></div>
       <div style="overflow-x:auto"><table class="wt-tbl">
         <thead><tr>
           <th style="text-align:left">종목명</th>
@@ -702,15 +722,15 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;
         <tbody id="wtBody"></tbody>
       </table></div>
     </div>
-    <div class="card">
-      <div class="card-ttl">리밸런싱 액션 <span class="chip" id="rbChip">전체</span></div>
+    <div class="card" style="border-left:3px solid var(--acc-rebal)">
+      <div class="card-ttl">⚖️ 리밸런싱 액션 <span class="chip" id="rbChip">전체</span></div>
       <div class="rb-summary" id="rbSummary"></div>
       <div id="rbContent"></div>
       <p style="font-size:10px;color:var(--text-3);margin-top:12px;">* |현재비중 − 목표비중| ≥ 5%p 종목만 표시 · 수량은 현재가 기준 추정값</p>
     </div>
   </div>
 
-  <div class="card" id="motivationCard" style="margin-top:20px">
+  <div class="card" id="motivationCard" style="margin-top:var(--sp-3)">
     <div class="card-ttl" style="cursor:pointer;user-select:none" onclick="toggleSection('motivExtra')">
       📈 투자 동기부여 <span class="chip">전체 포트폴리오 기준 · 필터 무관</span>
       <span id="motivExtraToggle" style="margin-left:auto;font-size:11px;color:var(--text-3);font-weight:500">▼ 펼치기</span>
@@ -732,26 +752,26 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;
     <div id="milestoneRow" style="display:flex;gap:6px;flex-wrap:wrap"></div>
 
     <div id="motivExtra" style="display:none">
-      <div class="m-stat-g" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:16px 0 14px;padding-top:14px;border-top:1px solid var(--border)">
+      <div class="m-stat-g" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:16px 0 14px;padding-top:var(--sp-2);border-top:1px solid var(--border)">
         <div style="background:var(--bg2);border-radius:11px;padding:10px 12px">
-          <div style="font-size:9px;color:var(--text-3);font-weight:600;margin-bottom:3px">연속 적립</div>
+          <div style="font-size:10px;color:var(--text-3);font-weight:600;margin-bottom:3px">연속 적립</div>
           <div style="font-size:13px;font-weight:800;color:var(--text-1)" id="motivStreakChip">🔥 -</div>
         </div>
         <div style="background:var(--bg2);border-radius:11px;padding:10px 12px">
-          <div style="font-size:9px;color:var(--text-3);font-weight:600;margin-bottom:3px">최고 기록</div>
+          <div style="font-size:10px;color:var(--text-3);font-weight:600;margin-bottom:3px">최고 기록</div>
           <div style="font-size:13px;font-weight:800;color:var(--text-1)" id="motivMaxStreak">-</div>
         </div>
         <div style="background:var(--bg2);border-radius:11px;padding:10px 12px">
-          <div style="font-size:9px;color:var(--text-3);font-weight:600;margin-bottom:3px">투자 기간</div>
+          <div style="font-size:10px;color:var(--text-3);font-weight:600;margin-bottom:3px">투자 기간</div>
           <div style="font-size:13px;font-weight:800;color:var(--text-1)" id="motivDayCount">-</div>
         </div>
         <div style="background:var(--bg2);border-radius:11px;padding:10px 12px">
-          <div style="font-size:9px;color:var(--text-3);font-weight:600;margin-bottom:3px">매수 일정성</div>
+          <div style="font-size:10px;color:var(--text-3);font-weight:600;margin-bottom:3px">매수 일정성</div>
           <div style="font-size:13px;font-weight:800;color:var(--text-1)" id="motivConsistency">-</div>
         </div>
       </div>
 
-      <div style="border-top:1px solid var(--border);padding-top:14px;margin-bottom:16px">
+      <div style="border-top:1px solid var(--border);padding-top:var(--sp-2);margin-bottom:16px">
         <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:4px">
           <div style="font-size:11px;font-weight:700;color:var(--text-2)">🗓️ 주별 매수 활동</div>
           <div style="font-size:10px;color:var(--text-3)">최근 52주 · <b style="color:var(--text-2)" id="motivBuyCount">0</b>회</div>
@@ -767,12 +787,12 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;
         </div>
       </div>
 
-      <div id="eokGrowthSection" style="border-top:1px solid var(--border);padding-top:14px;margin-bottom:16px;display:none">
+      <div id="eokGrowthSection" style="border-top:1px solid var(--border);padding-top:var(--sp-2);margin-bottom:16px;display:none">
         <div style="font-size:11px;font-weight:700;color:var(--text-2);margin-bottom:10px">🚀 억단위 성장 가속도</div>
         <div id="eokGrowthList"></div>
       </div>
 
-      <div id="netBuyYoySection" style="border-top:1px solid var(--border);padding-top:14px;margin-bottom:16px;display:none">
+      <div id="netBuyYoySection" style="border-top:1px solid var(--border);padding-top:var(--sp-2);margin-bottom:16px;display:none">
         <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:8px">
           <div style="font-size:11px;font-weight:700;color:var(--text-2)">📊 순매수 비교 (vs 작년의 나)</div>
           <div style="font-size:10px;color:var(--text-3)" id="netBuyYoySummary"></div>
@@ -784,25 +804,24 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;
         </div>
       </div>
 
-      <div style="border-top:1px solid var(--border);padding-top:14px">
+      <div style="border-top:1px solid var(--border);padding-top:var(--sp-2)">
         <div style="font-size:11px;font-weight:700;color:var(--text-2);margin-bottom:10px">⏳ 투자 타임캡슐</div>
         <div id="timeCapsuleGrid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px"></div>
       </div>
     </div>
   </div>
 
-  <div class="card" style="margin-top:20px">
-    <div class="card-ttl" style="cursor:pointer;user-select:none" onclick="toggleSection('hdWrap')">
+  <div class="card" style="margin-top:var(--sp-3)">
+    <div class="card-ttl">
       종목 상세 정보 <span class="chip" id="hdChip">전체 기준</span>
       <span class="chip" id="hdCountChip">0종목</span>
-      <span id="hdToggle" style="margin-left:auto;font-size:11px;color:var(--text-3);font-weight:500">▼ 펼치기</span>
+      <span style="margin-left:auto;font-size:10px;color:var(--text-3);font-weight:500">행을 누르면 상세정보가 열려요</span>
     </div>
-    <div class="hd-wrap" id="hdWrap" style="display:none">
-      <table class="hd-tbl">
+    <div class="hd-wrap" id="hdWrap">
+      <table class="hd-tbl hd-tbl-compact">
         <thead><tr>
           <th style="text-align:left">종목명</th>
-          <th>보유수량</th><th>평단가</th><th>현재가</th><th>평가금액</th><th>실투자금액</th>
-          <th>평가손익</th><th>수익률</th><th>천주달성률</th><th>보유계좌</th><th>비중</th>
+          <th>평가금액</th><th>수익률</th><th>비중</th>
         </tr></thead>
         <tbody id="hdBody"></tbody>
       </table>
@@ -816,7 +835,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;
     <div class="we-subtab-row" id="weightSubtabRow"></div>
     <div class="we-total">
       <div class="we-total-l">
-        <div class="lbl" id="weTotalLbl">포트폴리오 목표비중 합계</div>
+        <div class="lbl" id="weTotalLbl" style="color:var(--acc-weight)">🎯 포트폴리오 목표비중 합계</div>
         <div class="val" id="weTotalVal">0%</div>
         <div class="hint" id="weTotalHint"></div>
       </div>
@@ -826,9 +845,8 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;
     <div style="display:flex;align-items:center;gap:12px;margin-top:6px">
       <button class="save-btn" id="saveWBtn" onclick="saveWeights()"
         style="margin-top:0;flex:1">저장하기</button>
-      <button class="btn-o" onclick="resetWeights()"
-        style="font-size:12px;padding:10px 20px;color:#DC2626;border-color:#FCA5A5;
-          background:#FEF2F2;white-space:nowrap;flex-shrink:0">초기화</button>
+      <button class="btn-d" onclick="resetWeights()"
+        style="font-size:12px;padding:10px 20px;white-space:nowrap;flex-shrink:0">초기화</button>
     </div>
     <div id="resetWeightWrap" style="margin-top:8px"></div>
   </div>
@@ -841,19 +859,14 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;
   <div class="data-g">
     <div class="card">
       <div class="card-ttl">자산스냅샷 입력 <span class="chip">보유수량·평단가·현재가</span>
-        <button onclick="toggleHoldPaste()" id="holdPasteToggleBtn"
-          style="margin-left:auto;padding:3px 10px;border-radius:7px;border:1.5px solid var(--border);
-          background:var(--surface);color:var(--text-2);font-size:11px;font-weight:600;cursor:pointer;
-          display:flex;align-items:center;gap:4px;transition:all .15s"
-          onmouseover="this.style.borderColor='var(--blue)';this.style.color='var(--blue)'"
-          onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-2)'">
+        <button onclick="toggleHoldPaste()" id="holdPasteToggleBtn" class="btn-o" style="margin-left:auto;padding:3px 10px;font-size:11px;display:flex;align-items:center;gap:4px">
           📋 구글시트에서 붙여넣기
         </button>
       </div>
 
       <!-- 포지션 붙여넣기 패널 -->
       <div id="holdPastePanel" style="display:none;background:var(--bg2);border-radius:12px;
-        padding:16px 18px;margin-bottom:14px;border:1px solid var(--border);">
+        padding:16px 18px;margin-bottom:var(--sp-2);border:1px solid var(--border);">
         <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;gap:8px;flex-wrap:wrap">
           <div>
             <div style="font-size:12px;font-weight:700;color:var(--blue)">📊 구글시트에서 복사 후 붙여넣기</div>
@@ -863,8 +876,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;
             </div>
           </div>
           <div style="display:flex;gap:6px;flex-shrink:0">
-            <button onclick="parseHoldPaste()" style="padding:5px 14px;border-radius:8px;
-              background:var(--blue);color:#fff;border:none;font-size:12px;font-weight:700;cursor:pointer">미리보기</button>
+            <button onclick="parseHoldPaste()" class="btn-p" style="padding:5px 14px;font-size:12px">미리보기</button>
             <button onclick="toggleHoldPaste()" style="padding:5px 10px;border-radius:8px;
               border:1px solid var(--border);background:var(--surface);color:var(--text-3);font-size:12px;cursor:pointer">✕</button>
           </div>
@@ -876,31 +888,31 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;
             padding:6px 8px;text-align:center;font-size:10px">
             <div style="font-weight:700;color:var(--blue);margin-bottom:2px">A열</div>
             <div style="color:var(--text-2)">계좌ID</div>
-            <div style="color:var(--text-3);font-size:9px;margin-top:1px">ISA / IRP / PEN</div>
+            <div style="color:var(--text-3);font-size:10px;margin-top:1px">ISA / IRP / PEN</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:7px;
             padding:6px 8px;text-align:center;font-size:10px">
             <div style="font-weight:700;color:var(--blue);margin-bottom:2px">B열</div>
             <div style="color:var(--text-2)">종목명 또는 티커</div>
-            <div style="color:var(--text-3);font-size:9px;margin-top:1px">TIGER S&P500 / 360750</div>
+            <div style="color:var(--text-3);font-size:10px;margin-top:1px">TIGER S&P500 / 360750</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:7px;
             padding:6px 8px;text-align:center;font-size:10px">
             <div style="font-weight:700;color:var(--blue);margin-bottom:2px">C열</div>
             <div style="color:var(--text-2)">보유수량</div>
-            <div style="color:var(--text-3);font-size:9px;margin-top:1px">1500</div>
+            <div style="color:var(--text-3);font-size:10px;margin-top:1px">1500</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:7px;
             padding:6px 8px;text-align:center;font-size:10px">
             <div style="font-weight:700;color:var(--blue);margin-bottom:2px">D열</div>
             <div style="color:var(--text-2)">평단가</div>
-            <div style="color:var(--text-3);font-size:9px;margin-top:1px">17,460</div>
+            <div style="color:var(--text-3);font-size:10px;margin-top:1px">17,460</div>
           </div>
           <div style="background:var(--green-soft);border:1px solid #A7F3D0;border-radius:7px;
             padding:6px 8px;text-align:center;font-size:10px">
             <div style="font-weight:700;color:var(--green);margin-bottom:2px">E열 🔄</div>
             <div style="color:var(--text-2)">현재가</div>
-            <div style="color:var(--text-3);font-size:9px;margin-top:1px">GOOGLEFINANCE 자동</div>
+            <div style="color:var(--text-3);font-size:10px;margin-top:1px">GOOGLEFINANCE 자동</div>
           </div>
         </div>
 
@@ -921,9 +933,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;
                 <input type="checkbox" id="holdPasteReplaceChk" style="width:13px;height:13px;accent-color:var(--blue)">
                 기존 포지션 전체 교체
               </label>
-              <button onclick="applyHoldPaste()" style="padding:5px 16px;border-radius:8px;
-                background:var(--green);color:#fff;border:none;font-size:12px;font-weight:700;cursor:pointer">
-                ✓ 가져오기</button>
+              <button onclick="applyHoldPaste()" class="btn-p" style="padding:5px 16px;font-size:12px">✓ 가져오기</button>
             </div>
           </div>
           <div style="overflow-x:auto;max-height:200px;overflow-y:auto;border-radius:8px;border:1px solid var(--border)">
@@ -976,11 +986,11 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;
     </div>
     <div class="card">
       <div class="card-ttl">보유 포지션 목록 <span class="chip">수정 버튼 클릭 → 인라인 편집</span>
-        <button onclick="exportHoldingsCsv()" style="margin-left:auto;padding:4px 12px;border-radius:7px;border:1.5px solid var(--border);background:var(--surface);color:var(--text-2);font-size:11px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:4px;transition:all .15s;" onmouseover="this.style.borderColor='var(--blue)';this.style.color='var(--blue)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-2)'">⬇ CSV</button>
+        <button onclick="exportHoldingsCsv()" class="btn-o" style="margin-left:auto;padding:4px 12px;font-size:11px;display:flex;align-items:center;gap:4px">⬇ CSV</button>
       </div>
 
       <!-- 현재가 자동갱신 설정 패널 -->
-      <div id="priceApiPanel" style="display:none;background:var(--bg2);border-radius:12px;padding:16px 18px;margin-bottom:14px;border:1px solid var(--border);">
+      <div id="priceApiPanel" style="display:none;background:var(--bg2);border-radius:12px;padding:16px 18px;margin-bottom:var(--sp-2);border:1px solid var(--border);">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
           <div style="font-size:12px;font-weight:700;color:var(--blue)">🔄 현재가 자동갱신 설정</div>
           <button onclick="togglePriceApiSettings()" style="margin-left:auto;font-size:11px;font-weight:600;color:var(--text-3);background:none;border:none;cursor:pointer;padding:2px 6px">✕ 접기</button>
@@ -993,6 +1003,13 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;
           <input class="fc" id="priceApiUrlInput" placeholder="https://script.google.com/macros/s/xxxxx/exec" style="flex:1;min-width:220px">
           <button class="btn-p" style="padding:8px 16px;white-space:nowrap" onclick="savePriceApiUrl()">저장</button>
         </div>
+        <div style="display:flex;gap:8px;margin-bottom:4px;flex-wrap:wrap;align-items:center">
+          <input class="fc" id="priceApiTokenInput" placeholder="보안 토큰 (아래 코드의 SECRET_TOKEN과 동일하게 입력)" style="flex:1;min-width:220px">
+          <button class="btn-o" style="padding:8px 12px;white-space:nowrap;font-size:11px" onclick="generatePriceApiToken()">랜덤 생성</button>
+        </div>
+        <div style="font-size:11px;color:var(--text-3);line-height:1.5;margin-bottom:10px">
+          이 토큰을 모르면 URL을 알아도 내 데이터를 읽거나 덮어쓸 수 없어요. 아래 코드의 <code>SECRET_TOKEN</code> 값을 위 토큰과 똑같이 맞춰주세요.
+        </div>
 
         <div style="border-top:1px solid var(--border);margin:14px 0 12px"></div>
         <div style="font-size:12px;font-weight:700;color:var(--blue);margin-bottom:6px">☁️ 여러 기기 동기화</div>
@@ -1004,21 +1021,33 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;
           <button id="btnSyncUpload" class="btn-o" style="flex:1;min-width:120px" onclick="syncUpload()">⬆️ 클라우드에 업로드</button>
           <button id="btnSyncDownload" class="btn-o" style="flex:1;min-width:120px" onclick="syncDownload()">⬇️ 클라우드에서 가져오기</button>
         </div>
-        <div id="syncStatus" style="font-size:10.5px;color:var(--text-3)"></div>
+        <div id="syncStatus" style="font-size:11px;color:var(--text-3)"></div>
 
         <div style="border-top:1px solid var(--border);margin:14px 0 12px"></div>
         <button onclick="togglePriceApiHelp()" id="priceApiHelpToggle" style="font-size:11px;font-weight:700;color:var(--blue);background:none;border:none;cursor:pointer;padding:0">▶ 1회 설정 방법 보기 (5분)</button>
-        <div id="priceApiHelpBody" style="display:none;margin-top:10px;font-size:11.5px;color:var(--text-2);line-height:1.7">
+        <div id="priceApiHelpBody" style="display:none;margin-top:10px;font-size:12px;color:var(--text-2);line-height:1.7">
           <ol style="padding-left:18px;margin-bottom:10px">
             <li><a href="https://script.google.com" target="_blank" rel="noopener" style="color:var(--blue);font-weight:600">script.google.com</a> 접속 → <b>새 프로젝트</b></li>
-            <li>아래 코드를 전체 복사해서 기본 코드를 모두 지우고 붙여넣기</li>
+            <li>위 <b>랜덤 생성</b> 버튼으로 보안 토큰을 먼저 만들어두기</li>
+            <li>아래 코드를 전체 복사해서 기본 코드를 모두 지우고 붙여넣기 → 맨 위 <code>SECRET_TOKEN</code> 값을 방금 만든 토큰으로 교체</li>
             <li>우측 상단 <b>배포 → 새 배포</b> → 유형: <b>웹 앱</b></li>
             <li>실행 계정: <b>나</b> &nbsp;/&nbsp; 액세스 권한: <b>모든 사용자</b> 선택 후 <b>배포</b></li>
-            <li>발급된 <b>웹 앱 URL</b>을 복사해서 위 입력칸에 붙여넣고 저장</li>
+            <li>발급된 <b>웹 앱 URL</b>을 복사해서 위 입력칸에 붙여넣고, 토큰칸도 채운 뒤 저장</li>
           </ol>
           <div style="position:relative">
             <button onclick="copyPriceApiCode()" style="position:absolute;top:6px;right:6px;padding:3px 10px;font-size:10px;font-weight:700;border-radius:6px;border:1px solid var(--border2);background:var(--surface);color:var(--text-2);cursor:pointer;z-index:1">복사</button>
-            <pre id="priceApiCodeBlock" style="background:#0F172A;color:#E2E8F0;border-radius:8px;padding:14px 14px 14px;font-size:10.5px;line-height:1.6;overflow-x:auto;max-height:260px;white-space:pre">function doGet(e){
+            <pre id="priceApiCodeBlock" style="background:#0F172A;color:#E2E8F0;border-radius:8px;padding:14px 14px 14px;font-size:11px;line-height:1.6;overflow-x:auto;max-height:260px;white-space:pre">// ⚠️ 아래 줄을 위 입력칸의 "보안 토큰"과 똑같은 값으로 바꿔주세요. (랜덤 생성 버튼 사용 추천)
+var SECRET_TOKEN = 'PUT_YOUR_OWN_RANDOM_TOKEN_HERE';
+
+function checkToken(e){
+  return e.parameter.token === SECRET_TOKEN && SECRET_TOKEN !== 'PUT_YOUR_OWN_RANDOM_TOKEN_HERE';
+}
+
+function doGet(e){
+  if(!checkToken(e)){
+    return ContentService.createTextOutput(JSON.stringify({error:'unauthorized'}))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
   if(e.parameter.action === 'loadDB') return handleLoadDB();
   var tickers = (e.parameter.tickers||'').split(',').map(function(s){return s.trim();}).filter(Boolean);
   var out = {};
@@ -1038,6 +1067,10 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;
 }
 
 function doPost(e){
+  if(!checkToken(e)){
+    return ContentService.createTextOutput(JSON.stringify({error:'unauthorized'}))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
   if(e.parameter.action === 'saveDB') return handleSaveDB(e.postData.contents);
   return ContentService.createTextOutput(JSON.stringify({error:'unknown action'}))
     .setMimeType(ContentService.MimeType.JSON);
@@ -1131,7 +1164,7 @@ function handleLoadDB(){
         </table>
         <p style="font-size:10px;color:var(--text-3);margin-top:8px;">* 현재가 = 평가금액 ÷ 보유수량 (자동 계산)</p>
       </div>
-      <div id="holdEditForm" style="display:none;background:var(--bg2);border-radius:12px;padding:16px 18px;margin-top:14px;border:1px solid var(--border);">
+      <div id="holdEditForm" style="display:none;background:var(--bg2);border-radius:12px;padding:16px 18px;margin-top:var(--sp-2);border:1px solid var(--border);">
         <div style="font-size:12px;font-weight:700;color:var(--blue);margin-bottom:12px">✏️ 포지션 수정</div>
         <input type="hidden" id="editHoldIdx">
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:12px;">
@@ -1167,19 +1200,14 @@ function handleLoadDB(){
   <div class="data-g">
     <div class="card">
       <div class="card-ttl">매수·매도 기록 <span class="chip">평단가 자동계산 · 실현손익 기록</span>
-        <button onclick="toggleTrPaste()" id="trPasteToggleBtn"
-          style="margin-left:auto;padding:3px 10px;border-radius:7px;border:1.5px solid var(--border);
-          background:var(--surface);color:var(--text-2);font-size:11px;font-weight:600;cursor:pointer;
-          display:flex;align-items:center;gap:4px;transition:all .15s"
-          onmouseover="this.style.borderColor='var(--blue)';this.style.color='var(--blue)'"
-          onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-2)'">
+        <button onclick="toggleTrPaste()" id="trPasteToggleBtn" class="btn-o" style="margin-left:auto;padding:3px 10px;font-size:11px;display:flex;align-items:center;gap:4px">
           📋 구글시트에서 붙여넣기
         </button>
       </div>
 
       <!-- 거래기록 붙여넣기 패널 -->
       <div id="trPastePanel" style="display:none;background:var(--bg2);border-radius:12px;
-        padding:16px 18px;margin-bottom:14px;border:1px solid var(--border);">
+        padding:16px 18px;margin-bottom:var(--sp-2);border:1px solid var(--border);">
         <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;gap:8px;flex-wrap:wrap">
           <div>
             <div style="font-size:12px;font-weight:700;color:var(--blue)">📊 구글시트에서 복사 후 붙여넣기</div>
@@ -1189,8 +1217,7 @@ function handleLoadDB(){
             </div>
           </div>
           <div style="display:flex;gap:6px;flex-shrink:0">
-            <button onclick="parseTrPaste()" style="padding:5px 14px;border-radius:8px;
-              background:var(--blue);color:#fff;border:none;font-size:12px;font-weight:700;cursor:pointer">미리보기</button>
+            <button onclick="parseTrPaste()" class="btn-p" style="padding:5px 14px;font-size:12px">미리보기</button>
             <button onclick="toggleTrPaste()" style="padding:5px 10px;border-radius:8px;
               border:1px solid var(--border);background:var(--surface);color:var(--text-3);font-size:12px;cursor:pointer">✕</button>
           </div>
@@ -1202,49 +1229,49 @@ function handleLoadDB(){
             padding:6px 8px;text-align:center;font-size:10px">
             <div style="font-weight:700;color:var(--blue);margin-bottom:2px">A열</div>
             <div style="color:var(--text-2)">날짜</div>
-            <div style="color:var(--text-3);font-size:9px;margin-top:1px">2026-08-10</div>
+            <div style="color:var(--text-3);font-size:10px;margin-top:1px">2026-08-10</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:7px;
             padding:6px 8px;text-align:center;font-size:10px">
             <div style="font-weight:700;color:var(--blue);margin-bottom:2px">B열</div>
             <div style="color:var(--text-2)">계좌ID</div>
-            <div style="color:var(--text-3);font-size:9px;margin-top:1px">ISA / IRP / PEN</div>
+            <div style="color:var(--text-3);font-size:10px;margin-top:1px">ISA / IRP / PEN</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:7px;
             padding:6px 8px;text-align:center;font-size:10px">
             <div style="font-weight:700;color:var(--blue);margin-bottom:2px">C열</div>
             <div style="color:var(--text-2)">종목명/티커</div>
-            <div style="color:var(--text-3);font-size:9px;margin-top:1px">TIGER S&P500</div>
+            <div style="color:var(--text-3);font-size:10px;margin-top:1px">TIGER S&P500</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:7px;
             padding:6px 8px;text-align:center;font-size:10px">
             <div style="font-weight:700;color:var(--blue);margin-bottom:2px">D열</div>
             <div style="color:var(--text-2)">구분</div>
-            <div style="color:var(--text-3);font-size:9px;margin-top:1px">매수 / 매도</div>
+            <div style="color:var(--text-3);font-size:10px;margin-top:1px">매수 / 매도</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:7px;
             padding:6px 8px;text-align:center;font-size:10px">
             <div style="font-weight:700;color:var(--blue);margin-bottom:2px">E열</div>
             <div style="color:var(--text-2)">수량</div>
-            <div style="color:var(--text-3);font-size:9px;margin-top:1px">100</div>
+            <div style="color:var(--text-3);font-size:10px;margin-top:1px">100</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:7px;
             padding:6px 8px;text-align:center;font-size:10px">
             <div style="font-weight:700;color:var(--blue);margin-bottom:2px">F열</div>
             <div style="color:var(--text-2)">단가(원)</div>
-            <div style="color:var(--text-3);font-size:9px;margin-top:1px">15000</div>
+            <div style="color:var(--text-3);font-size:10px;margin-top:1px">15000</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:7px;
             padding:6px 8px;text-align:center;font-size:10px">
             <div style="font-weight:700;color:var(--blue);margin-bottom:2px">G열</div>
             <div style="color:var(--text-2)">수수료+세금</div>
-            <div style="color:var(--text-3);font-size:9px;margin-top:1px">선택 (비워도 됨)</div>
+            <div style="color:var(--text-3);font-size:10px;margin-top:1px">선택 (비워도 됨)</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:7px;
             padding:6px 8px;text-align:center;font-size:10px">
             <div style="font-weight:700;color:var(--blue);margin-bottom:2px">H열</div>
             <div style="color:var(--text-2)">메모</div>
-            <div style="color:var(--text-3);font-size:9px;margin-top:1px">선택 (비워도 됨)</div>
+            <div style="color:var(--text-3);font-size:10px;margin-top:1px">선택 (비워도 됨)</div>
           </div>
         </div>
 
@@ -1260,9 +1287,7 @@ function handleLoadDB(){
         <div id="trPastePreview" style="display:none;margin-top:10px">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;gap:8px;flex-wrap:wrap">
             <span style="font-size:11px;font-weight:700;color:var(--text-2)" id="trPastePreviewLbl"></span>
-            <button onclick="applyTrPaste()" style="padding:5px 16px;border-radius:8px;
-              background:var(--green);color:#fff;border:none;font-size:12px;font-weight:700;cursor:pointer">
-              ✓ 가져오기</button>
+            <button onclick="applyTrPaste()" class="btn-p" style="padding:5px 16px;font-size:12px">✓ 가져오기</button>
           </div>
           <div style="overflow-x:auto;max-height:220px;overflow-y:auto;border-radius:8px;border:1px solid var(--border)">
             <table style="width:100%;border-collapse:collapse;font-size:11px">
@@ -1281,7 +1306,7 @@ function handleLoadDB(){
           </div>
         </div>
       </div>
-      <div style="display:flex;gap:4px;background:var(--bg2);border-radius:9px;padding:3px;border:1px solid var(--border);width:fit-content;margin-bottom:14px">
+      <div style="display:flex;gap:4px;background:var(--bg2);border-radius:9px;padding:3px;border:1px solid var(--border);width:fit-content;margin-bottom:var(--sp-2)">
         <button id="trTypeBuy" onclick="setTrType('buy')"
           style="padding:6px 16px;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;
             border:none;background:var(--blue);color:#fff;transition:all .15s">매수</button>
@@ -1302,7 +1327,7 @@ function handleLoadDB(){
         <div class="fg"><label>수수료+세금 합계 (원) <em style="font-weight:400;color:var(--text-3);font-size:10px">선택</em></label><input class="fc" id="trFee" type="number" placeholder="0" oninput="updateTrPreview()"></div>
       </div>
       <div class="fg"><label>메모</label><input class="fc" id="trMemo" placeholder="선택 입력"></div>
-      <label style="display:flex;align-items:center;gap:7px;margin-top:8px;cursor:pointer;font-size:11.5px;color:var(--text-2)">
+      <label style="display:flex;align-items:center;gap:7px;margin-top:8px;cursor:pointer;font-size:12px;color:var(--text-2)">
         <input type="checkbox" id="trReflect" checked onchange="updateTrPreview()"> 포지션에 자동 반영
         <span style="font-size:10px;color:var(--text-3);font-weight:500">(끄면 거래 기록만 남고, 평단가·보유수량·실현손익 계산에서는 제외돼요)</span>
       </label>
@@ -1335,14 +1360,14 @@ function handleLoadDB(){
     </div>
   </div>
 
-  <div class="card" style="margin-top:20px">
+  <div class="card" style="margin-top:var(--sp-3)">
     <div class="card-ttl">계좌별 실현손익 <span class="chip">전체 기간 누적 기준</span></div>
     <div id="trByAccList"></div>
   </div>
 
-  <div class="card" style="margin-top:20px">
+  <div class="card" style="margin-top:var(--sp-3)">
     <div class="card-ttl">거래 내역 <span class="chip">수정 버튼 클릭 → 인라인 편집</span>
-      <button onclick="exportTradeCsv()" style="margin-left:auto;padding:4px 12px;border-radius:7px;border:1.5px solid var(--border);background:var(--surface);color:var(--text-2);font-size:11px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:4px;transition:all .15s;" onmouseover="this.style.borderColor='var(--blue)';this.style.color='var(--blue)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-2)'">⬇ CSV</button>
+      <button onclick="exportTradeCsv()" class="btn-o" style="margin-left:auto;padding:4px 12px;font-size:11px;display:flex;align-items:center;gap:4px">⬇ CSV</button>
     </div>
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap;">
       <div id="trFilterRow" style="display:flex;gap:6px;flex-wrap:nowrap;overflow-x:auto;flex:1;min-width:0;padding-bottom:2px;"></div>
@@ -1364,7 +1389,7 @@ function handleLoadDB(){
         <tbody id="trBody"></tbody>
       </table>
     </div>
-    <div id="trEditForm" style="display:none;background:var(--bg2);border-radius:12px;padding:16px 18px;margin-top:14px;border:1px solid var(--border);">
+    <div id="trEditForm" style="display:none;background:var(--bg2);border-radius:12px;padding:16px 18px;margin-top:var(--sp-2);border:1px solid var(--border);">
       <div style="font-size:12px;font-weight:700;color:var(--blue);margin-bottom:12px">✏️ 거래 수정</div>
       <input type="hidden" id="editTrIdx">
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:12px;">
@@ -1377,7 +1402,7 @@ function handleLoadDB(){
         <div class="fg" style="margin:0"><label>수수료+세금 (원)</label><input class="fc" id="editTrFee" type="number"></div>
         <div class="fg" style="margin:0"><label>메모</label><input class="fc" id="editTrMemo"></div>
       </div>
-      <label style="display:flex;align-items:center;gap:7px;margin-bottom:12px;cursor:pointer;font-size:11.5px;color:var(--text-2)">
+      <label style="display:flex;align-items:center;gap:7px;margin-bottom:12px;cursor:pointer;font-size:12px;color:var(--text-2)">
         <input type="checkbox" id="editTrReflect" checked> 포지션에 자동 반영
         <span style="font-size:10px;color:var(--text-3);font-weight:500">(끄면 거래 기록만 남고 평단가·보유수량·실현손익 계산에서 제외돼요)</span>
       </label>
@@ -1392,14 +1417,14 @@ function handleLoadDB(){
 <!-- FIRE 계산기 탭 -->
 <div class="tab-p" id="tab-fire">
   <div class="fire-wrap">
-    <div class="card">
+    <div class="card" style="border-left:3px solid var(--acc-fire)">
       <div class="card-ttl">🔥 FIRE 목표 시뮬레이션 <span class="chip">목표금액 도달 예상 시기</span></div>
 
       <div style="display:flex;gap:4px;background:var(--bg2);border-radius:9px;padding:3px;
-        border:1px solid var(--border);width:fit-content;margin-bottom:18px">
+        border:1px solid var(--border);width:fit-content;margin-bottom:var(--sp-2)">
         <button id="fireModeIncome" onclick="setFireMode('income')"
           style="padding:6px 16px;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;
-            border:none;background:var(--blue);color:#fff;transition:all .15s">총소득 기준</button>
+            border:none;background:var(--acc-fire);color:#fff;transition:all .15s">총소득 기준</button>
         <button id="fireModeAsset" onclick="setFireMode('asset')"
           style="padding:6px 16px;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;
             border:none;background:transparent;color:var(--text-2);transition:all .15s">평가금액 기준</button>
@@ -1472,7 +1497,7 @@ function handleLoadDB(){
       <div class="fire-chart-wrap"><canvas id="fireChart"></canvas></div>
       <p style="font-size:10px;color:var(--text-3);margin-top:10px;">* 매달 일정 수익률·투자금이 유지된다는 가정의 단순 추정이며, 옅은 음영은 ±3%p 낙관/비관 시나리오예요. 실제 시장 상황에 따라 달라질 수 있습니다.</p>
 
-      <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border)">
+      <div style="margin-top:var(--sp-3);padding-top:16px;border-top:1px solid var(--border)">
         <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:6px">
           <div style="font-size:11px;font-weight:700;color:var(--text-2)">📊 나의 수익률 추이 vs 비교 기준</div>
           <div style="display:flex;align-items:center;gap:6px">
@@ -1487,15 +1512,15 @@ function handleLoadDB(){
           <span style="display:flex;align-items:center;gap:4px"><span style="width:9px;height:2px;background:var(--blue);display:inline-block"></span>내 포트폴리오</span>
           <span style="display:flex;align-items:center;gap:4px"><span style="width:9px;height:2px;background:var(--text-3);display:inline-block;border-top:1px dashed var(--text-3)"></span>비교 기준 (가정)</span>
         </div>
-        <p style="font-size:9.5px;color:var(--text-3);margin-top:6px">* 실제 S&amp;P500 등 지수 데이터를 가져오는 게 아니라, 입력한 연수익률로 꾸준히 성장했다고 가정한 가상의 비교선이에요. 적립 초기에는 신규 투자금 비중이 커서 내 수익률이 0%에 가깝게 보일 수 있어요.</p>
+        <p style="font-size:10px;color:var(--text-3);margin-top:6px">* 실제 S&amp;P500 등 지수 데이터를 가져오는 게 아니라, 입력한 연수익률로 꾸준히 성장했다고 가정한 가상의 비교선이에요. 적립 초기에는 신규 투자금 비중이 커서 내 수익률이 0%에 가깝게 보일 수 있어요.</p>
       </div>
 
-      <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border)">
+      <div style="margin-top:var(--sp-3);padding-top:16px;border-top:1px solid var(--border)">
         <div style="font-size:11px;font-weight:700;color:var(--text-2);margin-bottom:10px">🏁 마일스톤 타임라인</div>
         <div id="fireMilestoneTimeline" style="display:flex;gap:8px;flex-wrap:wrap"></div>
       </div>
 
-      <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border)">
+      <div style="margin-top:var(--sp-3);padding-top:16px;border-top:1px solid var(--border)">
         <div style="font-size:11px;font-weight:700;color:var(--text-2);margin-bottom:10px">🎛️ 매수증액 시뮬레이션 <span style="font-weight:500;color:var(--text-3);font-size:10px">— 저장되지 않는 가상 계산이에요</span></div>
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
           <span style="font-size:11px;color:var(--text-3);white-space:nowrap">월 추가매수</span>
@@ -1511,21 +1536,16 @@ function handleLoadDB(){
 
 <div class="tab-p" id="tab-dividend">
   <div class="data-g">
-    <div class="card">
-      <div class="card-ttl">배당금 입력 <span class="chip">받은 날 직접 기록</span>
-        <button onclick="toggleDivPaste()" id="divPasteToggleBtn"
-          style="margin-left:auto;padding:3px 10px;border-radius:7px;border:1.5px solid var(--border);
-          background:var(--surface);color:var(--text-2);font-size:11px;font-weight:600;cursor:pointer;
-          display:flex;align-items:center;gap:4px;transition:all .15s"
-          onmouseover="this.style.borderColor='var(--blue)';this.style.color='var(--blue)'"
-          onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-2)'">
+    <div class="card" style="border-left:3px solid var(--acc-div)">
+      <div class="card-ttl">💰 배당금 입력 <span class="chip">받은 날 직접 기록</span>
+        <button onclick="toggleDivPaste()" id="divPasteToggleBtn" class="btn-o" style="margin-left:auto;padding:3px 10px;font-size:11px;display:flex;align-items:center;gap:4px">
           📋 구글시트에서 붙여넣기
         </button>
       </div>
 
       <!-- 배당금 붙여넣기 패널 -->
       <div id="divPastePanel" style="display:none;background:var(--bg2);border-radius:12px;
-        padding:16px 18px;margin-bottom:14px;border:1px solid var(--border);">
+        padding:16px 18px;margin-bottom:var(--sp-2);border:1px solid var(--border);">
         <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;gap:8px;flex-wrap:wrap">
           <div>
             <div style="font-size:12px;font-weight:700;color:var(--blue)">📊 구글시트에서 복사 후 붙여넣기</div>
@@ -1535,8 +1555,7 @@ function handleLoadDB(){
             </div>
           </div>
           <div style="display:flex;gap:6px;flex-shrink:0">
-            <button onclick="parseDivPaste()" style="padding:5px 14px;border-radius:8px;
-              background:var(--blue);color:#fff;border:none;font-size:12px;font-weight:700;cursor:pointer">미리보기</button>
+            <button onclick="parseDivPaste()" class="btn-p" style="padding:5px 14px;font-size:12px">미리보기</button>
             <button onclick="toggleDivPaste()" style="padding:5px 10px;border-radius:8px;
               border:1px solid var(--border);background:var(--surface);color:var(--text-3);font-size:12px;cursor:pointer">✕</button>
           </div>
@@ -1548,31 +1567,31 @@ function handleLoadDB(){
             padding:6px 8px;text-align:center;font-size:10px">
             <div style="font-weight:700;color:var(--blue);margin-bottom:2px">A열</div>
             <div style="color:var(--text-2)">날짜</div>
-            <div style="color:var(--text-3);font-size:9px;margin-top:1px">2026-08-10</div>
+            <div style="color:var(--text-3);font-size:10px;margin-top:1px">2026-08-10</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:7px;
             padding:6px 8px;text-align:center;font-size:10px">
             <div style="font-weight:700;color:var(--blue);margin-bottom:2px">B열</div>
             <div style="color:var(--text-2)">계좌ID</div>
-            <div style="color:var(--text-3);font-size:9px;margin-top:1px">ISA / IRP / PEN</div>
+            <div style="color:var(--text-3);font-size:10px;margin-top:1px">ISA / IRP / PEN</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:7px;
             padding:6px 8px;text-align:center;font-size:10px">
             <div style="font-weight:700;color:var(--blue);margin-bottom:2px">C열</div>
             <div style="color:var(--text-2)">종목명/티커</div>
-            <div style="color:var(--text-3);font-size:9px;margin-top:1px">선택 (비워도 됨)</div>
+            <div style="color:var(--text-3);font-size:10px;margin-top:1px">선택 (비워도 됨)</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:7px;
             padding:6px 8px;text-align:center;font-size:10px">
             <div style="font-weight:700;color:var(--blue);margin-bottom:2px">D열</div>
             <div style="color:var(--text-2)">배당금(원)</div>
-            <div style="color:var(--text-3);font-size:9px;margin-top:1px">50000</div>
+            <div style="color:var(--text-3);font-size:10px;margin-top:1px">50000</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:7px;
             padding:6px 8px;text-align:center;font-size:10px">
             <div style="font-weight:700;color:var(--blue);margin-bottom:2px">E열</div>
             <div style="color:var(--text-2)">메모</div>
-            <div style="color:var(--text-3);font-size:9px;margin-top:1px">선택 (비워도 됨)</div>
+            <div style="color:var(--text-3);font-size:10px;margin-top:1px">선택 (비워도 됨)</div>
           </div>
         </div>
 
@@ -1588,9 +1607,7 @@ function handleLoadDB(){
         <div id="divPastePreview" style="display:none;margin-top:10px">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;gap:8px;flex-wrap:wrap">
             <span style="font-size:11px;font-weight:700;color:var(--text-2)" id="divPastePreviewLbl"></span>
-            <button onclick="applyDivPaste()" style="padding:5px 16px;border-radius:8px;
-              background:var(--green);color:#fff;border:none;font-size:12px;font-weight:700;cursor:pointer">
-              ✓ 가져오기</button>
+            <button onclick="applyDivPaste()" class="btn-p" style="padding:5px 16px;font-size:12px">✓ 가져오기</button>
           </div>
           <div style="overflow-x:auto;max-height:200px;overflow-y:auto;border-radius:8px;border:1px solid var(--border)">
             <table style="width:100%;border-collapse:collapse;font-size:11px">
@@ -1630,7 +1647,7 @@ function handleLoadDB(){
         <label>세전 / 세후</label>
         <div style="display:flex;gap:4px;background:var(--bg2);border-radius:9px;padding:3px;width:fit-content">
           <button type="button" id="dvTaxPost" onclick="setDvTaxStatus('post')"
-            style="padding:5px 14px;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;border:none;background:var(--blue);color:#fff;transition:all .15s">세후 (실수령)</button>
+            style="padding:5px 14px;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;border:none;background:var(--acc-div);color:#fff;transition:all .15s">세후 (실수령)</button>
           <button type="button" id="dvTaxPre" onclick="setDvTaxStatus('pre')"
             style="padding:5px 14px;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;border:none;background:transparent;color:var(--text-2);transition:all .15s">세전</button>
         </div>
@@ -1653,7 +1670,7 @@ function handleLoadDB(){
         <div class="fire-stat">
           <div class="fire-stat-lbl">월 평균 배당금</div>
           <div class="fire-stat-val" id="dvStatAvg">-</div>
-          <div id="dvStatAvgSub" style="font-size:9px;color:var(--text-3);font-weight:600;margin-top:1px"></div>
+          <div id="dvStatAvgSub" style="font-size:10px;color:var(--text-3);font-weight:600;margin-top:1px"></div>
         </div>
         <div class="fire-stat">
           <div class="fire-stat-lbl">전체 누적 배당금</div>
@@ -1662,19 +1679,19 @@ function handleLoadDB(){
         <div class="fire-stat">
           <div class="fire-stat-lbl">예상 연간 배당</div>
           <div class="fire-stat-val" id="dvStatExpected">-</div>
-          <div style="font-size:9px;color:var(--text-3);font-weight:600;margin-top:1px">월 평균 × 12 추정</div>
+          <div style="font-size:10px;color:var(--text-3);font-weight:600;margin-top:1px">월 평균 × 12 추정</div>
         </div>
         <div class="fire-stat">
           <div class="fire-stat-lbl">배당수익률 <span style="font-weight:500">(연환산)</span></div>
           <div class="fire-stat-val" id="dvStatYield">-</div>
-          <div style="font-size:9px;color:var(--text-3);font-weight:600;margin-top:1px">예상 연간배당 ÷ 현재 평가금액</div>
+          <div style="font-size:10px;color:var(--text-3);font-weight:600;margin-top:1px">예상 연간배당 ÷ 현재 평가금액</div>
         </div>
       </div>
-      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:14px;flex-wrap:wrap">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:var(--sp-2);flex-wrap:wrap">
         <div style="display:flex;gap:4px;background:var(--bg2);border-radius:9px;padding:3px;border:1px solid var(--border);width:fit-content">
           <button id="dvChartModeMonth" onclick="setDvChartMode('month')"
             style="padding:5px 14px;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;
-              border:none;background:var(--blue);color:#fff;transition:all .15s">월별 (최근 12개월)</button>
+              border:none;background:var(--acc-div);color:#fff;transition:all .15s">월별 (최근 12개월)</button>
           <button id="dvChartModeYear" onclick="setDvChartMode('year')"
             style="padding:5px 14px;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;
               border:none;background:transparent;color:var(--text-2);transition:all .15s">연도별 (전체)</button>
@@ -1685,12 +1702,12 @@ function handleLoadDB(){
     </div>
   </div>
 
-  <div class="card" style="margin-top:20px">
+  <div class="card" style="margin-top:var(--sp-3)">
     <div class="card-ttl">계좌별 배당금
       <span style="margin-left:auto;display:flex;gap:4px;background:var(--bg2);border-radius:9px;padding:3px;border:1px solid var(--border)">
         <button id="dvAccModeAll" onclick="setDvAccMode('all')"
           style="padding:4px 12px;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;
-            border:none;background:var(--blue);color:#fff;transition:all .15s">전체 누적</button>
+            border:none;background:var(--acc-div);color:#fff;transition:all .15s">전체 누적</button>
         <button id="dvAccMode12m" onclick="setDvAccMode('12m')"
           style="padding:4px 12px;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;
             border:none;background:transparent;color:var(--text-2);transition:all .15s">최근 12개월</button>
@@ -1699,12 +1716,12 @@ function handleLoadDB(){
     <div id="dvByAccList"></div>
   </div>
 
-  <div class="card" style="margin-top:20px">
+  <div class="card" style="margin-top:var(--sp-3)">
     <div class="card-ttl">ETF별 배당금
       <span style="margin-left:auto;display:flex;gap:4px;background:var(--bg2);border-radius:9px;padding:3px;border:1px solid var(--border)">
         <button id="dvEtfModeAll" onclick="setDvEtfMode('all')"
           style="padding:4px 12px;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;
-            border:none;background:var(--blue);color:#fff;transition:all .15s">전체 누적</button>
+            border:none;background:var(--acc-div);color:#fff;transition:all .15s">전체 누적</button>
         <button id="dvEtfMode12m" onclick="setDvEtfMode('12m')"
           style="padding:4px 12px;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;
             border:none;background:transparent;color:var(--text-2);transition:all .15s">최근 12개월</button>
@@ -1713,9 +1730,9 @@ function handleLoadDB(){
     <div id="dvByEtfList"></div>
   </div>
 
-  <div class="card" style="margin-top:20px">
+  <div class="card" style="margin-top:var(--sp-3)">
     <div class="card-ttl">배당 내역 <span class="chip">수정 버튼 클릭 → 인라인 편집</span>
-      <button onclick="exportDividendCsv()" style="margin-left:auto;padding:4px 12px;border-radius:7px;border:1.5px solid var(--border);background:var(--surface);color:var(--text-2);font-size:11px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:4px;transition:all .15s;" onmouseover="this.style.borderColor='var(--blue)';this.style.color='var(--blue)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-2)'">⬇ CSV</button>
+      <button onclick="exportDividendCsv()" class="btn-o" style="margin-left:auto;padding:4px 12px;font-size:11px;display:flex;align-items:center;gap:4px">⬇ CSV</button>
     </div>
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap;">
       <div id="dvFilterRow" style="display:flex;gap:6px;flex-wrap:nowrap;overflow-x:auto;flex:1;min-width:0;padding-bottom:2px;"></div>
@@ -1733,7 +1750,7 @@ function handleLoadDB(){
         <tbody id="dvBody"></tbody>
       </table>
     </div>
-    <div id="dvEditForm" style="display:none;background:var(--bg2);border-radius:12px;padding:16px 18px;margin-top:14px;border:1px solid var(--border);">
+    <div id="dvEditForm" style="display:none;background:var(--bg2);border-radius:12px;padding:16px 18px;margin-top:var(--sp-2);border:1px solid var(--border);">
       <div style="font-size:12px;font-weight:700;color:var(--blue);margin-bottom:12px">✏️ 배당 수정</div>
       <input type="hidden" id="editDivIdx">
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:12px;">
@@ -1754,7 +1771,7 @@ function handleLoadDB(){
         <label>세전 / 세후</label>
         <div style="display:flex;gap:4px;background:var(--surface);border-radius:9px;padding:3px;width:fit-content;border:1px solid var(--border)">
           <button type="button" id="editDvTaxPost" onclick="setEditDvTaxStatus('post')"
-            style="padding:5px 14px;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;border:none;background:var(--blue);color:#fff;transition:all .15s">세후 (실수령)</button>
+            style="padding:5px 14px;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;border:none;background:var(--acc-div);color:#fff;transition:all .15s">세후 (실수령)</button>
           <button type="button" id="editDvTaxPre" onclick="setEditDvTaxStatus('pre')"
             style="padding:5px 14px;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;border:none;background:transparent;color:var(--text-2);transition:all .15s">세전</button>
         </div>
@@ -1828,21 +1845,17 @@ function handleLoadDB(){
       </div>
     </div>
   </div>
-  <div class="card" id="etfMgrSection" style="margin-bottom:20px;">
+  <div class="card" id="etfMgrSection" style="margin-bottom:var(--sp-3);">
     <div class="card-ttl" style="cursor:pointer;user-select:none" onclick="toggleSection('etfMgrBody_wrap')">📋 종목 관리
       <span style="margin-left:auto;display:flex;align-items:center;gap:6px" onclick="event.stopPropagation()">
-        <button onclick="toggleEtfPaste()" style="padding:3px 10px;border-radius:7px;border:1.5px solid var(--border);
-          background:var(--surface);color:var(--text-2);font-size:11px;font-weight:600;cursor:pointer;
-          display:flex;align-items:center;gap:4px;transition:all .15s"
-          onmouseover="this.style.borderColor='var(--blue)';this.style.color='var(--blue)'"
-          onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-2)'"
+        <button onclick="toggleEtfPaste()" class="btn-o" style="padding:3px 10px;font-size:11px;display:flex;align-items:center;gap:4px"
           id="etfPasteToggleBtn">📋 붙여넣기로 가져오기</button>
         <span id="etfMgrToggle" style="font-size:11px;color:var(--text-3);font-weight:500;cursor:pointer" onclick="toggleSection('etfMgrBody_wrap')">▲ 접기</span>
       </span>
     </div>
 
     <!-- 붙여넣기 패널 -->
-    <div id="etfPastePanel" style="display:none;background:var(--bg2);border-radius:12px;padding:16px 18px;margin-bottom:14px;border:1px solid var(--border);">
+    <div id="etfPastePanel" style="display:none;background:var(--bg2);border-radius:12px;padding:16px 18px;margin-bottom:var(--sp-2);border:1px solid var(--border);">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;gap:8px;flex-wrap:wrap">
         <div>
           <div style="font-size:12px;font-weight:700;color:var(--blue)">📊 구글시트에서 복사 후 붙여넣기</div>
@@ -1851,8 +1864,7 @@ function handleLoadDB(){
           </div>
         </div>
         <div style="display:flex;gap:6px">
-          <button onclick="parseEtfPaste()" style="padding:5px 14px;border-radius:8px;background:var(--blue);
-            color:#fff;border:none;font-size:12px;font-weight:700;cursor:pointer">미리보기</button>
+          <button onclick="parseEtfPaste()" class="btn-p" style="padding:5px 14px;font-size:12px">미리보기</button>
           <button onclick="toggleEtfPaste()" style="padding:5px 10px;border-radius:8px;border:1px solid var(--border);
             background:var(--surface);color:var(--text-3);font-size:12px;cursor:pointer">✕</button>
         </div>
@@ -1873,9 +1885,7 @@ function handleLoadDB(){
               <input type="checkbox" id="etfPasteReplaceChk" style="width:13px;height:13px;accent-color:var(--blue)">
               기존 종목 전체 교체
             </label>
-            <button onclick="applyEtfPaste()" style="padding:5px 16px;border-radius:8px;
-              background:var(--green);color:#fff;border:none;font-size:12px;font-weight:700;cursor:pointer">
-              ✓ 가져오기</button>
+            <button onclick="applyEtfPaste()" class="btn-p" style="padding:5px 16px;font-size:12px">✓ 가져오기</button>
           </div>
         </div>
         <div style="overflow-x:auto;max-height:200px;overflow-y:auto;border-radius:8px;border:1px solid var(--border)">
@@ -1932,7 +1942,7 @@ function handleLoadDB(){
   </div>
   </div>
 
-  <div class="card" id="etfDictSection" style="margin-top:20px;margin-bottom:12px;">
+  <div class="card" id="etfDictSection" style="margin-top:var(--sp-3);margin-bottom:12px;">
     <div class="card-ttl" style="cursor:pointer;user-select:none" onclick="toggleSection('etfDictBody_wrap')">
       📖 ETF 사전 관리
       <span class="chip" style="margin-left:6px" id="dictCountChip">0개</span>
@@ -1967,26 +1977,17 @@ function handleLoadDB(){
       <div style="margin-top:10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
         <span style="font-size:10px;color:var(--text-3)">CSV로 내보내기 후 수정해서 다시 가져오면 사전을 자유롭게 편집할 수 있습니다.</span>
         <div style="margin-left:auto;display:flex;gap:6px;flex-wrap:wrap">
-          <button onclick="exportDictCsv()" style="padding:4px 12px;border-radius:7px;border:1.5px solid var(--border);
-            background:var(--surface);color:var(--text-2);font-size:11px;font-weight:600;cursor:pointer"
-            onmouseover="this.style.borderColor='var(--blue)';this.style.color='var(--blue)'"
-            onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-2)'">⬇ CSV 내보내기</button>
-          <label style="padding:4px 12px;border-radius:7px;border:1.5px solid var(--border);
-            background:var(--surface);color:var(--text-2);font-size:11px;font-weight:600;cursor:pointer"
-            onmouseover="this.style.borderColor='var(--blue)';this.style.color='var(--blue)'"
-            onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-2)'">
+          <button onclick="exportDictCsv()" class="btn-o" style="padding:4px 12px;font-size:11px">⬇ CSV 내보내기</button>
+          <label class="btn-o" style="padding:4px 12px;font-size:11px;display:inline-flex;align-items:center;cursor:pointer">
             ⬆ CSV 가져오기<input type="file" accept=".csv" style="display:none" onchange="importDictCsv(event)">
           </label>
-          <button onclick="resetDictAll()" style="padding:4px 12px;border-radius:7px;border:1.5px solid #FCA5A5;
-            background:#FEF2F2;color:#DC2626;font-size:11px;font-weight:600;cursor:pointer"
-            onmouseover="this.style.background='#FCA5A5'"
-            onmouseout="this.style.background='#FEF2F2'">🗑 사전 전체 초기화</button>
+          <button onclick="resetDictAll()" class="btn-d" style="padding:4px 12px">🗑 사전 전체 초기화</button>
         </div>
       </div>
     </div>
   </div>
 
-  <div class="card" style="margin-top:20px">
+  <div class="card" style="margin-top:var(--sp-3)">
     <div class="card-ttl">백업 · 데이터 관리 <span class="chip">CSV / JSON 내보내기 · 가져오기</span></div>
     <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;">
     <span style="font-size:11px;font-weight:700;color:var(--text-3);margin-right:4px;white-space:nowrap">내보내기</span>
@@ -2002,7 +2003,7 @@ function handleLoadDB(){
     </div>
 
     <!-- 선택적 초기화 패널 -->
-    <div id="resetPanel" style="display:none;background:var(--bg2);border-radius:12px;padding:16px 18px;margin-top:14px;border:1px solid var(--border);">
+    <div id="resetPanel" style="display:none;background:var(--bg2);border-radius:12px;padding:16px 18px;margin-top:var(--sp-2);border:1px solid var(--border);">
       <div style="font-size:12px;font-weight:700;color:var(--neg);margin-bottom:8px">🗑 선택 초기화</div>
       <div style="font-size:11px;color:var(--text-3);margin-bottom:10px;line-height:1.6">체크한 항목만 삭제됩니다. 계좌/종목 설정은 항목과 무관하게 항상 유지돼요.</div>
       <label style="display:flex;align-items:center;gap:7px;margin-bottom:7px;cursor:pointer;font-size:12px">
@@ -2031,7 +2032,7 @@ function handleLoadDB(){
     </div>
     <div class="m-kpi-g" id="mKpis"></div>
     <div class="m-section-ttl" style="margin-bottom:10px">계좌별 보유 내역</div>
-    <div style="overflow-x:auto;margin-bottom:22px">
+    <div style="overflow-x:auto;margin-bottom:var(--sp-3)">
       <table class="m-hold-tbl" id="mHoldTbl">
         <thead><tr><th>계좌</th><th>보유수량</th><th>평단가</th><th>현재가</th><th>평가금액</th><th>실투자금액</th><th>평가손익</th><th>수익률</th></tr></thead>
         <tbody id="mHoldBody"></tbody>
@@ -2039,7 +2040,7 @@ function handleLoadDB(){
     </div>
 
     <div class="m-section-ttl">목표비중</div>
-    <div id="mTargetWeight" style="margin-bottom:22px"></div>
+    <div id="mTargetWeight" style="margin-bottom:var(--sp-3)"></div>
 
     <div class="chun-box" id="chunBox">
       <div class="chun-top">
@@ -2055,7 +2056,7 @@ function handleLoadDB(){
 
     <div class="m-section-ttl" style="display:flex;align-items:center;gap:8px">거래기록 <span id="mTradeCount" style="font-size:11px;font-weight:600;color:var(--text-3)"></span></div>
     <div id="mTradeSummary" style="margin-bottom:10px"></div>
-    <div style="overflow-x:auto;max-height:220px;overflow-y:auto;margin-bottom:22px;border:1px solid var(--border);border-radius:10px">
+    <div style="overflow-x:auto;max-height:220px;overflow-y:auto;margin-bottom:var(--sp-3);border:1px solid var(--border);border-radius:10px">
       <table class="m-hold-tbl" id="mTradeTbl">
         <thead><tr><th>날짜</th><th>계좌</th><th>구분</th><th>수량</th><th>단가</th><th>실현손익</th></tr></thead>
         <tbody id="mTradeBody"></tbody>
@@ -2064,7 +2065,7 @@ function handleLoadDB(){
 
     <div class="m-section-ttl" style="display:flex;align-items:center;gap:8px">배당기록 <span id="mDivCount" style="font-size:11px;font-weight:600;color:var(--text-3)"></span></div>
     <div id="mDivSummary" style="margin-bottom:10px"></div>
-    <div style="overflow-x:auto;max-height:220px;overflow-y:auto;margin-bottom:22px;border:1px solid var(--border);border-radius:10px">
+    <div style="overflow-x:auto;max-height:220px;overflow-y:auto;margin-bottom:var(--sp-3);border:1px solid var(--border);border-radius:10px">
       <table class="m-hold-tbl" id="mDivTbl">
         <thead><tr><th>날짜</th><th>계좌</th><th>배당금</th><th>메모</th></tr></thead>
         <tbody id="mDivBody"></tbody>
@@ -2072,7 +2073,7 @@ function handleLoadDB(){
     </div>
 
     <div class="m-section-ttl">최근 메모</div>
-    <div id="mMemoList" style="margin-bottom:22px"></div>
+    <div id="mMemoList" style="margin-bottom:var(--sp-3)"></div>
 
     <div class="m-section-ttl">최근 12개월 평가금액 추이</div>
     <div class="m-chart-wrap"><canvas id="mLineChart"></canvas></div>
@@ -2176,7 +2177,7 @@ function handleLoadDB(){
    천주달성률 = 보유수량 ÷ 목표수량  (자동)
 ═══════════════════════════════════════════════════════════ */
 let DB = {
-  meta:{ baseDate:"2026-08-10", lastUpdated:"2026-08-10 21:30", priceApiUrl:"" },
+  meta:{ baseDate:"2026-08-10", lastUpdated:"2026-08-10 21:30", priceApiUrl:"", priceApiToken:"" },
 
   // 계좌 정의 — 여기에만 추가/삭제하면 전체 자동 반영
   accounts:[
@@ -2280,9 +2281,15 @@ const getAccColor = id => DB.accounts.find(a=>a.id===id)?.color || '#9396B2';
 const BAR_COLORS = ['#433D9E','#C09A3E','#0F6E66','#9D5B8B','#3F7CAC','#A8591E','#6B7FB8','#8C6B22','#5B8A7A','#7A6BC4'];
 
 /* ═══ 자동 계산 파생값 ═══ */
-/* ── 오늘 날짜 ── */
+/* ── 오늘 날짜 (로컬 타임존 기준) ──
+   주의: new Date().toISOString()은 UTC 기준이라 한국시간 새벽 0~9시 사이에
+   하루 전 날짜가 나오는 버그가 있었음. 로컬 연/월/일을 직접 조합해서 방지. */
 function today(){
-  return new Date().toISOString().slice(0,10);
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth()+1).padStart(2,'0');
+  const day = String(d.getDate()).padStart(2,'0');
+  return `${y}-${m}-${day}`;
 }
 
 /* ── 기준일 기준 활성 스냅샷 추출 ──────────────────────────
@@ -2479,7 +2486,7 @@ function renderKpi(){
     const hasHoldings = a.totalInvest>0;
     return {
       ico: a.icon||'💰', cls:'ico-acc',
-      lbl: a.label+' 평가금액',
+      lbl: a.label,
       val: W(dispAmt), valCls:'',
       sub: hasHoldings ? W2(aGain)+' ('+PCT(aRate)+')' : '보유 종목 없음',
       subCls: hasHoldings ? (aGain>=0?'pos':'neg') : '',
@@ -2492,7 +2499,7 @@ function renderKpi(){
   const cards = [
     { ico:'💼', cls:'ico-t', lbl:'총 평가금액',
       val:W(DB.totalEval), valCls:'',
-      sub:'실투자금액 '+W(DB.totalInvest) },
+      sub:'실투자 '+W(DB.totalInvest) },
     { ico:'📈', cls:'ico-g', lbl:'평가손익',
       val:W2(g), valCls:g>=0?'pos':'neg',
       sub:'수익률 '+PCT(r), subCls:g>=0?'pos':'neg' },
@@ -2649,7 +2656,7 @@ function renderLine(){
   document.getElementById('lcKpiRow').innerHTML = `
     <div class="lc-kpi">
       <div class="lc-kpi-lbl">${totalAmt>0?'포지션':'평가금액'}</div>
-      <div class="lc-kpi-val">${W(last)}${totalAmt>0?`<span style="font-size:9px;color:#F97316;font-weight:700;margin-left:5px">/ ${W(totalAmt)}</span>`:''}</div>
+      <div class="lc-kpi-val">${W(last)}${totalAmt>0?`<span style="font-size:10px;color:#F97316;font-weight:700;margin-left:5px">/ ${W(totalAmt)}</span>`:''}</div>
     </div>
     <div class="lc-kpi-divider"></div>
     <div class="lc-kpi">
@@ -2787,7 +2794,7 @@ function renderLine(){
       label:'포지션 합산',
       data:vals,
       borderColor:lineColor,
-      borderWidth:2.5,
+      borderWidth:2,
       backgroundColor:g,
       fill:true,
       tension:.42,
@@ -3333,10 +3340,10 @@ function renderAiBriefing(){
   detailPanel.innerHTML = changes.length ? changes.map((c,i)=>{
     const cat = BRIEF_CATEGORY[c.category] || BRIEF_CATEGORY.caution;
     return `
-    <div style="margin-bottom:14px;${i<changes.length-1?'padding-bottom:14px;border-bottom:1px solid var(--border)':''}">
+    <div style="margin-bottom:var(--sp-2);${i<changes.length-1?'padding-bottom:14px;border-bottom:1px solid var(--border)':''}">
       <div style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:5px;display:inline-block;margin-bottom:8px;
         background:${cat.bg};color:${cat.fg}">${cat.label}</div>
-      <div style="font-size:12.5px;font-weight:700;color:var(--text-1);margin-bottom:6px">① 변화 — ${c.headline}</div>
+      <div style="font-size:13px;font-weight:700;color:var(--text-1);margin-bottom:6px">① 변화 — ${c.headline}</div>
       <div style="font-size:12px;color:var(--text-2);margin-bottom:4px">② 근거 — ${c.evidence}</div>
       <div style="font-size:12px;color:var(--text-2);margin-bottom:4px">③ 영향 — ${c.impact}</div>
       <div style="font-size:12px;color:var(--text-2);margin-bottom:${c.tab?'8px':'0'}">④ 행동 — ${c.action}</div>
@@ -3355,7 +3362,7 @@ function renderAiBriefing(){
     qWrap.innerHTML = `<span style="font-size:11px;color:var(--text-3)">변화가 쌓이면 질문도 추천해드릴게요.</span>`;
   } else {
     qWrap.innerHTML = qList.map((c,i)=>
-      `<button onclick="showBriefAnswer(${i})" style="font-size:11.5px;color:var(--blue);background:var(--blue-soft);
+      `<button onclick="showBriefAnswer(${i})" style="font-size:12px;color:var(--blue);background:var(--blue-soft);
         border:none;border-radius:20px;padding:6px 13px;cursor:pointer">${c.question}</button>`
     ).join('');
   }
@@ -3396,11 +3403,11 @@ function generateTodaysAgenda(){
 function renderBriefAgenda(){
   const wrap = document.getElementById('aiBriefAgenda');
   if(!wrap) return;
-  const items = generateTodaysAgenda();
+  const items = generateTodaysAgenda().slice(0,3); // 기본 화면엔 최대 3개만
   wrap.innerHTML = items.length ? items.map(it=>`
     <button onclick="goToBrief('${it.tab}','${it.anchor||''}')" style="display:flex;align-items:center;gap:8px;
       width:100%;text-align:left;background:var(--bg2);border:none;border-radius:9px;padding:9px 12px;
-      font-size:12.5px;color:var(--text-1);cursor:pointer">
+      font-size:13px;color:var(--text-1);cursor:pointer">
       <span>${it.icon}</span><span style="flex:1">${it.label}</span><span style="color:var(--text-3);font-size:11px">→</span>
     </button>`).join('')
     : `<div style="font-size:12px;color:var(--text-3)">오늘은 따로 확인할 안건이 없어요.</div>`;
@@ -3469,11 +3476,11 @@ function showBriefAnswer(i){
 }
 
 function toggleAiBriefDetail(){
-  const panel = document.getElementById('aiBriefDetailPanel');
+  const panel = document.getElementById('aiBriefMore');
   const btn = document.getElementById('aiBriefMoreBtn');
   const open = panel.style.display !== 'none';
   panel.style.display = open ? 'none' : 'block';
-  btn.textContent = open ? '자세히 보기 ▾' : '접기 ▴';
+  btn.textContent = open ? '더보기 ▾' : '접기 ▴';
 }
 
 function renderMotivation(){
@@ -3518,7 +3525,7 @@ function renderMotivation(){
     const m = w.getMonth();
     const show = (m !== lastMonth);
     lastMonth = m;
-    return `<div style="font-size:9px;color:var(--text-3);white-space:nowrap">${show?(m+1)+'월':''}</div>`;
+    return `<div style="font-size:10px;color:var(--text-3);white-space:nowrap">${show?(m+1)+'월':''}</div>`;
   }).join('');
   const dataCells = weeks.map(w=>{
     const key = fmtWeekKey(w);
@@ -3673,8 +3680,8 @@ function renderMotivation(){
       return `<div style="background:var(--bg2);border-radius:12px;padding:12px 10px">
         <div style="font-size:10px;color:var(--text-3);font-weight:600;margin-bottom:6px">${p.label}</div>
         <div style="font-size:13px;font-weight:800;color:${diffEval>=0?'var(--pos)':'var(--neg)'}">${W2(diffEval)}</div>
-        <div style="font-size:9px;color:var(--text-3);margin-top:2px">${WK(past.totalEval)} → ${WK(curState.totalEval)}</div>
-        <div style="font-size:9px;color:var(--text-2);margin-top:6px">수익률 ${diffRate>=0?'+':''}${diffRate.toFixed(1)}%p · 종목 ${past.etfCount}→${curState.etfCount}</div>
+        <div style="font-size:10px;color:var(--text-3);margin-top:2px">${WK(past.totalEval)} → ${WK(curState.totalEval)}</div>
+        <div style="font-size:10px;color:var(--text-2);margin-top:6px">수익률 ${diffRate>=0?'+':''}${diffRate.toFixed(1)}%p · 종목 ${past.etfCount}→${curState.etfCount}</div>
       </div>`;
     }).join('');
   }
@@ -4006,7 +4013,7 @@ function renderRebal(){
         const eWord = et==='buy'?'매수':'매도';
         const eDot  = et==='buy'?'🔴':'🟡';
         return `<div class="rb-compact-row" style="padding-left:14px;background:rgba(0,0,0,.02);border-radius:6px">
-          <span class="rb-compact-dot" style="font-size:9px">${eDot}</span>
+          <span class="rb-compact-dot" style="font-size:10px">${eDot}</span>
           <span class="rb-compact-name" style="font-size:11px;color:var(--text-2)">↳ ${e.name}</span>
           <div class="rb-compact-right">
             <span class="rb-compact-qty ${et}" style="font-size:11px">${eWord}</span>
@@ -4246,15 +4253,8 @@ function renderHoldings(){
       : '-';
     return `<tr onclick="openModal('${e.id}')">
       <td>${e.name}</td>
-      <td>${qty.toLocaleString()}주</td>
-      <td>${W(avgCost)}</td>
-      <td>${curPrice_>0?W(curPrice_):'-'}</td>
       <td>${W(eval_)}</td>
-      <td>${W(invest)}</td>
-      <td style="white-space:nowrap;color:${gain>=0?'var(--pos)':'var(--neg)'}">${W2(gain)}</td>
       <td style="color:${rate>=0?'var(--pos)':'var(--neg)'}">${PCT(rate)}</td>
-      <td>${prg}</td>
-      <td>${accTags}</td>
       <td>${pct}%</td>
     </tr>`;
   }).join('');
@@ -4391,9 +4391,9 @@ function openModal(etfId){
   ].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,5);
   const memoWrap = document.getElementById('mMemoList');
   memoWrap.innerHTML = memoItems.length ? memoItems.map(m=>`
-    <div style="display:flex;gap:8px;align-items:baseline;padding:7px 0;border-bottom:1px solid var(--border);font-size:11.5px">
+    <div style="display:flex;gap:8px;align-items:baseline;padding:7px 0;border-bottom:1px solid var(--border);font-size:12px">
       <span style="color:var(--text-3);white-space:nowrap">${m.date}</span>
-      <span style="font-size:9px;font-weight:700;color:var(--blue);background:var(--blue-soft);padding:1px 6px;border-radius:8px;white-space:nowrap">${m.src}</span>
+      <span style="font-size:10px;font-weight:700;color:var(--blue);background:var(--blue-soft);padding:1px 6px;border-radius:8px;white-space:nowrap">${m.src}</span>
       <span style="color:var(--text-1)">${m.memo}</span>
     </div>`).join('') : `<p style="font-size:11px;color:var(--text-3)">남겨진 메모가 없습니다.</p>`;
 
@@ -4537,7 +4537,7 @@ function renderWeightEditor(){
 
   // 미보유 종목구분 추가 UI (datalist)
   const unusedCats = allCatNames.filter(c=>!displayCatNames.includes(c));
-  const addCatUI = `<div id="addCatWrap" style="margin-top:14px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+  const addCatUI = `<div id="addCatWrap" style="margin-top:var(--sp-2);display:flex;align-items:center;gap:8px;flex-wrap:wrap">
     <span style="font-size:11px;color:var(--text-3);font-weight:600;white-space:nowrap">+ 종목구분 추가</span>
     <input type="text" id="addCatInput" list="addCatDatalist" placeholder="종목구분 선택 또는 직접 입력"
       style="flex:1;min-width:160px;max-width:260px;padding:6px 10px;border-radius:8px;
@@ -4604,8 +4604,7 @@ function renderWeightEditor(){
       : '';
 
     const notHeldBadge = !isHeld
-      ? `<span style="font-size:10px;font-weight:700;padding:1px 7px;border-radius:20px;
-          background:var(--amber-soft);color:var(--amber);margin-left:6px">미보유</span>`
+      ? `<span class="badge badge-warn" style="margin-left:6px">미보유</span>`
       : '';
 
     return `<div class="sl-row" style="border-left:3px solid ${isHeld?color:'var(--amber)'}${!isHeld?';opacity:.92':''}">
@@ -4735,7 +4734,7 @@ function saveWeights(){
 function renderEtfMgr(){
   document.getElementById('etfMgrBody').innerHTML=DB.etfs.map((e,i)=>`<tr id="etfRow${i}">
     <td>${e.name}</td>
-    <td><span style="background:var(--blue-soft);color:var(--blue);font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;white-space:nowrap">${e.category||'-'}</span></td>
+    <td><span class="badge badge-info">${e.category||'-'}</span></td>
     <td>${e.ticker||'-'}</td>
     <td>${e.goalQty?.toLocaleString()||'-'}주</td>
     <td style="white-space:nowrap">
@@ -4835,10 +4834,8 @@ function parseEtfPaste(){
 
   document.getElementById('etfPasteTbody').innerHTML = parsed.map(r=>{
     const badge = r.exists
-      ? `<span style="font-size:10px;font-weight:700;padding:1px 7px;border-radius:20px;
-          background:var(--amber-soft);color:var(--amber)">덮어쓰기</span>`
-      : `<span style="font-size:10px;font-weight:700;padding:1px 7px;border-radius:20px;
-          background:var(--green-soft);color:var(--green)">신규</span>`;
+      ? `<span class="badge badge-warn">덮어쓰기</span>`
+      : `<span class="badge badge-ok">신규</span>`;
     return `<tr style="border-top:1px solid var(--border)">
       <td style="padding:6px 10px;font-weight:600">${r.name}</td>
       <td style="padding:6px 10px;color:var(--text-2)">${r.cat||'-'}</td>
@@ -5262,19 +5259,12 @@ function renderDictTable(){
   document.getElementById('etfDictBody').innerHTML = filtered.length
     ? filtered.map((e,i)=>`<tr>
         <td style="font-size:12px;font-weight:600">${e.name}</td>
-        <td><span style="background:var(--blue-soft);color:var(--blue);font-size:10px;font-weight:700;
-          padding:2px 8px;border-radius:20px">${e.category||'-'}</span></td>
+        <td><span class="badge badge-info">${e.category||'-'}</span></td>
         <td style="font-size:12px;font-family:monospace">${e.ticker||'-'}</td>
-        <td><span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;
-          background:${e.src==='U'?'var(--green-soft)':'var(--bg2)'};
-          color:${e.src==='U'?'var(--green)':'var(--text-3)'}">${e.src==='U'?'사용자':'내장'}</span></td>
+        <td><span class="badge ${e.src==='U'?'badge-ok':'badge-neutral'}">${e.src==='U'?'사용자':'내장'}</span></td>
         <td>
           <button onclick="addEtfFromDict(${JSON.stringify(e).replace(/"/g,'&quot;')})"
-            style="padding:3px 10px;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;
-              border:1.5px solid var(--border2);background:var(--surface);color:var(--text-2);
-              transition:all .15s;white-space:nowrap"
-            onmouseover="this.style.borderColor='var(--blue)';this.style.color='var(--blue)';this.style.background='var(--blue-soft)'"
-            onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--text-2)';this.style.background='var(--surface)'">
+            class="btn-o" style="padding:3px 10px;font-size:11px;white-space:nowrap">
             + 종목관리
           </button>
         </td>
@@ -5507,6 +5497,29 @@ function toggleHoldPaste(){
 
 let _holdParsedRows = [];
 
+// ── 붙여넣기 가져오기 공용: 종목관리에 없으면 ETF사전에서 찾아 자동등록 ──
+// (보유/거래/배당 3개 붙여넣기 파서가 공통으로 사용)
+function matchEtfDict(etfRaw){
+  const dict = getFullDict();
+  return dict.find(e=>
+    e.name===etfRaw ||
+    (e.ticker && e.ticker.toUpperCase()===etfRaw.toUpperCase())
+  ) || null;
+}
+function ensureEtfFromDict(dictEntry){
+  let etfObj = DB.etfs.find(e=>
+    e.name===dictEntry.name ||
+    (dictEntry.ticker && e.ticker && e.ticker.toUpperCase()===dictEntry.ticker.toUpperCase())
+  );
+  if(!etfObj){
+    etfObj = { id:'ETF_'+Date.now()+'_'+Math.random().toString(36).slice(2,6),
+      name:dictEntry.name, category:dictEntry.category||dictEntry.name,
+      ticker:dictEntry.ticker||'', targetWeight:0, goalQty:0, accTarget:{} };
+    DB.etfs.push(etfObj);
+  }
+  return etfObj;
+}
+
 function parseHoldPaste(){
   const raw = document.getElementById('holdPasteArea').value.trim();
   if(!raw){ showToast('붙여넣을 내용이 없습니다.'); return; }
@@ -5545,6 +5558,8 @@ function parseHoldPaste(){
       etfRaw.includes(e.name) ||
       (e.ticker && e.ticker.toUpperCase()===etfRaw.toUpperCase())
     );
+    // 종목관리에 없으면 ETF사전에서 찾아 자동등록 후보로 표시
+    const etfDictMatch = !etfObj ? matchEtfDict(etfRaw) : null;
 
     const evalAmt = qty>0 && price>0 ? Math.round(qty*price) : 0;
 
@@ -5552,7 +5567,8 @@ function parseHoldPaste(){
       accRaw, etfRaw, qty, avg, price, evalAmt,
       accObj: accObj||null,
       etfObj: etfObj||null,
-      ok: !!(accObj && etfObj && qty>0)
+      etfDictMatch,
+      ok: !!(accObj && (etfObj||etfDictMatch) && qty>0)
     });
   });
 
@@ -5562,25 +5578,26 @@ function parseHoldPaste(){
 
   const okCnt   = parsed.filter(r=>r.ok).length;
   const errCnt  = parsed.filter(r=>!r.ok).length;
+  const dictCnt = parsed.filter(r=>r.ok && r.etfDictMatch).length;
   document.getElementById('holdPastePreviewLbl').textContent =
-    `총 ${parsed.length}행 · 정상 ${okCnt}개 · 오류 ${errCnt}개${warns.length?' · '+warns.length+'행 무시':''}`;
+    `총 ${parsed.length}행 · 정상 ${okCnt}개${dictCnt?` (사전에서 자동등록 ${dictCnt}개)`:''} · 오류 ${errCnt}개${warns.length?' · '+warns.length+'행 무시':''}`;
 
   const W2l = n => (n>=0?'+':'-')+'₩'+Math.abs(Math.round(n)).toLocaleString();
 
   document.getElementById('holdPasteTbody').innerHTML = parsed.map(r=>{
     const accBadge = r.accObj
-      ? `<span style="background:${r.accObj.color}22;color:${r.accObj.color};
-          font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px">${r.accObj.label}</span>`
-      : `<span style="background:var(--pos-soft);color:var(--pos);font-size:10px;font-weight:700;
-          padding:2px 7px;border-radius:20px" title="계좌 없음">⚠ ${r.accRaw}</span>`;
+      ? `<span class="badge" style="background:${r.accObj.color}22;color:${r.accObj.color}">${r.accObj.label}</span>`
+      : `<span class="badge badge-err" title="계좌 없음">⚠ ${r.accRaw}</span>`;
     const etfBadge = r.etfObj
       ? `<span style="font-weight:600">${r.etfObj.name}</span>`
+      : r.etfDictMatch
+      ? `<span style="font-weight:600;color:var(--blue)" title="ETF사전에서 자동등록됩니다">🆕 ${r.etfDictMatch.name}</span>`
       : `<span style="color:var(--pos);font-weight:700" title="종목 없음">⚠ ${r.etfRaw}</span>`;
     const statusBadge = r.ok
-      ? `<span style="background:var(--green-soft);color:var(--green);font-size:10px;font-weight:700;
-          padding:2px 7px;border-radius:20px">정상</span>`
-      : `<span style="background:var(--pos-soft);color:var(--pos);font-size:10px;font-weight:700;
-          padding:2px 7px;border-radius:20px">${!r.accObj?'계좌불일치':!r.etfObj?'종목불일치':'수량없음'}</span>`;
+      ? (r.etfDictMatch
+          ? `<span class="badge badge-info">사전 자동등록</span>`
+          : `<span class="badge badge-ok">정상</span>`)
+      : `<span class="badge badge-err">${!r.accObj?'계좌불일치':!(r.etfObj||r.etfDictMatch)?'종목불일치':'수량없음'}</span>`;
     return `<tr style="border-top:1px solid var(--border)">
       <td style="padding:7px 10px">${accBadge}</td>
       <td style="padding:7px 10px">${etfBadge}</td>
@@ -5612,13 +5629,14 @@ function applyHoldPaste(){
   }
 
   okRows.forEach(r=>{
+    const etfObj = r.etfObj || ensureEtfFromDict(r.etfDictMatch);
     const evalAmt = r.qty>0 && r.price>0 ? Math.round(r.qty*r.price)
                   : r.qty>0 && r.avg>0   ? Math.round(r.qty*r.avg) : 0;
     // 같은 날짜·계좌·종목이 이미 있으면 업데이트, 없으면 추가
     const existing = DB.holdings.find(h=>
       h.baseDate===baseDate &&
       h.accountId===r.accObj.id &&
-      h.etfId===r.etfObj.id
+      h.etfId===etfObj.id
     );
     if(existing){
       existing.qty = r.qty;
@@ -5628,7 +5646,7 @@ function applyHoldPaste(){
       DB.holdings.push({
         baseDate,
         accountId: r.accObj.id,
-        etfId:     r.etfObj.id,
+        etfId:     etfObj.id,
         qty:       r.qty,
         avgCost:   r.avg||0,
         evalAmount: evalAmt,
@@ -5827,7 +5845,7 @@ function renderHoldMgr(){
     const textStyle = '';
     const activeBadge = isActive
 
-      ? `<span style="font-size:9px;font-weight:700;color:var(--blue);
+      ? `<span style="font-size:10px;font-weight:700;color:var(--blue);
           background:var(--blue-mid);border-radius:4px;padding:1px 5px;margin-left:4px">현재</span>`
       : '';
 
@@ -6004,7 +6022,7 @@ function renderAccMgr(){
         <span style="font-size:11px;color:var(--text-3);margin-left:6px">${a.color}</span></td>
     <td style="white-space:nowrap;font-weight:600">
       ${dispAmt>0?W(dispAmt):'-'}
-      ${isManual?`<span style="font-size:9px;font-weight:600;color:var(--blue);background:var(--blue-soft);padding:1px 5px;border-radius:4px;margin-left:3px">수동</span>`:''}
+      ${isManual?`<span style="font-size:10px;font-weight:600;color:var(--blue);background:var(--blue-soft);padding:1px 5px;border-radius:4px;margin-left:3px">수동</span>`:''}
     </td>
     <td style="white-space:nowrap">
       ${dispAmt>0
@@ -6209,7 +6227,7 @@ function renderBenchmarkCompare(){
 function setFireMode(mode){
   DB.fireSettings = DB.fireSettings || {};
   DB.fireSettings.mode = mode;
-  const onCol  = 'var(--blue)', offCol = 'transparent';
+  const onCol  = 'var(--acc-fire)', offCol = 'transparent';
   const incBtn = document.getElementById('fireModeIncome');
   const astBtn = document.getElementById('fireModeAsset');
   incBtn.style.background = mode==='income' ? onCol : offCol;
@@ -6384,7 +6402,7 @@ function renderFireMilestoneTimeline(series, current){
     return `<div style="background:var(--bg2);border-radius:12px;padding:12px 10px;text-align:center;flex:1">
       <div style="font-size:10px;color:var(--text-3);font-weight:600;margin-bottom:6px">${p.label}</div>
       <div style="font-size:13px;font-weight:800;color:var(--text-1)">${WK(val)}</div>
-      <div style="font-size:9px;color:var(--pos);margin-top:3px">+${pct.toFixed(0)}%</div>
+      <div style="font-size:10px;color:var(--pos);margin-top:3px">+${pct.toFixed(0)}%</div>
     </div>`;
   }).join('');
 }
@@ -6523,7 +6541,7 @@ function renderDivSelects(){
 let _dvChartMode = 'month'; // 'month': 최근 12개월 / 'year': 연도별 전체
 function setDvChartMode(mode){
   _dvChartMode = mode;
-  const onCol='var(--blue)', offCol='transparent';
+  const onCol='var(--acc-div)', offCol='transparent';
   const mBtn=document.getElementById('dvChartModeMonth'), yBtn=document.getElementById('dvChartModeYear');
   if(mBtn){ mBtn.style.background = mode==='month' ? onCol : offCol; mBtn.style.color = mode==='month' ? '#fff' : 'var(--text-2)'; }
   if(yBtn){ yBtn.style.background = mode==='year'  ? onCol : offCol; yBtn.style.color = mode==='year'  ? '#fff' : 'var(--text-2)'; }
@@ -6592,7 +6610,7 @@ function renderDivList(){
     const etf = DB.etfs.find(e=>e.id===d.etfId);
     const krwAmt = getDividendKrwAmount(d);
     const taxBadge = d.taxStatus==='pre'
-      ? `<span style="font-size:9px;font-weight:700;color:var(--amber);background:var(--amber-soft);padding:1px 5px;border-radius:8px;margin-left:4px">세전</span>` : '';
+      ? `<span style="font-size:10px;font-weight:700;color:var(--amber);background:var(--amber-soft);padding:1px 5px;border-radius:8px;margin-left:4px">세전</span>` : '';
     const amtCell = d.currency==='USD'
       ? `<div style="white-space:nowrap;color:var(--pos);font-weight:700">$${(d.amount||0).toLocaleString()}${taxBadge}</div>
          <div style="font-size:10px;color:var(--text-3)">≈ ${W(krwAmt)} (환율 ${d.fxRate||'-'})</div>`
@@ -6618,7 +6636,7 @@ function renderDivList(){
 let _dvAccMode = 'all'; // 'all': 전체 누적 / '12m': 최근 12개월
 function setDvAccMode(mode){
   _dvAccMode = mode;
-  const onCol='var(--blue)', offCol='transparent';
+  const onCol='var(--acc-div)', offCol='transparent';
   const allBtn=document.getElementById('dvAccModeAll'), mBtn=document.getElementById('dvAccMode12m');
   if(allBtn){ allBtn.style.background = mode==='all' ? onCol : offCol; allBtn.style.color = mode==='all' ? '#fff' : 'var(--text-2)'; }
   if(mBtn){ mBtn.style.background = mode==='12m' ? onCol : offCol; mBtn.style.color = mode==='12m' ? '#fff' : 'var(--text-2)'; }
@@ -6673,7 +6691,7 @@ function renderDivByAccount(){
 let _dvEtfMode = 'all'; // 'all': 전체 누적 / '12m': 최근 12개월
 function setDvEtfMode(mode){
   _dvEtfMode = mode;
-  const onCol='var(--blue)', offCol='transparent';
+  const onCol='var(--acc-div)', offCol='transparent';
   const allBtn=document.getElementById('dvEtfModeAll'), mBtn=document.getElementById('dvEtfMode12m');
   if(allBtn){ allBtn.style.background = mode==='all' ? onCol : offCol; allBtn.style.color = mode==='all' ? '#fff' : 'var(--text-2)'; }
   if(mBtn){ mBtn.style.background = mode==='12m' ? onCol : offCol; mBtn.style.color = mode==='12m' ? '#fff' : 'var(--text-2)'; }
@@ -6756,7 +6774,7 @@ function updateDvFxPreview(){
 let _dvTaxStatus = 'post';
 function setDvTaxStatus(status){
   _dvTaxStatus = status;
-  const onCol='var(--blue)', offCol='transparent';
+  const onCol='var(--acc-div)', offCol='transparent';
   const postBtn=document.getElementById('dvTaxPost'), preBtn=document.getElementById('dvTaxPre');
   postBtn.style.background = status==='post' ? onCol : offCol; postBtn.style.color = status==='post' ? '#fff' : 'var(--text-2)';
   preBtn.style.background  = status==='pre'  ? onCol : offCol; preBtn.style.color  = status==='pre'  ? '#fff' : 'var(--text-2)';
@@ -6771,7 +6789,7 @@ function toggleEditDvFxField(){
 let _editDvTaxStatus = 'post';
 function setEditDvTaxStatus(status){
   _editDvTaxStatus = status;
-  const onCol='var(--blue)', offCol='transparent';
+  const onCol='var(--acc-div)', offCol='transparent';
   const postBtn=document.getElementById('editDvTaxPost'), preBtn=document.getElementById('editDvTaxPre');
   postBtn.style.background = status==='post' ? onCol : offCol; postBtn.style.color = status==='post' ? '#fff' : 'var(--text-2)';
   preBtn.style.background  = status==='pre'  ? onCol : offCol; preBtn.style.color  = status==='pre'  ? '#fff' : 'var(--text-2)';
@@ -6978,9 +6996,10 @@ function parseDivPaste(){
       etfRaw.includes(e.name) ||
       (e.ticker && e.ticker.toUpperCase()===etfRaw.toUpperCase())
     ) : null;
+    const etfDictMatch = (etfRaw && !etfObj) ? matchEtfDict(etfRaw) : null;
 
     parsed.push({
-      dateRaw, dateNorm, accRaw, etfRaw, etfObj, accObj, amount, memo,
+      dateRaw, dateNorm, accRaw, etfRaw, etfObj, etfDictMatch, accObj, amount, memo,
       ok: !!(dateNorm && accObj && amount>0)
     });
   });
@@ -6991,27 +7010,27 @@ function parseDivPaste(){
 
   const okCnt  = parsed.filter(r=>r.ok).length;
   const errCnt = parsed.filter(r=>!r.ok).length;
+  const dictCnt = parsed.filter(r=>r.ok && r.etfDictMatch).length;
   document.getElementById('divPastePreviewLbl').textContent =
-    `총 ${parsed.length}행 · 정상 ${okCnt}개 · 오류 ${errCnt}개${skippedHeader?' · 헤더 1행 무시':''}`;
+    `총 ${parsed.length}행 · 정상 ${okCnt}개${dictCnt?` (사전에서 자동등록 ${dictCnt}개)`:''} · 오류 ${errCnt}개${skippedHeader?' · 헤더 1행 무시':''}`;
 
   document.getElementById('divPasteTbody').innerHTML = parsed.map(r=>{
     const dateBadge = r.dateNorm
       ? r.dateNorm
       : `<span style="color:var(--pos);font-weight:700" title="날짜 형식 오류">⚠ ${r.dateRaw||'-'}</span>`;
     const accBadge = r.accObj
-      ? `<span style="background:${r.accObj.color}22;color:${r.accObj.color};
-          font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px">${r.accObj.label}</span>`
-      : `<span style="background:var(--pos-soft);color:var(--pos);font-size:10px;font-weight:700;
-          padding:2px 7px;border-radius:20px" title="계좌 없음">⚠ ${r.accRaw||'-'}</span>`;
+      ? `<span class="badge" style="background:${r.accObj.color}22;color:${r.accObj.color}">${r.accObj.label}</span>`
+      : `<span class="badge badge-err" title="계좌 없음">⚠ ${r.accRaw||'-'}</span>`;
     const etfBadge = r.etfRaw
       ? (r.etfObj ? `<span style="font-weight:600">${r.etfObj.name}</span>`
+                  : r.etfDictMatch ? `<span style="font-weight:600;color:var(--blue)" title="ETF사전에서 자동등록됩니다">🆕 ${r.etfDictMatch.name}</span>`
                   : `<span style="color:var(--pos);font-weight:700" title="종목 불일치 → 미지정으로 저장">⚠ ${r.etfRaw}</span>`)
       : `<span style="color:var(--text-3)">(미지정)</span>`;
     const statusBadge = r.ok
-      ? `<span style="background:var(--green-soft);color:var(--green);font-size:10px;font-weight:700;
-          padding:2px 7px;border-radius:20px">정상</span>`
-      : `<span style="background:var(--pos-soft);color:var(--pos);font-size:10px;font-weight:700;
-          padding:2px 7px;border-radius:20px">${!r.dateNorm?'날짜오류':!r.accObj?'계좌불일치':'금액없음'}</span>`;
+      ? (r.etfDictMatch
+          ? `<span class="badge badge-info">사전 자동등록</span>`
+          : `<span class="badge badge-ok">정상</span>`)
+      : `<span class="badge badge-err">${!r.dateNorm?'날짜오류':!r.accObj?'계좌불일치':'금액없음'}</span>`;
     return `<tr style="border-top:1px solid var(--border)">
       <td style="padding:7px 10px">${dateBadge}</td>
       <td style="padding:7px 10px">${accBadge}</td>
@@ -7036,7 +7055,7 @@ function applyDivPaste(){
   let added=0, dupSkipped=0;
   okRows.forEach(r=>{
     const accountId = r.accObj.id;
-    const etfId = r.etfObj ? r.etfObj.id : '';
+    const etfId = r.etfObj ? r.etfObj.id : (r.etfDictMatch ? ensureEtfFromDict(r.etfDictMatch).id : '');
     // 동일 날짜·계좌·종목·금액 행이 이미 있으면 중복으로 보고 건너뜀 (같은 시트를 두 번 붙여넣는 실수 방지)
     const dup = DB.dividends.find(d=>
       d.date===r.dateNorm && d.accountId===accountId && (d.etfId||'')===etfId && d.amount===r.amount
@@ -7050,6 +7069,7 @@ function applyDivPaste(){
   toggleDivPaste();
   renderDivFilterRow(); renderDivSummary(); renderDivByAccount(); renderDivByEtf(); renderDivList();
   calcFire();
+  renderDataTab();
   showToast(`배당금 ${added}건을 가져왔습니다.${dupSkipped?` (중복 ${dupSkipped}건 건너뜀)`:''}`);
   save();
 }
@@ -7353,9 +7373,9 @@ function renderTradeList(){
     const etf = DB.etfs.find(e=>e.id===t.etfId);
     const amt = t.qty * t.price;
     const typeBadge = (t.type==='buy'
-      ? `<span style="background:var(--blue-soft);color:var(--blue);font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px">매수</span>`
-      : `<span style="background:#FEF3C7;color:#B45309;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px">매도</span>`)
-      + (t.reflect===false ? `<br><span style="font-size:9px;font-weight:700;color:var(--text-3);background:var(--bg2);padding:1px 6px;border-radius:10px;margin-top:2px;display:inline-block">📝 기록만</span>` : '');
+      ? `<span class="badge badge-buy">매수</span>`
+      : `<span class="badge badge-sell">매도</span>`)
+      + (t.reflect===false ? `<br><span style="font-size:10px;font-weight:700;color:var(--text-3);background:var(--bg2);padding:1px 6px;border-radius:10px;margin-top:2px;display:inline-block">📝 기록만</span>` : '');
     const gainTxt = t.type==='sell' && t.realizedGain!==undefined
       ? `<span style="color:${t.realizedGain>=0?'var(--pos)':'var(--neg)'};font-weight:700">${W2(t.realizedGain)}</span>`
       : `<span style="color:var(--text-3)">-</span>`;
@@ -7589,10 +7609,11 @@ function parseTrPaste(){
       (etfRaw && etfRaw.includes(e.name)) ||
       (e.ticker && etfRaw && e.ticker.toUpperCase()===etfRaw.toUpperCase())
     );
+    const etfDictMatch = (!etfObj && etfRaw) ? matchEtfDict(etfRaw) : null;
 
     parsed.push({
-      dateRaw, dateNorm, accRaw, accObj, etfRaw, etfObj, typeRaw, type, qty, price, fee, memo,
-      ok: !!(dateNorm && accObj && etfObj && type && qty>0 && price>0)
+      dateRaw, dateNorm, accRaw, accObj, etfRaw, etfObj, etfDictMatch, typeRaw, type, qty, price, fee, memo,
+      ok: !!(dateNorm && accObj && (etfObj||etfDictMatch) && type && qty>0 && price>0)
     });
   });
 
@@ -7602,31 +7623,32 @@ function parseTrPaste(){
 
   const okCnt  = parsed.filter(r=>r.ok).length;
   const errCnt = parsed.filter(r=>!r.ok).length;
+  const dictCnt = parsed.filter(r=>r.ok && r.etfDictMatch).length;
   document.getElementById('trPastePreviewLbl').textContent =
-    `총 ${parsed.length}행 · 정상 ${okCnt}개 · 오류 ${errCnt}개${skippedHeader?' · 헤더 1행 무시':''}`;
+    `총 ${parsed.length}행 · 정상 ${okCnt}개${dictCnt?` (사전에서 자동등록 ${dictCnt}개)`:''} · 오류 ${errCnt}개${skippedHeader?' · 헤더 1행 무시':''}`;
 
   document.getElementById('trPasteTbody').innerHTML = parsed.map(r=>{
     const dateBadge = r.dateNorm
       ? r.dateNorm
       : `<span style="color:var(--pos);font-weight:700" title="날짜 형식 오류">⚠ ${r.dateRaw||'-'}</span>`;
     const accBadge = r.accObj
-      ? `<span style="background:${r.accObj.color}22;color:${r.accObj.color};
-          font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px">${r.accObj.label}</span>`
-      : `<span style="background:var(--pos-soft);color:var(--pos);font-size:10px;font-weight:700;
-          padding:2px 7px;border-radius:20px" title="계좌 없음">⚠ ${r.accRaw||'-'}</span>`;
+      ? `<span class="badge" style="background:${r.accObj.color}22;color:${r.accObj.color}">${r.accObj.label}</span>`
+      : `<span class="badge badge-err" title="계좌 없음">⚠ ${r.accRaw||'-'}</span>`;
     const etfBadge = r.etfObj
       ? `<span style="font-weight:600">${r.etfObj.name}</span>`
+      : r.etfDictMatch
+      ? `<span style="font-weight:600;color:var(--blue)" title="ETF사전에서 자동등록됩니다">🆕 ${r.etfDictMatch.name}</span>`
       : `<span style="color:var(--pos);font-weight:700" title="종목 불일치">⚠ ${r.etfRaw||'-'}</span>`;
     const typeBadge = r.type
       ? (r.type==='buy'
-          ? `<span style="background:var(--blue-soft);color:var(--blue);font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px">매수</span>`
-          : `<span style="background:#FEF3C7;color:#B45309;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px">매도</span>`)
+          ? `<span class="badge badge-buy">매수</span>`
+          : `<span class="badge badge-sell">매도</span>`)
       : `<span style="color:var(--pos);font-weight:700" title="구분 인식 불가">⚠ ${r.typeRaw||'-'}</span>`;
     const statusBadge = r.ok
-      ? `<span style="background:var(--green-soft);color:var(--green);font-size:10px;font-weight:700;
-          padding:2px 7px;border-radius:20px">정상</span>`
-      : `<span style="background:var(--pos-soft);color:var(--pos);font-size:10px;font-weight:700;
-          padding:2px 7px;border-radius:20px">${!r.dateNorm?'날짜오류':!r.accObj?'계좌불일치':!r.etfObj?'종목불일치':!r.type?'구분오류':'수량/단가없음'}</span>`;
+      ? (r.etfDictMatch
+          ? `<span class="badge badge-info">사전 자동등록</span>`
+          : `<span class="badge badge-ok">정상</span>`)
+      : `<span class="badge badge-err">${!r.dateNorm?'날짜오류':!r.accObj?'계좌불일치':!(r.etfObj||r.etfDictMatch)?'종목불일치':!r.type?'구분오류':'수량/단가없음'}</span>`;
     return `<tr style="border-top:1px solid var(--border)">
       <td style="padding:7px 10px">${dateBadge}</td>
       <td style="padding:7px 10px">${accBadge}</td>
@@ -7655,7 +7677,8 @@ function applyTrPaste(){
 
   okRows.forEach(r=>{
     const accountId = r.accObj.id;
-    const etfId = r.etfObj.id;
+    const etfObj = r.etfObj || ensureEtfFromDict(r.etfDictMatch);
+    const etfId = etfObj.id;
     // 동일 날짜·계좌·종목·구분·수량·단가 행이 이미 있으면 중복으로 보고 건너뜀
     const dup = DB.trades.find(t=>
       t.date===r.dateNorm && t.accountId===accountId && t.etfId===etfId &&
@@ -7934,7 +7957,10 @@ function togglePriceApiSettings(){
   const p = document.getElementById('priceApiPanel');
   const open = p.style.display !== 'none';
   p.style.display = open ? 'none' : 'block';
-  if(!open) document.getElementById('priceApiUrlInput').value = DB.meta.priceApiUrl || '';
+  if(!open){
+    document.getElementById('priceApiUrlInput').value = DB.meta.priceApiUrl || '';
+    document.getElementById('priceApiTokenInput').value = DB.meta.priceApiToken || '';
+  }
 }
 function togglePriceApiHelp(){
   const b = document.getElementById('priceApiHelpBody');
@@ -7948,15 +7974,31 @@ function copyPriceApiCode(){
     .then(()=>showToast('코드가 복사되었습니다. Apps Script에 붙여넣어주세요.'))
     .catch(()=>showToast('복사에 실패했습니다. 코드를 직접 드래그해서 복사해주세요.'));
 }
+function generatePriceApiToken(){
+  const token = Array.from(crypto.getRandomValues(new Uint8Array(16)))
+    .map(b=>b.toString(16).padStart(2,'0')).join('');
+  document.getElementById('priceApiTokenInput').value = token;
+  showToast('랜덤 토큰이 생성되었습니다. 저장 후 Apps Script 코드의 SECRET_TOKEN도 동일하게 바꿔주세요.');
+}
 function savePriceApiUrl(){
   const v = document.getElementById('priceApiUrlInput').value.trim();
+  const tk = document.getElementById('priceApiTokenInput').value.trim();
   DB.meta.priceApiUrl = v;
+  DB.meta.priceApiToken = tk;
   save();
   showToast(v ? '가격조회 URL이 저장되었습니다.' : '가격조회 URL이 비워졌습니다.');
   if(v){
     const p = document.getElementById('priceApiPanel');
     if(p) p.style.display = 'none';
   }
+}
+// API 호출 URL에 토큰 파라미터를 안전하게 붙여주는 헬퍼
+function withToken(url, extraParams){
+  const sep = url.includes('?') ? '&' : '?';
+  const token = (DB.meta.priceApiToken||'').trim();
+  let out = url + sep + 'token=' + encodeURIComponent(token);
+  if(extraParams) out += '&' + extraParams;
+  return out;
 }
 
 /* ═══ 여러 기기 동기화 (구글시트 경유) ═══ */
@@ -7971,12 +8013,16 @@ async function syncUpload(){
   if(btn){ btn.disabled = true; btn.textContent = '⏳ 업로드 중...'; }
   try{
     const json = JSON.stringify(DB);
-    const res = await fetch(url + '?action=saveDB', {
+    const res = await fetch(withToken(url, 'action=saveDB'), {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // CORS 사전요청 회피용
       body: json
     });
     const data = await res.json();
+    if(data.error==='unauthorized'){
+      showToast('인증 실패 — 토큰이 Apps Script 코드의 SECRET_TOKEN과 일치하는지 확인해주세요.');
+      return;
+    }
     if(data.ok){
       const ts = new Date(data.savedAt).toLocaleString('ko-KR');
       setSyncStatus(`마지막 업로드: ${ts}`);
@@ -7999,15 +8045,18 @@ async function syncDownload(){
   const btn = document.getElementById('btnSyncDownload');
   if(btn){ btn.disabled = true; btn.textContent = '⏳ 가져오는 중...'; }
   try{
-    const res = await fetch(url + '?action=loadDB');
+    const res = await fetch(withToken(url, 'action=loadDB'));
     const data = await res.json();
+    if(data.error==='unauthorized'){ showToast('인증 실패 — 토큰이 Apps Script 코드의 SECRET_TOKEN과 일치하는지 확인해주세요.'); return; }
     if(!data.data){ showToast('클라우드에 저장된 데이터가 없습니다. 먼저 업로드해주세요.'); return; }
     const p = JSON.parse(data.data);
 
-    // 현재 priceApiUrl은 유지(덮어쓰지 않음) — 기기마다 같은 URL을 직접 등록했으므로
+    // 현재 priceApiUrl/토큰은 유지(덮어쓰지 않음) — 기기마다 직접 등록했으므로
     const keepUrl = DB.meta.priceApiUrl;
+    const keepToken = DB.meta.priceApiToken;
     if(!mergeImportedDB(p)){ showToast('받아온 데이터 형식이 올바르지 않습니다.'); return; }
     DB.meta.priceApiUrl = keepUrl;
+    DB.meta.priceApiToken = keepToken;
 
     save();
     renderAll();
@@ -8025,8 +8074,7 @@ async function syncDownload(){
 async function fetchPriceMap(tickers){
   const url = (DB.meta.priceApiUrl||'').trim();
   if(!url) return null;
-  const sep = url.includes('?') ? '&' : '?';
-  const res = await fetch(url + sep + 'tickers=' + encodeURIComponent(tickers.join(',')));
+  const res = await fetch(withToken(url, 'tickers=' + encodeURIComponent(tickers.join(','))));
   if(!res.ok) throw new Error('HTTP '+res.status);
   return await res.json();
 }
